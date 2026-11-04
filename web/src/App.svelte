@@ -2,6 +2,7 @@
   import { tick } from 'svelte';
   import Nav from './components/Nav.svelte';
   import { apiGet } from './lib/api';
+  import { devMode } from './lib/devmode.svelte';
   import { i18n, t, type Key, type Lang } from './lib/i18n.svelte';
   import { connectivity } from './lib/online.svelte';
   import { href, navigate, route } from './lib/router';
@@ -108,6 +109,12 @@
   <main id="main" tabindex="-1" bind:this={mainEl}>
     {#if !connectivity.online}
       <p class="offline" role="status">{t('app.offline')}</p>
+    {/if}
+    {#if devMode.stepUpSkipped}
+      <div class="offline dev" role="status" data-testid="dev-stepup-banner">
+        <strong>{t('app.devStepUpSkipped')}</strong>
+        <span>{t('app.devStepUpSkippedDetail')}</span>
+      </div>
     {/if}
 
     {#if !$route.known}
@@ -234,6 +241,16 @@
     border-radius: var(--radius-md);
     padding: var(--space-2) var(--space-3);
     font-weight: 600;
+  }
+  .dev {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    border: 2px dashed var(--color-warning);
+  }
+  .dev span {
+    font-weight: 400;
+    font-size: var(--text-sm);
   }
 
   @media (min-width: 900px) {

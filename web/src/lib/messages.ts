@@ -13,6 +13,8 @@ export const en = {
   'app.pageNotFound': 'Page not found',
   'app.goHome': 'Go to Home',
   'app.loading': 'Loading…',
+  'app.devStepUpSkipped': 'Dev mode: passkey step-up skipped',
+  'app.devStepUpSkippedDetail': 'This test server has BANK_DEV_TEST_LOGIN=1 and this browser cannot use passkeys here, so the confirmation was recorded without one. Never use this outside testing.',
   'lang.label': 'Language',
 
   // Screen titles and navigation
@@ -202,6 +204,8 @@ export const en = {
   'signin.demo.bob': 'Bob (customer)',
   'signin.demo.carol': 'Carol (staff approver)',
   'signin.demo.dave': 'Dave (staff initiator)',
+  'signin.devFallback':
+    'Passkeys are not available here: they need a secure (https) connection, which this test build does not have. Use a demo sign-in below; payment confirmations are skipped in this mode.',
   'signin.registerTitle': 'New here? Create a passkey',
   'signin.handle': 'Handle',
   'signin.handleHint': 'A unique name, e.g. alice.',
@@ -323,6 +327,9 @@ export const he: Dict = {
   'app.pageNotFound': 'הדף לא נמצא',
   'app.goHome': 'מעבר לדף הבית',
   'app.loading': 'טוען…',
+  'app.devStepUpSkipped': 'מצב פיתוח: אימות passkey דולג',
+  'app.devStepUpSkippedDetail':
+    'שרת בדיקה זה פועל עם BANK_DEV_TEST_LOGIN=1, ודפדפן זה אינו יכול להשתמש כאן במפתחות גישה, ולכן האישור נרשם ללא מפתח גישה. אין להשתמש בכך מחוץ לסביבת בדיקות.',
   'lang.label': 'שפה',
 
   'title.home': 'בית',
@@ -503,6 +510,8 @@ export const he: Dict = {
   'signin.demo.bob': 'Bob (לקוח)',
   'signin.demo.carol': 'Carol (עובדת, מאשרת)',
   'signin.demo.dave': 'Dave (עובד, יוזם)',
+  'signin.devFallback':
+    'מפתחות גישה אינם זמינים כאן: הם דורשים חיבור מאובטח (https), שאינו קיים בגרסת בדיקה זו. ניתן להשתמש בהתחברות להדגמה שלהלן; במצב זה אימות התשלומים מדולג.',
   'signin.registerTitle': 'משתמש חדש? יצירת מפתח גישה',
   'signin.handle': 'שם משתמש',
   'signin.handleHint': 'שם ייחודי באותיות לטיניות, למשל alice.',

@@ -1,13 +1,12 @@
 <script lang="ts">
   import Card from '../components/Card.svelte';
   import Problem from '../components/Problem.svelte';
-  import { apiGet, apiPost, ProblemError } from '../lib/api';
+  import { apiPost, ProblemError } from '../lib/api';
   import { t, type Key } from '../lib/i18n.svelte';
   import { navigate, ROUTES } from '../lib/router';
   import { session } from '../lib/session.svelte';
   import { status } from '../lib/status.svelte';
-  import type { AppConfig } from '../lib/types';
-  import { describeWebAuthnError, login, register, webauthnSupported } from '../lib/webauthn';
+  import { currentEnv, describeWebAuthnError, loadConfig, login, register, useDevFallback, webauthnSupported } from '../lib/webauthn';
 
   interface Props {
     next?: string;
@@ -26,9 +25,13 @@
     { handle: 'dave', label: 'signin.demo.dave' },
   ];
   let devLogin = $state(false);
-  apiGet<AppConfig>('/api/config')
-    .then((c) => (devLogin = c.dev_test_login === true))
-    .catch(() => (devLogin = false));
+  // Dev-mode fallback (insecure WebView on a LAN test server): passkeys
+  // cannot work, so only the demo sign-in is offered, with a note why.
+  let devFallback = $state(false);
+  loadConfig().then((c) => {
+    devLogin = c?.dev_test_login === true;
+    devFallback = useDevFallback(c, currentEnv());
+  });
 
   async function onDemo(h: string) {
     error = null;
@@ -96,19 +99,23 @@
 <h1>{t('title.signIn')}</h1>
 <p class="muted">{t('signin.lead')}</p>
 
-{#if !supported}
+{#if devFallback}
+  <p class="dev-note" role="note">{t('signin.devFallback')}</p>
+{:else if !supported}
   <Problem error={new Error(t('signin.unsupported'))} />
 {/if}
 
 <div class="stack">
   {#if error}<Problem {error} />{/if}
 
+  {#if !devFallback}
   <Card title={t('signin.useTitle')} id="login">
     <p>{t('signin.useBody')}</p>
     <button type="button" onclick={onLogin} disabled={!supported || busy !== null} aria-busy={busy === 'login'}>
       {busy === 'login' ? t('signin.waiting') : t('signin.withPasskey')}
     </button>
   </Card>
+  {/if}
 
   {#if devLogin}
     <Card title={t('signin.demoTitle')} id="demo">
@@ -123,6 +130,7 @@
     </Card>
   {/if}
 
+  {#if !devFallback}
   <Card title={t('signin.registerTitle')} id="register">
     <form onsubmit={onRegister} novalidate>
       <div class="field">
@@ -151,4 +159,16 @@
       </button>
     </form>
   </Card>
+  {/if}
 </div>
+
+<style>
+  .dev-note {
+    background: var(--color-banner-bg);
+    color: var(--color-banner-text);
+    border: 2px dashed var(--color-warning);
+    border-radius: var(--radius-md);
+    padding: var(--space-2) var(--space-3);
+    font-weight: 600;
+  }
+</style>
