@@ -505,8 +505,9 @@ func (s *Service) BeginAddCredential(ctx context.Context, sess Session) (json.Ra
 // principal in: registering is also a login. For a new registration the
 // principal is created here, in the same transaction; if its handle was
 // taken meanwhile the result is ErrHandleTaken. For an added passkey the
-// caller must carry (in ctx or r's context) the session that began it. The
-// browser's previous session, if any, is ended.
+// caller must carry (in ctx or r's context) the session that began it, and
+// every other session of the principal is revoked (auth.sessions_revoked).
+// The browser's previous session, if any, is ended.
 func (s *Service) FinishRegistration(ctx context.Context, challengeID string, r *http.Request) (Session, error) {
 	body, err := readCredential(r)
 	if err != nil {
@@ -579,6 +580,11 @@ func (s *Service) finishRegistration(ctx context.Context, challengeID string, cr
 		if adding {
 			action = "auth.credential_added"
 			payload["session_id"] = current.ID // ended above, so no longer a bearer secret
+			// A new passkey ends every other session; only the one this
+			// ceremony signs in remains.
+			if err := s.revokeOtherSessionsTx(ctx, tx, user.id, sess.ID, "credential_added"); err != nil {
+				return err
+			}
 		}
 		return s.audit(ctx, tx, action, "principal:"+user.id.String(), &user.id, payload)
 	})
@@ -605,7 +611,8 @@ func (s *Service) BeginLogin(ctx context.Context) (json.RawMessage, string, erro
 // FinishLogin verifies the assertion in r's body and creates a session,
 // ending the browser's previous session (from ctx or r's context) if any.
 // A signature counter regression is allowed here but audited as
-// auth.clone_warning; step-up refuses it.
+// auth.clone_warning and ends the principal's other sessions; step-up
+// refuses it (and also ends the other sessions).
 func (s *Service) FinishLogin(ctx context.Context, challengeID string, r *http.Request) (Session, error) {
 	body, err := readCredential(r)
 	if err != nil {
@@ -656,6 +663,10 @@ func (s *Service) finishLogin(ctx context.Context, challengeID string, credentia
 		}
 		subject := "principal:" + user.id.String()
 		if cred.Authenticator.CloneWarning {
+			// A possibly cloned authenticator: end every other session.
+			if err := s.revokeOtherSessionsTx(ctx, tx, user.id, sess.ID, "clone_warning"); err != nil {
+				return err
+			}
 			if err := s.audit(ctx, tx, "auth.clone_warning", subject, &user.id, cloneWarningPayload("login", cred, parsed)); err != nil {
 				return err
 			}

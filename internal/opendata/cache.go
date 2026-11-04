@@ -30,7 +30,7 @@ func NewStore(pool *pgxpool.Pool) *Store { return &Store{pool: pool} }
 // Data["distance_km"] added. Without Near, order is provider id, then the
 // publisher's order.
 func (s *Store) Records(ctx context.Context, kind Kind, f Filter) ([]RecordWithMeta, error) {
-	rows, err := s.pool.Query(ctx, `select provider, fetched_at, source_url, license, payload
+	rows, err := s.pool.Query(ctx, `select provider, fetched_at, source_url, license, license_url, payload
 		from opendata.snapshots where kind = $1 order by provider`, string(kind))
 	if err != nil {
 		return nil, fmt.Errorf("opendata: query snapshots: %w", err)
@@ -40,11 +40,11 @@ func (s *Store) Records(ctx context.Context, kind Kind, f Filter) ([]RecordWithM
 	var out []RecordWithMeta
 	for rows.Next() {
 		var (
-			provider, src, lic string
-			at                 time.Time
-			payload            []byte
+			provider, src, lic, licURL string
+			at                         time.Time
+			payload                    []byte
 		)
-		if err := rows.Scan(&provider, &at, &src, &lic, &payload); err != nil {
+		if err := rows.Scan(&provider, &at, &src, &lic, &licURL, &payload); err != nil {
 			return nil, err
 		}
 		var recs []Record
@@ -63,7 +63,7 @@ func (s *Store) Records(ctx context.Context, kind Kind, f Filter) ([]RecordWithM
 				}
 				r.Data["distance_km"] = math.Round(haversineKM(f.Near.Lat, f.Near.Lon, lat, lon)*1000) / 1000
 			}
-			out = append(out, RecordWithMeta{Record: r, Provider: provider, FetchedAt: at.UTC(), SourceURL: src, License: lic})
+			out = append(out, RecordWithMeta{Record: r, Provider: provider, FetchedAt: at.UTC(), SourceURL: src, License: lic, LicenseURL: licURL})
 		}
 	}
 	if err := rows.Err(); err != nil {

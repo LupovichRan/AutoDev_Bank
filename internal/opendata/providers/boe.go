@@ -20,6 +20,12 @@ type BoE struct {
 	client *http.Client
 }
 
+// Short factual attribution; the publisher's terms at boeLicenseURL govern.
+const (
+	boeLicense    = "Bank of England Database; source: Bank of England"
+	boeLicenseURL = "https://www.bankofengland.co.uk/legal"
+)
+
 func NewBoE(baseURL string, client *http.Client) *BoE {
 	return &BoE{base: strings.TrimRight(baseURL, "/"), client: client}
 }
@@ -50,8 +56,7 @@ func (p *BoE) Fetch(ctx context.Context, kind opendata.Kind) (opendata.Result, e
 	if len(rows) == 0 || len(rows[0]) < 2 || strings.TrimSpace(rows[0][0]) != "DATE" || strings.TrimSpace(rows[0][1]) != "IUDBEDR" {
 		return opendata.Result{}, fmt.Errorf("boe: unexpected response (body %s)", snippet(body))
 	}
-	res := opendata.Result{SourceURL: url,
-		License: "Bank of England Database (https://www.bankofengland.co.uk/boeapps/database), reuse with attribution to the Bank of England"}
+	res := opendata.Result{SourceURL: url, License: boeLicense, LicenseURL: boeLicenseURL}
 	var last opendata.Record
 	var lastT time.Time
 	for _, row := range rows[1:] {

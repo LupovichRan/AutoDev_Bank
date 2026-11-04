@@ -90,6 +90,19 @@ func (s *Service) endSessionTx(ctx context.Context, tx pgx.Tx, sess Session, rea
 		map[string]any{"reason": reason})
 }
 
+// revokeOtherSessionsTx deletes every session of principalID except keepID
+// inside tx and, when any existed, audits auth.sessions_revoked with reason.
+// It runs when a passkey is added or a clone warning is seen (M6): whoever
+// held another session must sign in again.
+func (s *Service) revokeOtherSessionsTx(ctx context.Context, tx pgx.Tx, principalID uuid.UUID, keepID, reason string) error {
+	tag, err := tx.Exec(ctx, `delete from control.sessions where principal_id = $1 and id <> $2`, principalID, keepID)
+	if err != nil || tag.RowsAffected() == 0 {
+		return err
+	}
+	return s.audit(ctx, tx, "auth.sessions_revoked", "principal:"+principalID.String(), &principalID,
+		map[string]any{"reason": reason, "count": tag.RowsAffected()})
+}
+
 // TestLogin signs principalID in without an authenticator. It works only
 // when Config.AllowTestLogin is set (tests, and BANK_DEV_TEST_LOGIN=1 for
 // the Playwright harness) and must never be enabled in production.

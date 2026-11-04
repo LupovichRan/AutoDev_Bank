@@ -30,8 +30,8 @@ import (
 	"github.com/LupovichRan/AutoDev_Bank/web"
 )
 
-// runServe migrates the database, starts the open-data refresher and the
-// daily audit-root signer, and serves the API and web app on cfg.Addr until
+// runServe migrates the database, starts the open-data refresher, the
+// daily audit-root signer and the hourly expiry sweeps, and serves the API and web app on cfg.Addr until
 // ctx is cancelled (SIGINT/SIGTERM), then shuts down gracefully.
 func runServe(ctx context.Context, cfg Config, log *slog.Logger) error {
 	signer, err := auditSignerFor(cfg)
@@ -104,7 +104,7 @@ func runServe(ctx context.Context, cfg Config, log *slog.Logger) error {
 	handler := httpapi.New(httpapi.Deps{
 		Pool: pool, Ledger: led, Audit: rec, Approvals: ap, Auth: authSvc,
 		OpenData: od, Static: static, Log: log,
-		Origin: cfg.Origin, PublicRateLimitPerMinute: publicRate,
+		Origin: cfg.Origin, DevTestLogin: cfg.DevTestLogin, PublicRateLimitPerMinute: publicRate,
 	})
 
 	// The background goroutines use pool; stop and wait for them before the
@@ -115,7 +115,7 @@ func runServe(ctx context.Context, cfg Config, log *slog.Logger) error {
 		cancel()
 		wg.Wait()
 	}()
-	wg.Add(2)
+	wg.Add(3)
 	go func() {
 		defer wg.Done()
 		refresher.Run(ctx, 6*time.Hour) // refreshes once now, then every 6 hours
@@ -123,6 +123,10 @@ func runServe(ctx context.Context, cfg Config, log *slog.Logger) error {
 	go func() {
 		defer wg.Done()
 		signDailyRoots(ctx, rec, log)
+	}()
+	go func() {
+		defer wg.Done()
+		runSweeps(ctx, time.Hour, log, sweep{"approvals", ap.ExpireApprovals}, sweep{"ledger holds", led.ExpireHolds})
 	}()
 
 	srv := &http.Server{
@@ -193,6 +197,36 @@ func isDevOrigin(origin string) bool {
 	}
 	ip := net.ParseIP(host)
 	return ip != nil && ip.IsLoopback()
+}
+
+// sweep is one periodic expiry job: run returns how many items it expired.
+type sweep struct {
+	name string
+	run  func(context.Context) (int, error)
+}
+
+// runSweeps runs every sweep once now and then every interval until ctx is
+// done: pending approvals past expires_at become expired (R3) and ledger
+// holds past expires_at are voided (M9). A failing sweep is logged and
+// retried at the next tick.
+func runSweeps(ctx context.Context, interval time.Duration, log *slog.Logger, sweeps ...sweep) {
+	t := time.NewTicker(interval)
+	defer t.Stop()
+	for {
+		for _, s := range sweeps {
+			n, err := s.run(ctx)
+			if err != nil && ctx.Err() == nil {
+				log.Error("expiry sweep failed", "sweep", s.name, "expired", n, "err", err)
+			} else if n > 0 {
+				log.Info("expiry sweep", "sweep", s.name, "expired", n)
+			}
+		}
+		select {
+		case <-ctx.Done():
+			return
+		case <-t.C:
+		}
+	}
 }
 
 // signDailyRoots stores yesterday's (UTC) audit root at startup if it is

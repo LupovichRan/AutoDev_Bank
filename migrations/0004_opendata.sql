@@ -7,6 +7,8 @@ create table opendata.snapshots (
   fetched_at timestamptz not null,
   source_url text        not null,
   license    text        not null default '',
+  -- the publisher's terms page (license is only a short summary of it)
+  license_url text       not null default '',
   payload    jsonb       not null check (jsonb_typeof(payload) = 'array'),
   primary key (provider, kind)
 );

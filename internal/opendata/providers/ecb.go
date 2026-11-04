@@ -22,7 +22,11 @@ func NewECB(baseURL string, client *http.Client) *ECB {
 	return &ECB{base: strings.TrimRight(baseURL, "/"), client: client}
 }
 
-const ecbLicense = "ECB statistical data, reuse permitted with source attribution (European Central Bank, ECB Data Portal)"
+// Short factual attribution; the publisher's terms at ecbLicenseURL govern.
+const (
+	ecbLicense    = "ECB Data Portal; source: European Central Bank"
+	ecbLicenseURL = "https://www.ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html"
+)
 
 func (p *ECB) ID() string { return "ecb" }
 func (p *ECB) Kinds() []opendata.Kind {
@@ -37,7 +41,7 @@ func (p *ECB) Fetch(ctx context.Context, kind opendata.Kind) (opendata.Result, e
 		if err != nil {
 			return opendata.Result{}, err
 		}
-		res := opendata.Result{SourceURL: url, License: ecbLicense}
+		res := opendata.Result{SourceURL: url, License: ecbLicense, LicenseURL: ecbLicenseURL}
 		for _, o := range obs {
 			res.Records = append(res.Records, fxRecord("ecb", "EUR", o.dim, o.value, o.period, "European Central Bank"))
 		}
@@ -48,7 +52,7 @@ func (p *ECB) Fetch(ctx context.Context, kind opendata.Kind) (opendata.Result, e
 		if err != nil {
 			return opendata.Result{}, err
 		}
-		res := opendata.Result{SourceURL: url, License: ecbLicense}
+		res := opendata.Result{SourceURL: url, License: ecbLicense, LicenseURL: ecbLicenseURL}
 		for _, o := range obs {
 			res.Records = append(res.Records, policyRecord("ecb:policy:"+o.dim, "European Central Bank",
 				"Main refinancing operations - fixed rate", o.value, o.period))

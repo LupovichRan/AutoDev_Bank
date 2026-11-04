@@ -158,7 +158,14 @@ func (a *api) createTransfer(w http.ResponseWriter, r *http.Request) {
 	case err != nil:
 		WriteErr(w, r, err)
 	case out.Posted != nil:
-		JSON(w, http.StatusCreated, map[string]any{"transaction": transactionView(*out.Posted)})
+		// Only the caller's own side of the posting: the payee's entry (and
+		// its balance_after) is none of the payer's business.
+		held, err := a.heldAccounts(r.Context(), sess.PrincipalID, out.Posted.Entries)
+		if err != nil {
+			WriteErr(w, r, err)
+			return
+		}
+		JSON(w, http.StatusCreated, map[string]any{"transaction": transactionView(*out.Posted, held)})
 	default:
 		names, err := a.principalNames(r.Context(), []uuid.UUID{out.Approval.InitiatorID})
 		if err != nil {
@@ -229,20 +236,47 @@ type entryLite struct {
 	BalanceAfter int64  `json:"balance_after"`
 }
 
-func transactionView(t ledger.Transaction) transactionJSON {
+// transactionView renders t with only the entries on accounts in held (the
+// caller's own accounts).
+func transactionView(t ledger.Transaction, held map[uuid.UUID]bool) transactionJSON {
 	out := transactionJSON{
 		ID: t.ID.String(), IdempotencyKey: t.IdempotencyKey, Description: t.Description,
 		Currency: t.Currency, Status: t.Status, EffectiveDate: t.EffectiveDate.Format("2006-01-02"),
-		CreatedAt: t.CreatedAt.UTC(), Entries: make([]entryLite, len(t.Entries)),
+		CreatedAt: t.CreatedAt.UTC(), Entries: []entryLite{},
 	}
-	for i, e := range t.Entries {
-		out.Entries[i] = entryLite{ID: e.ID.String(), AccountID: e.AccountID.String(),
-			Amount: e.Amount, Currency: e.Currency, BalanceAfter: e.BalanceAfter}
+	for _, e := range t.Entries {
 		if out.Currency == "" {
 			out.Currency = e.Currency
 		}
+		if !held[e.AccountID] {
+			continue
+		}
+		out.Entries = append(out.Entries, entryLite{ID: e.ID.String(), AccountID: e.AccountID.String(),
+			Amount: e.Amount, Currency: e.Currency, BalanceAfter: e.BalanceAfter})
 	}
 	return out
+}
+
+// heldAccounts reports which of the entries' accounts principalID holds.
+func (a *api) heldAccounts(ctx context.Context, principalID uuid.UUID, entries []ledger.Entry) (map[uuid.UUID]bool, error) {
+	ids := make([]uuid.UUID, 0, len(entries))
+	for _, e := range entries {
+		ids = append(ids, e.AccountID)
+	}
+	rows, err := a.Pool.Query(ctx, `select account_id from control.account_holders
+		where principal_id = $1 and account_id = any($2)`, principalID, ids)
+	if err != nil {
+		return nil, err
+	}
+	held, err := pgx.CollectRows(rows, pgx.RowTo[uuid.UUID])
+	if err != nil {
+		return nil, err
+	}
+	out := make(map[uuid.UUID]bool, len(held))
+	for _, id := range held {
+		out[id] = true
+	}
+	return out, nil
 }
 
 // principalNames returns display names for ids in one query.

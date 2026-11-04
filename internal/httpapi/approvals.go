@@ -1,6 +1,7 @@
 package httpapi
 
 import (
+	"crypto/sha256"
 	"net/http"
 	"time"
 	"unicode/utf8"
@@ -31,6 +32,7 @@ type approvalJSON struct {
 	Decisions           []decisionJSON `json:"decisions"`
 	Subject             subjectJSON    `json:"subject"`
 	CreatedAt           time.Time      `json:"created_at"`
+	ExpiresAt           time.Time      `json:"expires_at"`
 	NotBefore           *time.Time     `json:"not_before"`
 	LedgerTransactionID *string        `json:"ledger_transaction_id"`
 }
@@ -50,6 +52,7 @@ func approvalView(ap approvals.Approval, names map[uuid.UUID]string) approvalJSO
 		Subject: subjectJSON{FromAccountID: ap.Subject.FromAccountID.String(),
 			ToAccountID: ap.Subject.ToAccountID.String(), Description: ap.Subject.Description},
 		CreatedAt: ap.CreatedAt.UTC(),
+		ExpiresAt: ap.ExpiresAt.UTC(),
 	}
 	if ap.NotBefore != nil {
 		nb := ap.NotBefore.UTC()
@@ -131,15 +134,60 @@ func (a *api) decideApproval(w http.ResponseWriter, r *http.Request) {
 		Write(w, r, http.StatusUnprocessableEntity, "", "invalid_reason", nil)
 		return
 	}
+	// R1: approving moves money, so it needs a fresh passkey step-up bound
+	// to this approval, like initiating does. It is consumed before Decide
+	// runs (a refused decision has spent it). Rejecting needs none.
+	if *req.Approve {
+		if err := a.Auth.RequireStepUp(r.Context(), sess, ApprovePayloadHash(id)); err != nil {
+			WriteErr(w, r, err)
+			return
+		}
+	}
 	ap, err := a.Approvals.Decide(r.Context(), id, sess.PrincipalID, *req.Approve, req.Reason)
 	if err != nil {
 		WriteErr(w, r, err)
 		return
 	}
+	a.writeApproval(w, r, ap)
+}
+
+// ApprovePayloadHash is the step-up payload hash that authorises approving
+// approval id: sha256("approve:" + id).
+func ApprovePayloadHash(id uuid.UUID) []byte {
+	h := sha256.Sum256([]byte("approve:" + id.String()))
+	return h[:]
+}
+
+// POST /api/approvals/{id}/cancel: the initiator withdraws a pending approval.
+func (a *api) cancelApproval(w http.ResponseWriter, r *http.Request) {
+	sess, _ := auth.FromContext(r.Context())
+	id, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		Write(w, r, http.StatusNotFound, "", "not_found", nil)
+		return
+	}
+	var req struct{}
+	if r.ContentLength != 0 && !decodeJSON(w, r, &req) {
+		return
+	}
+	ap, err := a.Approvals.Cancel(r.Context(), id, sess.PrincipalID)
+	if err != nil {
+		WriteErr(w, r, err)
+		return
+	}
+	a.writeApproval(w, r, ap)
+}
+
+func (a *api) writeApproval(w http.ResponseWriter, r *http.Request, ap approvals.Approval) {
 	v, err := a.views(r, []approvals.Approval{ap})
 	if err != nil {
 		WriteErr(w, r, err)
 		return
 	}
 	JSON(w, http.StatusOK, map[string]any{"approval": v[0][0]})
+}
+
+// GET /api/config: public, non-secret settings the web app needs.
+func (a *api) config(w http.ResponseWriter, r *http.Request) {
+	JSON(w, http.StatusOK, map[string]any{"dev_test_login": a.DevTestLogin, "origin": a.Origin})
 }

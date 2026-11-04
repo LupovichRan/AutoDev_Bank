@@ -136,7 +136,7 @@ func (p *EnableBanking) Fetch(ctx context.Context, kind opendata.Kind) (opendata
 		return opendata.Result{}, err
 	}
 	base := strings.TrimRight(p.BaseURL, "/")
-	res := opendata.Result{SourceURL: base + "/accounts/{uid}/balances", License: "Enable Banking AIS (private, own accounts)"}
+	res := opendata.Result{SourceURL: base + "/accounts/{uid}/balances", License: "Enable Banking AIS (private, own accounts)", LicenseURL: "https://enablebanking.com/"}
 	hdr := http.Header{"Authorization": {"Bearer " + tok}}
 	for _, uid := range p.accountUIDs {
 		var doc struct {

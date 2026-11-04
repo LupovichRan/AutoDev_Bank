@@ -226,11 +226,12 @@ func (r *Refresher) store(ctx context.Context, o RefreshOutcome, res Result, fal
 		return fmt.Errorf("encode records: %w", err)
 	}
 	return pgx.BeginFunc(ctx, r.pool, func(tx pgx.Tx) error {
-		if _, err := tx.Exec(ctx, `insert into opendata.snapshots (provider, kind, fetched_at, source_url, license, payload)
-			values ($1, $2, $3, $4, $5, $6)
+		if _, err := tx.Exec(ctx, `insert into opendata.snapshots (provider, kind, fetched_at, source_url, license, license_url, payload)
+			values ($1, $2, $3, $4, $5, $6, $7)
 			on conflict (provider, kind) do update set fetched_at = excluded.fetched_at,
-			  source_url = excluded.source_url, license = excluded.license, payload = excluded.payload`,
-			o.Provider, string(o.Kind), o.FetchedAt, res.SourceURL, res.License, payload); err != nil {
+			  source_url = excluded.source_url, license = excluded.license,
+			  license_url = excluded.license_url, payload = excluded.payload`,
+			o.Provider, string(o.Kind), o.FetchedAt, res.SourceURL, res.License, res.LicenseURL, payload); err != nil {
 			return fmt.Errorf("store snapshot: %w", err)
 		}
 		_, err := tx.Exec(ctx, `insert into opendata.refresh_log (provider, kind, at, ok, error, duration_ms, records)

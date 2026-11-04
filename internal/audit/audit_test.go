@@ -108,12 +108,22 @@ func TestVerify_DetectsTamperedPayload(t *testing.T) {
 	testutil.Equal(t, bad, rep.FirstBadSeq)
 }
 
+// appendYesterday appends ev with yesterday's timestamp (a finished day).
+func appendYesterday(t *testing.T, r *Recorder, pool *pgxpool.Pool, ev Event) int64 {
+	t.Helper()
+	r.now = func() time.Time { return time.Now().AddDate(0, 0, -1) }
+	defer func() { r.now = time.Now }()
+	return appendOne(t, r, pool, ev)
+}
+
 func TestSignDailyRoot_VerifiesWithPublicKey(t *testing.T) {
 	r, pool := newRecorder(t)
-	appendOne(t, r, pool, Event{Action: "a", Subject: "s"})
-	seq := appendOne(t, r, pool, Event{Action: "b", Subject: "s"})
+	appendYesterday(t, r, pool, Event{Action: "a", Subject: "s"})
+	seq := appendYesterday(t, r, pool, Event{Action: "b", Subject: "s"})
+	appendOne(t, r, pool, Event{Action: "today", Subject: "s"}) // after the day's end
+	yesterday := time.Now().UTC().AddDate(0, 0, -1)
 
-	root, err := r.SignDailyRoot(context.Background(), time.Now().UTC())
+	root, err := r.SignDailyRoot(context.Background(), yesterday)
 	testutil.NoError(t, err)
 	testutil.Equal(t, seq, root.HeadSeq)
 	testutil.True(t, VerifyRoot(r.PublicKey(), root))
@@ -126,7 +136,7 @@ func TestSignDailyRoot_VerifiesWithPublicKey(t *testing.T) {
 	testutil.Equal(t, 1, n)
 
 	// Re-signing the same day upserts.
-	_, err = r.SignDailyRoot(context.Background(), time.Now().UTC())
+	_, err = r.SignDailyRoot(context.Background(), yesterday)
 	testutil.NoError(t, err)
 	testutil.NoError(t, pool.QueryRow(context.Background(), `select count(*) from control.audit_roots`).Scan(&n))
 	testutil.Equal(t, 1, n)
@@ -239,12 +249,28 @@ func TestSignDailyRootIfMissing_NeverOverwrites(t *testing.T) {
 func TestComputeRoot_DoesNotPersist(t *testing.T) {
 	r, pool := newRecorder(t)
 	ctx := context.Background()
-	seq := appendOne(t, r, pool, Event{Action: "a", Subject: "s"})
-	root, err := r.ComputeRoot(ctx, time.Now().UTC())
+	seq := appendYesterday(t, r, pool, Event{Action: "a", Subject: "s"})
+	root, err := r.ComputeRoot(ctx, time.Now().UTC().AddDate(0, 0, -1))
 	testutil.NoError(t, err)
 	testutil.Equal(t, seq, root.HeadSeq)
 	testutil.True(t, VerifyRoot(r.PublicKey(), root), "verifies")
 	var n int
 	testutil.NoError(t, pool.QueryRow(ctx, `select count(*) from control.audit_roots`).Scan(&n))
 	testutil.Equal(t, 0, n)
+}
+
+// R4: today is never signed; its head is available unsigned.
+func TestToday_NeverSigned(t *testing.T) {
+	r, pool := newRecorder(t)
+	ctx := context.Background()
+	seq := appendOne(t, r, pool, Event{Action: "a", Subject: "s"})
+	today := time.Now().UTC()
+	_, err := r.ComputeRoot(ctx, today)
+	testutil.ErrorIs(t, err, ErrDayNotFinished)
+	_, err = r.SignDailyRoot(ctx, today)
+	testutil.ErrorIs(t, err, ErrDayNotFinished)
+	head, err := r.HeadAsOf(ctx, today)
+	testutil.NoError(t, err)
+	testutil.Equal(t, seq, head.HeadSeq)
+	testutil.True(t, head.Signature == nil, "unsigned")
 }

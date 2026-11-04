@@ -138,6 +138,10 @@ func (s *Service) refuseClonedStepUp(ctx context.Context, sess Session, credID, 
 			where id=$1 and principal_id=$2`, credID, sess.PrincipalID); err != nil {
 			return err
 		}
+		// A possibly cloned authenticator: end every other session.
+		if err := s.revokeOtherSessionsTx(ctx, tx, sess.PrincipalID, sess.ID, "clone_warning"); err != nil {
+			return err
+		}
 		return s.audit(ctx, tx, "auth.clone_warning", "principal:"+sess.PrincipalID.String(), &sess.PrincipalID, payload)
 	})
 	if err != nil {

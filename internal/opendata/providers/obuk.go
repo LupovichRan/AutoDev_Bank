@@ -53,7 +53,7 @@ func (p *OBUK) Fetch(ctx context.Context, kind opendata.Kind) (opendata.Result, 
 	if err := getJSON(ctx, p.client, url, hdr, &doc); err != nil {
 		return opendata.Result{}, err
 	}
-	res := opendata.Result{SourceURL: url, License: licenseOrDefault(doc.Meta.License)}
+	res := opendata.Result{SourceURL: url, License: licenseOrDefault(doc.Meta.License), LicenseURL: obukDefaultLicense}
 	seen := map[string]bool{}
 	add := func(id string, data map[string]any) {
 		key := p.cfg.ID + ":" + string(kind) + ":" + id

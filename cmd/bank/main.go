@@ -59,7 +59,7 @@ func main() {
 	case "serve":
 		err = runServe(ctx, cfg, log)
 	case "seed":
-		err = runSeed(ctx, cfg, log)
+		err = runSeed(ctx, cfg, os.Args[2:], log)
 	case "opendata-refresh":
 		err = runRefresh(ctx, cfg, log)
 	case "help", "-h", "--help":
@@ -75,7 +75,7 @@ func main() {
 }
 
 func usage() {
-	fmt.Fprintln(os.Stderr, `usage: bank <serve|migrate|seed|opendata-refresh>
+	fmt.Fprintln(os.Stderr, `usage: bank <serve|migrate|seed [--force]|opendata-refresh>
 env: DATABASE_URL BANK_ADDR BANK_ORIGIN BANK_AUDIT_SIGNING_KEY BANK_DEV_TEST_LOGIN BANK_OPENDATA_FIXTURES`)
 }
 

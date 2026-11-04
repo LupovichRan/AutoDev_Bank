@@ -20,7 +20,11 @@ func NewBoI(baseURL string, client *http.Client) *BoI {
 	return &BoI{base: strings.TrimRight(baseURL, "/"), client: client}
 }
 
-const boiLicense = "Bank of Israel public data (https://www.boi.org.il), reuse with attribution to the Bank of Israel"
+// Short factual attribution; the publisher's terms at boiLicenseURL govern.
+const (
+	boiLicense    = "Bank of Israel public data; source: Bank of Israel"
+	boiLicenseURL = "https://www.boi.org.il/en/"
+)
 
 func (p *BoI) ID() string { return "boi" }
 func (p *BoI) Kinds() []opendata.Kind {
@@ -42,7 +46,7 @@ func (p *BoI) Fetch(ctx context.Context, kind opendata.Kind) (opendata.Result, e
 		if err := getJSON(ctx, p.client, url, nil, &doc); err != nil {
 			return opendata.Result{}, err
 		}
-		res := opendata.Result{SourceURL: url, License: boiLicense}
+		res := opendata.Result{SourceURL: url, License: boiLicense, LicenseURL: boiLicenseURL}
 		for _, r := range doc.ExchangeRates {
 			if r.Key == "" || r.CurrentExchangeRate <= 0 {
 				continue
@@ -65,7 +69,7 @@ func (p *BoI) Fetch(ctx context.Context, kind opendata.Kind) (opendata.Result, e
 		if err := getJSON(ctx, p.client, url, nil, &doc); err != nil {
 			return opendata.Result{}, err
 		}
-		res := opendata.Result{SourceURL: url, License: boiLicense}
+		res := opendata.Result{SourceURL: url, License: boiLicense, LicenseURL: boiLicenseURL}
 		if doc.CurrentInterest != nil {
 			rec := policyRecord("boi:policy:interest", "Bank of Israel", "Bank of Israel interest rate",
 				*doc.CurrentInterest, isoDate(doc.LastPublishedDate))

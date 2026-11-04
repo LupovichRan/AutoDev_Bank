@@ -37,6 +37,9 @@ type Deps struct {
 	Log       *slog.Logger
 	// Origin is the public origin (BANK_ORIGIN); an https origin adds HSTS.
 	Origin string
+	// DevTestLogin mirrors BANK_DEV_TEST_LOGIN=1; GET /api/config reports it
+	// so the web app offers demo sign-in buttons (dev only).
+	DevTestLogin bool
 	// PublicRateLimitPerMinute is the per-IP budget for /api/transparency/*
 	// and /api/opendata/* (0 means 60).
 	PublicRateLimitPerMinute int
@@ -85,6 +88,8 @@ func New(d Deps) http.Handler {
 	mux.Handle("POST /api/transfers", a.session(a.createTransfer))
 	mux.Handle("GET /api/approvals", a.session(a.listApprovals))
 	mux.Handle("POST /api/approvals/{id}/decide", a.session(a.decideApproval))
+	mux.Handle("POST /api/approvals/{id}/cancel", a.session(a.cancelApproval))
+	mux.HandleFunc("GET /api/config", a.config)
 	mux.HandleFunc("GET /api/transparency/audit/verify", a.auditVerify)
 	mux.HandleFunc("GET /api/transparency/audit/recent", a.auditRecent)
 	mux.HandleFunc("GET /api/transparency/audit/root", a.auditRoot)

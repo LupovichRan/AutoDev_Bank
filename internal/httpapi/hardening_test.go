@@ -69,12 +69,14 @@ func TestTransparency_RootFillsMissingDayAndTodayIsProvisional(t *testing.T) {
 	anon := e.anon()
 	e.login("alice")
 
-	// Today: signed in memory, not stored.
+	// Today: the current head, never signed, never stored.
 	today := time.Now().UTC().Format("2006-01-02")
 	var root tRoot
 	anon.getJSON("/api/transparency/audit/root?day="+today, &root)
 	testutil.True(t, root.Provisional, "today is provisional")
-	testutil.True(t, root.Verified, "today's root verifies")
+	testutil.Equal(t, "", root.Signature, "today is not signed")
+	testutil.False(t, root.Verified, "nothing to verify")
+	testutil.True(t, root.HeadSeq >= 1, "head includes the login")
 	testutil.Equal(t, 0, e.storedRootCount(t))
 
 	// A missing finished day is filled once.
@@ -169,7 +171,7 @@ func TestJSONEndpoints_RequireJSONContentType(t *testing.T) {
 	}
 	// Parameters are fine.
 	resp, raw := alice.do("POST", "/api/approvals/0192f000-0000-7000-8000-000000000009/decide",
-		map[string]any{"approve": true}, map[string]string{"Content-Type": "application/json; charset=utf-8"})
+		map[string]any{"approve": false}, map[string]string{"Content-Type": "application/json; charset=utf-8"})
 	testutil.Equal(t, http.StatusNotFound, resp.StatusCode, string(raw))
 }
 

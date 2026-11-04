@@ -65,7 +65,10 @@ type Record struct {
 type Result struct {
 	Records   []Record
 	SourceURL string
-	License   string
+	License   string // short factual attribution
+	// LicenseURL is the publisher's own terms page; License is our summary
+	// of it, LicenseURL is what counts.
+	LicenseURL string
 }
 
 // Provider is one upstream publisher. Fetch is called once per Kind the
@@ -92,8 +95,9 @@ type Filter struct {
 // RecordWithMeta is a cached record plus the provenance of its snapshot.
 type RecordWithMeta struct {
 	Record
-	Provider  string    `json:"provider"`
-	FetchedAt time.Time `json:"fetched_at"`
-	SourceURL string    `json:"source_url"`
-	License   string    `json:"license"`
+	Provider   string    `json:"provider"`
+	FetchedAt  time.Time `json:"fetched_at"`
+	SourceURL  string    `json:"source_url"`
+	License    string    `json:"license"`
+	LicenseURL string    `json:"license_url"`
 }

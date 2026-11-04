@@ -55,6 +55,8 @@ var errMapping = []struct {
 	{approvals.ErrNotBefore, http.StatusConflict, "not_before"},
 	{approvals.ErrAlreadyDecided, http.StatusConflict, "already_decided"},
 	{approvals.ErrSoDConflict, http.StatusConflict, "separation_of_duties"},
+	{approvals.ErrRoleNotAllowed, http.StatusConflict, "separation_of_duties"},
+	{approvals.ErrInvalidDestination, http.StatusUnprocessableEntity, "invalid_destination"},
 	{approvals.ErrNotFound, http.StatusNotFound, "not_found"},
 	{ledger.ErrNotFound, http.StatusNotFound, "not_found"},
 	{ledger.ErrIdempotencyConflict, http.StatusConflict, "idempotency_conflict"},

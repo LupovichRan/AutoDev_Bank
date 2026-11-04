@@ -36,7 +36,8 @@ func (p *Frankfurter) Fetch(ctx context.Context, kind opendata.Kind) (opendata.R
 		return opendata.Result{}, err
 	}
 	res := opendata.Result{SourceURL: url,
-		License: "Frankfurter (open source, https://frankfurter.dev); rates are ECB euro foreign exchange reference rates, reuse with attribution to the European Central Bank"}
+		License:    "Frankfurter; ECB euro foreign exchange reference rates",
+		LicenseURL: "https://frankfurter.dev/"}
 	quotes := make([]string, 0, len(doc.Rates))
 	for q := range doc.Rates {
 		quotes = append(quotes, q)

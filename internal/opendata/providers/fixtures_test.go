@@ -18,6 +18,7 @@ func TestFixtureProviders_EveryKindHasRecords(t *testing.T) {
 			testutil.True(t, len(res.Records) > 0, p.ID()+" "+string(k))
 			testutil.True(t, strings.HasPrefix(res.SourceURL, "https://"), res.SourceURL)
 			testutil.True(t, res.License != "", p.ID()+" license")
+			testutil.True(t, strings.HasPrefix(res.LicenseURL, "https://"), p.ID()+" license_url "+res.LicenseURL)
 		}
 	}
 }

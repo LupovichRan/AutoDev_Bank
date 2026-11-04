@@ -398,6 +398,7 @@ func TestTransfers_LargeReturns202AndApproverCanDecide(t *testing.T) {
 	testutil.Equal(t, out.Approval.ID, bl.Inbox[0].ID)
 	testutil.Equal(t, "Alice", bl.Inbox[0].Initiator.DisplayName)
 
+	bob.approveStepUp(out.Approval.ID)
 	resp, raw = bob.do("POST", "/api/approvals/"+out.Approval.ID+"/decide", map[string]any{"approve": true, "reason": "ok"}, nil)
 	testutil.Equal(t, http.StatusOK, resp.StatusCode, string(raw))
 	var dec struct {
@@ -418,8 +419,10 @@ func TestTransfers_LargeReturns202AndApproverCanDecide(t *testing.T) {
 	testutil.Equal(t, int64(2700000), bal[seed.AliceILS].Balance)
 
 	// Deciding again is a conflict; an unknown approval is not found.
+	bob.approveStepUp(out.Approval.ID)
 	resp, raw = bob.do("POST", "/api/approvals/"+out.Approval.ID+"/decide", map[string]any{"approve": true, "reason": "again"}, nil)
 	testutil.Equal(t, http.StatusConflict, resp.StatusCode, string(raw))
+	bob.approveStepUp("0192f000-0000-7000-8000-000000000009")
 	resp, raw = bob.do("POST", "/api/approvals/0192f000-0000-7000-8000-000000000009/decide", map[string]any{"approve": true}, nil)
 	testutil.Equal(t, http.StatusNotFound, resp.StatusCode, string(raw))
 }
@@ -437,12 +440,14 @@ func TestTransfers_InitiatorCannotDecide403(t *testing.T) {
 	}
 	testutil.NoError(t, json.Unmarshal(raw, &out))
 
+	alice.approveStepUp(out.Approval.ID)
 	resp, raw = alice.do("POST", "/api/approvals/"+out.Approval.ID+"/decide", map[string]any{"approve": true, "reason": "me"}, nil)
 	testutil.Equal(t, http.StatusForbidden, resp.StatusCode, string(raw))
 	testutil.Equal(t, "self_approval", decodeProblem(t, resp, raw).Detail)
 
 	// dave (payments.initiator, no approver role, not a holder) may not decide either.
 	dave := e.login("dave")
+	dave.approveStepUp(out.Approval.ID)
 	resp, raw = dave.do("POST", "/api/approvals/"+out.Approval.ID+"/decide", map[string]any{"approve": true, "reason": "x"}, nil)
 	testutil.Equal(t, http.StatusForbidden, resp.StatusCode, string(raw))
 	testutil.Equal(t, "not_authorized", decodeProblem(t, resp, raw).Detail)
@@ -502,19 +507,18 @@ func TestTransparency_AuditVerifyOK(t *testing.T) {
 
 	var recent struct {
 		Events []struct {
-			Seq     int64   `json:"seq"`
-			At      string  `json:"at"`
-			Action  string  `json:"action"`
-			Subject string  `json:"subject"`
-			ActorID *string `json:"actor_id"`
+			Seq        int64  `json:"seq"`
+			At         string `json:"at"`
+			Action     string `json:"action"`
+			HashPrefix string `json:"hash_prefix"`
 		} `json:"events"`
 	}
 	anon.getJSON("/api/transparency/audit/recent?limit=5", &recent)
 	testutil.True(t, len(recent.Events) >= 2 && len(recent.Events) <= 5, "bounded by limit")
-	testutil.Equal(t, "transfer.submitted", recent.Events[0].Action)
-	testutil.Equal(t, alice.sess.PrincipalID.String(), *recent.Events[0].ActorID)
-	testutil.Equal(t, "transfer.posted", recent.Events[1].Action)
+	testutil.Equal(t, "transfer", recent.Events[0].Action) // transfer.submitted, class only
+	testutil.Equal(t, "transfer", recent.Events[1].Action) // transfer.posted
 	testutil.Equal(t, v.Length, recent.Events[0].Seq)
+	testutil.Equal(t, v.HeadHash[:16], recent.Events[0].HashPrefix)
 }
 
 func TestTransparency_FeesAndRoot(t *testing.T) {
@@ -537,8 +541,9 @@ func TestTransparency_FeesAndRoot(t *testing.T) {
 	testutil.Equal(t, 50, fees.IncomeSharePercent)
 	testutil.True(t, len(fees.Rules) >= 4 && len(fees.Rules) <= 6, "4-6 rules")
 
-	e.login("alice") // at least one event today
-	day := time.Now().UTC().Format("2006-01-02")
+	// Finished days are signed; today is provisional and unsigned
+	// (TestTransparency_TodayRootUnsigned).
+	day := time.Now().UTC().AddDate(0, 0, -1).Format("2006-01-02")
 	var root struct {
 		Day       string `json:"day"`
 		HeadSeq   int64  `json:"head_seq"`
@@ -548,7 +553,6 @@ func TestTransparency_FeesAndRoot(t *testing.T) {
 	}
 	anon.getJSON("/api/transparency/audit/root?day="+day, &root)
 	testutil.Equal(t, day, root.Day)
-	testutil.True(t, root.HeadSeq >= 1, "today's head includes the login")
 	sig, err := base64.StdEncoding.DecodeString(root.Signature)
 	testutil.NoError(t, err)
 	pub, err := base64.StdEncoding.DecodeString(root.PublicKey)

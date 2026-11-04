@@ -54,11 +54,13 @@ type Root struct {
 type Recorder struct {
 	pool   *pgxpool.Pool
 	signer ed25519.PrivateKey
+	now    func() time.Time // event timestamps and "today"; tests may override
 }
 
-// New returns a Recorder. signer is used only by SignDailyRoot.
+// New returns a Recorder. signer is used only to sign daily roots; it may
+// be nil for a recorder that only appends (e.g. `bank seed`).
 func New(pool *pgxpool.Pool, signer ed25519.PrivateKey) *Recorder {
-	return &Recorder{pool: pool, signer: signer}
+	return &Recorder{pool: pool, signer: signer, now: time.Now}
 }
 
 // PublicKey returns the key that verifies signed roots.
@@ -133,7 +135,7 @@ func (r *Recorder) Append(ctx context.Context, tx pgx.Tx, ev Event) (int64, erro
 	if err != nil {
 		return 0, fmt.Errorf("audit: payload: %w", err)
 	}
-	at := time.Now().UTC().Truncate(time.Microsecond) // timestamptz precision
+	at := r.now().UTC().Truncate(time.Microsecond) // timestamptz precision
 	hash, err := computeHash(prev, at, ev.ActorID, ev.Action, ev.Subject, payloadJSON)
 	if err != nil {
 		return 0, err
@@ -253,16 +255,22 @@ func dayStart(day time.Time) time.Time {
 	return time.Date(d.Year(), d.Month(), d.Day(), 0, 0, 0, 0, time.UTC)
 }
 
-// ComputeRoot signs the chain head as of the end of day (UTC) in memory,
-// without storing it. The day's head is chosen by each event's
-// application-assigned timestamp (the app clock at Append), so the result is
-// only exact when all app servers have synchronised clocks.
-func (r *Recorder) ComputeRoot(ctx context.Context, day time.Time) (Root, error) {
+// finished reports whether the UTC day has ended.
+func (r *Recorder) finished(day time.Time) bool {
+	return dayStart(day).Before(dayStart(r.now()))
+}
+
+// HeadAsOf returns the chain head as of the end of day (UTC), unsigned
+// (Signature is nil). For today it is a provisional head that will still
+// move. The day's head is chosen by each event's application-assigned
+// timestamp (the app clock at Append), so the result is only exact when all
+// app servers have synchronised clocks.
+func (r *Recorder) HeadAsOf(ctx context.Context, day time.Time) (Root, error) {
 	start := dayStart(day)
 	end := start.AddDate(0, 0, 1)
 
 	var seq int64
-	head := make([]byte, 32) // empty chain signs the genesis hash at seq 0
+	head := make([]byte, 32) // empty chain: the genesis hash at seq 0
 	err := r.pool.QueryRow(ctx, `
 		select seq, hash from control.audit_events where at < $1 order by seq desc limit 1`, end).Scan(&seq, &head)
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
@@ -271,7 +279,23 @@ func (r *Recorder) ComputeRoot(ctx context.Context, day time.Time) (Root, error)
 	if errors.Is(err, pgx.ErrNoRows) {
 		seq, head = 0, make([]byte, 32)
 	}
-	root := Root{Day: start.Format("2006-01-02"), HeadSeq: seq, HeadHash: hex.EncodeToString(head)}
+	return Root{Day: start.Format("2006-01-02"), HeadSeq: seq, HeadHash: hex.EncodeToString(head)}, nil
+}
+
+// ComputeRoot signs the chain head as of the end of a finished UTC day in
+// memory, without storing it. Today (or a future day) is never signed: it
+// fails with ErrDayNotFinished; use HeadAsOf for a provisional head.
+func (r *Recorder) ComputeRoot(ctx context.Context, day time.Time) (Root, error) {
+	if !r.finished(day) {
+		return Root{}, ErrDayNotFinished
+	}
+	if r.signer == nil {
+		return Root{}, errors.New("audit: no signing key")
+	}
+	root, err := r.HeadAsOf(ctx, day)
+	if err != nil {
+		return Root{}, err
+	}
 	msg, err := rootMessage(root.Day, root.HeadSeq, root.HeadHash)
 	if err != nil {
 		return Root{}, err
@@ -280,9 +304,10 @@ func (r *Recorder) ComputeRoot(ctx context.Context, day time.Time) (Root, error)
 	return root, nil
 }
 
-// SignDailyRoot signs the chain head as of the end of day (UTC) and upserts
-// it into control.audit_roots, replacing any stored root for that day. It is
-// for explicit operator use; automatic signing uses SignDailyRootIfMissing.
+// SignDailyRoot signs the chain head as of the end of a finished day (UTC)
+// and upserts it into control.audit_roots, replacing any stored root for
+// that day. It is for explicit operator use; automatic signing uses
+// SignDailyRootIfMissing. An unfinished day is ErrDayNotFinished.
 func (r *Recorder) SignDailyRoot(ctx context.Context, day time.Time) (Root, error) {
 	root, err := r.ComputeRoot(ctx, day)
 	if err != nil {
@@ -311,7 +336,7 @@ var ErrDayNotFinished = errors.New("audit: day is not finished")
 // unchanged (even if its signature no longer verifies). created reports
 // whether this call stored it.
 func (r *Recorder) SignDailyRootIfMissing(ctx context.Context, day time.Time) (root Root, created bool, err error) {
-	if !dayStart(day).Before(dayStart(time.Now())) {
+	if !r.finished(day) {
 		return Root{}, false, ErrDayNotFinished
 	}
 	if stored, ok, err := r.Root(ctx, day); err != nil || ok {
