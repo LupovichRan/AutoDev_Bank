@@ -3,12 +3,12 @@
   import Card from '../components/Card.svelte';
   import Problem from '../components/Problem.svelte';
   import { apiGet, NetworkError, ProblemError } from '../lib/api';
+  import { SubmitFlow } from './pay/submit.svelte';
   import { formatMinor, parseToMinor } from '../lib/money';
   import { connectivity } from '../lib/online.svelte';
   import type { TransferBody } from '../lib/payload';
   import { href } from '../lib/router';
   import { status } from '../lib/status.svelte';
-  import { isStepUpRequired, newAttempt, sameBody, submitTransfer, type Attempt, type Outcome } from '../lib/transfer';
   import type { Account, Me } from '../lib/types';
   import { describeWebAuthnError, stepUp } from '../lib/webauthn';
 
@@ -30,12 +30,20 @@
   let description = $state('');
   let errors = $state<Record<string, string>>({});
 
-  // Submission state
-  let phase = $state<'idle' | 'stepup' | 'sending'>('idle');
-  let attempt: Attempt | null = null;
-  let submitError = $state<unknown>(null);
-  let canRetry = $state(false);
-  let outcome = $state<Outcome | null>(null);
+  // Submission state lives in a unit-tested module with a synchronous double-submit guard.
+  const flow = new SubmitFlow({
+    stepUp: async (hash) => {
+      try {
+        await stepUp(hash);
+      } catch (e) {
+        throw e instanceof ProblemError || e instanceof NetworkError ? e : new Error(describeWebAuthnError(e));
+      }
+    },
+  });
+  const phase = $derived(flow.phase);
+  const submitError = $derived(flow.submitError);
+  const canRetry = $derived(flow.canRetry);
+  const outcome = $derived(flow.outcome);
   let sentSummary = $state('');
 
   const from = $derived(accounts?.find((a) => a.id === fromId) ?? null);
@@ -105,56 +113,31 @@
     return { from_account_id: from.id, to_account_id: toId, amount, currency: from.currency, description: description.trim() };
   }
 
-  async function run() {
-    if (!attempt) return;
-    submitError = null;
-    canRetry = false;
-    try {
-      phase = attempt.steppedUp ? 'sending' : 'stepup';
-      const current = attempt;
-      const result = await submitTransfer(current, async (hash) => {
-        try {
-          await stepUp(hash);
-        } catch (e) {
-          throw e instanceof ProblemError || e instanceof NetworkError ? e : new Error(describeWebAuthnError(e));
-        }
-        phase = 'sending';
-      });
-      outcome = result;
-      sentSummary = `${formatMinor(current.body.amount, current.body.currency)} to ${toName}`;
-      attempt = null;
-      status.announce(
-        result.kind === 'sent'
-          ? `Sent ${sentSummary}.`
-          : `Awaiting approval: ${result.requiredApprovals} approver${result.requiredApprovals === 1 ? '' : 's'} required.`,
-      );
-    } catch (e) {
-      submitError = e;
-      // Same key on retry: the server de-duplicates, so retrying cannot pay twice.
-      canRetry = e instanceof NetworkError || isStepUpRequired(e);
-      status.announce('Payment not sent.');
-    } finally {
-      phase = 'idle';
-    }
-  }
-
   async function onSubmit(e: SubmitEvent) {
     e.preventDefault();
+    if (flow.busy) return;
     const body = validate();
     if (!body) {
       status.announce('Please fix the highlighted fields.');
       return;
     }
-    // Reuse the pending attempt (and its key) if the user re-submits the same payment.
-    if (!attempt || !sameBody(attempt.body, body)) attempt = await newAttempt(body);
-    await run();
+    const name = toName;
+    await flow.submit(
+      body,
+      (result, sent) => {
+        sentSummary = `${formatMinor(sent.amount, sent.currency)} to ${name}`;
+        status.announce(
+          result.kind === 'sent'
+            ? `Sent ${sentSummary}.`
+            : `Awaiting approval: ${result.requiredApprovals} approver${result.requiredApprovals === 1 ? '' : 's'} required.`,
+        );
+      },
+      () => status.announce('Payment not sent.'),
+    );
   }
 
   function reset() {
-    outcome = null;
-    attempt = null;
-    submitError = null;
-    canRetry = false;
+    flow.reset();
     amountText = '';
     description = '';
   }

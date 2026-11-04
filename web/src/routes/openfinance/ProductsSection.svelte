@@ -3,6 +3,7 @@
   import Problem from '../../components/Problem.svelte';
   import { apiGet } from '../../lib/api';
   import { formatPercent } from '../../lib/format';
+  import { safeUrl } from '../../lib/safeUrl';
   import type { OpenDataList, OpenDataRecord, ProductData } from '../../lib/types';
   import Badges from './Badges.svelte';
 
@@ -59,7 +60,7 @@
             <tr>
               <td>{r.data.brand || r.data.bank}</td>
               <th scope="row">
-                {#if r.data.url}<a href={r.data.url} rel="noopener noreferrer" target="_blank">{r.data.name}</a>{:else}{r.data.name}{/if}
+                {#if safeUrl(r.data.url)}<a href={safeUrl(r.data.url)} rel="noopener noreferrer" target="_blank">{r.data.name}</a>{:else}{r.data.name}{/if}
               </th>
               <td>{r.data.type}</td>
               <td class="num">{formatPercent(r.data.overdraft_ear)}</td>

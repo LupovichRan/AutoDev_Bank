@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { apiGet, apiPost, apiPostWithStatus, NetworkError, ProblemError } from './api';
+import { apiGet, apiPost, apiPostWithStatus, NetworkError, ProblemError, setUnauthorizedHandler } from './api';
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -59,5 +59,16 @@ describe('api', () => {
   it('handles empty 204 bodies', async () => {
     stubFetch(new Response(null, { status: 204 }));
     await expect(apiPost('/api/auth/logout')).resolves.toBeUndefined();
+  });
+
+  it('notifies the unauthorized handler on 401 except for /api/me', async () => {
+    const handler = vi.fn();
+    setUnauthorizedHandler(handler);
+    stubFetch(new Response('{"status":401}', { status: 401, headers: { 'content-type': 'application/problem+json' } }));
+    await expect(apiGet('/api/accounts')).rejects.toBeInstanceOf(ProblemError);
+    await expect(apiGet('/api/me')).rejects.toBeInstanceOf(ProblemError);
+    setUnauthorizedHandler(null);
+    expect(handler).toHaveBeenCalledTimes(1);
+    expect(handler).toHaveBeenCalledWith('/api/accounts');
   });
 });

@@ -16,7 +16,7 @@
   let error = $state<unknown>(null);
   let loading = $state(false);
 
-  async function search() {
+  async function search(k: 'atms' | 'branches' = kind) {
     const p = parseLatLon(point);
     pointError = p ? '' : 'Enter latitude,longitude, e.g. 51.5074,-0.1278';
     if (!p) return;
@@ -24,7 +24,7 @@
     loading = true;
     try {
       const q = `${p.lat},${p.lon}`;
-      records = (await apiGet<OpenDataList<PlaceData>>(`/api/opendata/${kind}?near=${encodeURIComponent(q)}&limit=20`)).records;
+      records = (await apiGet<OpenDataList<PlaceData>>(`/api/opendata/${k}?near=${encodeURIComponent(q)}&limit=20`)).records;
     } catch (e) {
       error = e;
     } finally {
@@ -67,8 +67,8 @@
   <form onsubmit={onSubmit} novalidate>
     <fieldset class="kind">
       <legend>Show</legend>
-      <label class="inline"><input type="radio" bind:group={kind} value="atms" onchange={search} /> ATMs</label>
-      <label class="inline"><input type="radio" bind:group={kind} value="branches" onchange={search} /> Branches</label>
+      <label class="inline"><input type="radio" bind:group={kind} value="atms" onchange={() => search('atms')} /> ATMs</label>
+      <label class="inline"><input type="radio" bind:group={kind} value="branches" onchange={() => search('branches')} /> Branches</label>
     </fieldset>
     <div class="field">
       <label for="near">Near (latitude,longitude)</label>
@@ -93,7 +93,7 @@
 
   <div class="results" aria-busy={loading}>
     {#if error}
-      <Problem {error} onretry={search} />
+      <Problem {error} onretry={() => search()} />
     {:else if records === null}
       <p aria-busy="true">Loading…</p>
     {:else if records.length === 0}

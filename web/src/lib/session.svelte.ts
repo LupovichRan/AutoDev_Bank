@@ -1,6 +1,7 @@
 // Who is signed in. `me` is null when signed out; `ready` flips once the
 // first /api/me answer (or failure) is in.
-import { apiGet, apiPost, NetworkError, ProblemError } from './api';
+import { apiGet, apiPost, NetworkError, ProblemError, setUnauthorizedHandler } from './api';
+import { navigate, parseHash } from './router';
 import type { Me } from './types';
 
 class Session {
@@ -70,3 +71,17 @@ async function clearCachedAccountData(): Promise<void> {
 }
 
 export const session = new Session();
+
+/** Any 401 mid-session: drop cached identity and data, then go to sign-in (unless already there). */
+export function handleUnauthorized(path = ''): void {
+  // A failed login/registration ceremony is not an expired session.
+  if (path.startsWith('/api/auth/')) return;
+  session.me = null;
+  void clearCachedAccountData();
+  if (typeof location === 'undefined') return;
+  const current = parseHash(location.hash);
+  if (current.path === '/sign-in') return;
+  navigate('/sign-in', { next: current.path });
+}
+
+setUnauthorizedHandler(handleUnauthorized);

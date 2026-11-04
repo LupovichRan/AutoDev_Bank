@@ -140,7 +140,8 @@ export interface AuditEvent {
 
 export interface FeeSchedule {
   currency_fx_markup_bp: number;
-  monthly_fee: number;
+  monthly_fee: number; // minor units of `currency`
+  currency?: string; // defaults to ILS
   income_share_percent: number;
   rules: { name: string; description: string }[];
 }

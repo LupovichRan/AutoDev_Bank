@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { safeUrl } from '../lib/safeUrl';
   import { formatDateTime, relativeTime } from '../lib/format';
 
   interface Props {
@@ -8,6 +9,8 @@
     license?: string;
   }
   let { provider, fetchedAt, sourceUrl, license }: Props = $props();
+
+  const source = $derived(safeUrl(sourceUrl));
 
   // Re-render the relative time every minute.
   let now = $state(Date.now());
@@ -22,9 +25,9 @@
   <span>{provider}</span>
   <span aria-hidden="true">·</span>
   <time datetime={fetchedAt} title={formatDateTime(fetchedAt)}>fetched {relativeTime(fetchedAt, now)}</time>
-  {#if sourceUrl}
+  {#if source}
     <span aria-hidden="true">·</span>
-    <a href={sourceUrl} rel="noopener noreferrer" target="_blank">Source<span class="visually-hidden"> for {provider} (opens in a new tab)</span></a>
+    <a href={source} rel="noopener noreferrer" target="_blank">Source<span class="visually-hidden"> for {provider} (opens in a new tab)</span></a>
   {/if}
   {#if license}
     <span aria-hidden="true">·</span>

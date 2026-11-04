@@ -3,6 +3,7 @@
   import Problem from '../components/Problem.svelte';
   import { apiGet } from '../lib/api';
   import { formatDateTime, truncateMiddle } from '../lib/format';
+  import { formatMinor } from '../lib/money';
   import { status } from '../lib/status.svelte';
   import type { AuditEvent, AuditVerify, FeeSchedule } from '../lib/types';
 
@@ -125,7 +126,7 @@
       <p aria-busy="true">Loading fees…</p>
     {:else}
       <dl class="facts">
-        <div><dt>Monthly fee</dt><dd>{fees.monthly_fee === 0 ? 'None' : fees.monthly_fee}</dd></div>
+        <div><dt>Monthly fee</dt><dd>{fees.monthly_fee === 0 ? 'None' : formatMinor(fees.monthly_fee, fees.currency ?? 'ILS')}</dd></div>
         <div><dt>FX markup</dt><dd>{fees.currency_fx_markup_bp === 0 ? 'None (0 bp)' : `${fees.currency_fx_markup_bp} bp`}</dd></div>
         <div><dt>Income shared with customers</dt><dd>{fees.income_share_percent}%</dd></div>
       </dl>

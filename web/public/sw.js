@@ -7,7 +7,7 @@
 //   worker entirely: money never moves from a cache.
 /* eslint-env serviceworker */
 
-const VERSION = 'v1';
+const VERSION = '__BUILD_ID__'; // replaced at build time by vite.config.ts
 const SHELL_CACHE = `autodev-shell-${VERSION}`;
 const API_CACHE = 'autodev-api'; // cleared by the page on sign-out
 const SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icons/icon.svg', '/icons/icon-maskable.svg'];
@@ -26,9 +26,26 @@ self.addEventListener('activate', (event) => {
     caches
       .keys()
       .then((keys) => Promise.all(keys.filter((k) => k.startsWith('autodev-shell-') && k !== SHELL_CACHE).map((k) => caches.delete(k))))
+      .then(pruneAssets)
       .then(() => self.clients.claim()),
   );
 });
+
+// Drop cached /assets/* entries that the current shell no longer references.
+async function pruneAssets() {
+  try {
+    const cache = await caches.open(SHELL_CACHE);
+    const html = await (await cache.match('/index.html'))?.text();
+    if (!html) return;
+    const live = new Set([...html.matchAll(/["'(](\/assets\/[^"')\s]+)/g)].map((m) => m[1]));
+    for (const req of await cache.keys()) {
+      const p = new URL(req.url).pathname;
+      if (p.startsWith('/assets/') && !live.has(p)) await cache.delete(req);
+    }
+  } catch {
+    // best effort
+  }
+}
 
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'clear-api-cache') {

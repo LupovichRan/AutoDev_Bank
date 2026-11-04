@@ -33,6 +33,14 @@ export class NetworkError extends Error {
   }
 }
 
+type UnauthorizedHandler = (path: string) => void;
+let onUnauthorized: UnauthorizedHandler | null = null;
+
+/** Called on any 401 (except /api/me, which the session store handles itself). */
+export function setUnauthorizedHandler(h: UnauthorizedHandler | null): void {
+  onUnauthorized = h;
+}
+
 async function toProblem(res: Response): Promise<ProblemError> {
   let body: Partial<Problem> = {};
   const ct = res.headers.get('content-type') ?? '';
@@ -69,7 +77,11 @@ async function request<T>(
   } catch (e) {
     throw new NetworkError(e);
   }
-  if (!res.ok) throw await toProblem(res);
+  if (!res.ok) {
+    const problem = await toProblem(res);
+    if (res.status === 401 && path !== '/api/me') onUnauthorized?.(path);
+    throw problem;
+  }
   const text = res.status === 204 ? '' : await res.text();
   return { status: res.status, data: (text ? JSON.parse(text) : undefined) as T };
 }
