@@ -7,10 +7,12 @@
     fetchedAt: string;
     sourceUrl?: string;
     license?: string;
+    licenseUrl?: string;
   }
-  let { provider, fetchedAt, sourceUrl, license }: Props = $props();
+  let { provider, fetchedAt, sourceUrl, license, licenseUrl }: Props = $props();
 
   const source = $derived(safeUrl(sourceUrl));
+  const terms = $derived(safeUrl(licenseUrl));
 
   // Re-render the relative time every minute.
   let now = $state(Date.now());
@@ -32,6 +34,10 @@
   {#if license}
     <span aria-hidden="true">·</span>
     <span>Licence: {license}</span>
+  {/if}
+  {#if terms}
+    <span aria-hidden="true">·</span>
+    <a href={terms} rel="noopener noreferrer" target="_blank">Terms<span class="visually-hidden"> of {provider} (opens in a new tab)</span></a>
   {/if}
 </p>
 

@@ -92,6 +92,7 @@
   </Card>
 
   <Card title="Recent audit events" id="events">
+    <p class="muted">Who did what is private: only the event number, the hour, the kind of event and the start of its hash are published.</p>
     {#if eventsError}
       <Problem error={eventsError} onretry={loadEvents} />
     {:else if events === null}
@@ -102,15 +103,14 @@
       <div class="table-wrap">
         <table>
           <caption class="visually-hidden">Most recent audit events</caption>
-          <thead><tr><th scope="col" class="num">#</th><th scope="col">When</th><th scope="col">Action</th><th scope="col">Subject</th><th scope="col">Actor</th></tr></thead>
+          <thead><tr><th scope="col" class="num">#</th><th scope="col">Hour</th><th scope="col">Kind</th><th scope="col">Hash</th></tr></thead>
           <tbody>
             {#each events as ev (ev.seq)}
               <tr>
                 <td class="num">{ev.seq}</td>
                 <td><time datetime={ev.at}>{formatDateTime(ev.at)}</time></td>
                 <td>{ev.action}</td>
-                <td class="mono">{ev.subject}</td>
-                <td class="mono">{ev.actor_id || '—'}</td>
+                <td class="mono">{ev.hash_prefix}…</td>
               </tr>
             {/each}
           </tbody>

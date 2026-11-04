@@ -1,6 +1,15 @@
 import { createHash } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
-import { canonicalTransferJSON, payloadHash } from './payload';
+import { approvePayloadHash, canonicalTransferJSON, payloadHash } from './payload';
+
+describe('approvePayloadHash', () => {
+  it('is sha256("approve:" + id), as the server binds it', async () => {
+    // printf '%s' 'approve:0192f000-0000-7000-8000-000000000001' | sha256sum
+    await expect(approvePayloadHash('0192f000-0000-7000-8000-000000000001')).resolves.toBe(
+      '96e53a456328da80e2441c6e5bd4be9bbe034907dab9366a475e3ac217709ffa',
+    );
+  });
+});
 
 const body = {
   to_account_id: 'acc_b',

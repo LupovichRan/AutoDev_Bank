@@ -1,10 +1,11 @@
 <script lang="ts">
   import Card from '../components/Card.svelte';
   import Problem from '../components/Problem.svelte';
-  import { ProblemError } from '../lib/api';
+  import { apiGet, apiPost, ProblemError } from '../lib/api';
   import { navigate, ROUTES } from '../lib/router';
   import { session } from '../lib/session.svelte';
   import { status } from '../lib/status.svelte';
+  import type { AppConfig } from '../lib/types';
   import { describeWebAuthnError, login, register, webauthnSupported } from '../lib/webauthn';
 
   interface Props {
@@ -13,7 +14,33 @@
   let { next }: Props = $props();
 
   const supported = webauthnSupported();
-  let busy = $state<'login' | 'register' | null>(null);
+  let busy = $state<'login' | 'register' | 'demo' | null>(null);
+
+  // Demo sign-in exists only when the server runs with BANK_DEV_TEST_LOGIN=1
+  // (./dev demo, e2e). It skips passkeys, so it is never offered otherwise.
+  const DEMO_USERS = [
+    { handle: 'alice', label: 'Alice (customer)' },
+    { handle: 'bob', label: 'Bob (customer)' },
+    { handle: 'carol', label: 'Carol (staff approver)' },
+    { handle: 'dave', label: 'Dave (staff initiator)' },
+  ];
+  let devLogin = $state(false);
+  apiGet<AppConfig>('/api/config')
+    .then((c) => (devLogin = c.dev_test_login === true))
+    .catch(() => (devLogin = false));
+
+  async function onDemo(h: string) {
+    error = null;
+    busy = 'demo';
+    try {
+      await apiPost('/api/auth/dev-login', { handle: h });
+      await done(`Signed in as ${h} (demo).`);
+    } catch (e) {
+      error = toError(e);
+    } finally {
+      busy = null;
+    }
+  }
   let error = $state<unknown>(null);
   let handle = $state('');
   let displayName = $state('');
@@ -81,6 +108,19 @@
       {busy === 'login' ? 'Waiting for passkey…' : 'Sign in with passkey'}
     </button>
   </Card>
+
+  {#if devLogin}
+    <Card title="Demo sign-in (dev only)" id="demo">
+      <p class="muted">This server runs with BANK_DEV_TEST_LOGIN=1, so you can sign in as a seeded demo user without a passkey. Never enable it in production.</p>
+      <div class="row">
+        {#each DEMO_USERS as u (u.handle)}
+          <button type="button" class="secondary" onclick={() => onDemo(u.handle)} disabled={busy !== null}>
+            Demo sign-in as {u.label}
+          </button>
+        {/each}
+      </div>
+    </Card>
+  {/if}
 
   <Card title="New here? Create a passkey" id="register">
     <form onsubmit={onRegister} novalidate>

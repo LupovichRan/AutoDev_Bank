@@ -8,5 +8,5 @@
 </script>
 
 {#each providers as p (p.provider)}
-  <LiveBadge provider={p.provider} fetchedAt={p.fetchedAt} sourceUrl={p.sourceUrl} license={p.license} />
+  <LiveBadge provider={p.provider} fetchedAt={p.fetchedAt} sourceUrl={p.sourceUrl} license={p.license} licenseUrl={p.licenseUrl} />
 {/each}

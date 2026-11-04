@@ -9,6 +9,7 @@ import {
   devLogin,
   enableVirtualAuthenticator,
   JOINT,
+  sha256Hex,
 } from './helpers';
 
 /** Fill the Pay form (from/to preselected by query) and confirm; the virtual authenticator answers the step-up. */
@@ -24,10 +25,17 @@ async function pay(page: Page, fromId: string, toId: string, amount: string, des
 
 test('payments: step-up, maker-checker on the joint account, no self-approval', async ({ page, baseURL }) => {
   const run = Date.now().toString(36);
+
+  // Both people need a passkey: paying and approving each take a step-up
+  // through the page's virtual authenticator. Adding a passkey ends the
+  // principal's other sessions, so the API-only context for Bob is opened
+  // after his passkey exists.
+  await enableVirtualAuthenticator(page);
+  await devLogin(page, 'bob');
+  await addPasskey(page, 'bob');
   const bobApi = await apiAs(baseURL!, 'bob');
   const bobIls = await accountByCode(bobApi, BOB_ILS);
 
-  await enableVirtualAuthenticator(page);
   await devLogin(page, 'alice');
   await addPasskey(page, 'alice');
   const aliceIls = await accountByCode(page.request, ALICE_ILS);
@@ -63,7 +71,15 @@ test('payments: step-up, maker-checker on the joint account, no self-approval', 
     await expect(item.getByRole('button', { name: /Approve/ })).toHaveCount(0);
   });
 
-  await test.step('Bob approves it from his inbox', async () => {
+  await test.step('Bob cannot approve through the API without a step-up', async () => {
+    const pending = (await approvals(bobApi)).inbox.find((a) => a.subject.description === big);
+    expect(pending, 'in bob\'s inbox').toBeTruthy();
+    const res = await bobApi.post(`/api/approvals/${pending!.id}/decide`, { data: { approve: true, reason: 'no step-up' } });
+    expect(res.status()).toBe(403);
+    expect(((await res.json()) as { detail?: string }).detail).toBe('step_up_required');
+  });
+
+  await test.step('Bob approves it from his inbox with his passkey', async () => {
     await devLogin(page, 'bob');
     await page.goto('/#/approvals');
     const item = page.getByRole('region', { name: 'Waiting for you' }).getByRole('listitem').filter({ hasText: big });
@@ -88,7 +104,6 @@ test('payments: step-up, maker-checker on the joint account, no self-approval', 
     const jointBeforeOwn = await balance(page.request, JOINT);
     let approvalId = '';
     await devLogin(page, 'bob');
-    await addPasskey(page, 'bob');
     await pay(page, joint.id, aliceIls.id, '1500.00', own);
     await expect(page.getByRole('heading', { name: 'Awaiting approval', exact: true })).toBeVisible();
 
@@ -100,10 +115,13 @@ test('payments: step-up, maker-checker on the joint account, no self-approval', 
     const inbox = (await approvals(page.request)).inbox;
     expect(inbox.some((a) => a.subject.description === own)).toBe(false);
 
-    // The API refuses the initiator too, not just the UI.
+    // The API refuses the initiator too, not just the UI, even with a
+    // step-up for this approval (bootstrapped with dev-stepup).
     const ownApproval = (await approvals(page.request)).mine.find((a) => a.subject.description === own);
     expect(ownApproval, "bob's pending approval").toBeTruthy();
     approvalId = ownApproval!.id;
+    const su = await page.request.post('/api/auth/dev-stepup', { data: { payload_hash: sha256Hex(`approve:${approvalId}`) } });
+    expect(su.ok()).toBeTruthy();
     const self = await page.request.post(`/api/approvals/${approvalId}/decide`, {
       data: { approve: true, reason: 'e2e self' },
     });
@@ -124,6 +142,23 @@ test('payments: step-up, maker-checker on the joint account, no self-approval', 
     const bobView = (await approvals(bobApi)).mine.find((a) => a.id === approvalId);
     expect(bobView?.status).toBe('rejected');
     expect(await balance(page.request, JOINT)).toBe(jointBeforeOwn);
+  });
+
+  await test.step('Alice cancels a payment she started', async () => {
+    const oops = `e2e cancel ${run}`;
+    await devLogin(page, 'alice');
+    const jointBefore = await balance(page.request, JOINT);
+    await pay(page, joint.id, bobIls.id, '1200.00', oops);
+    await expect(page.getByRole('heading', { name: 'Awaiting approval', exact: true })).toBeVisible();
+    await page.goto('/#/approvals');
+    const item = page.getByRole('region', { name: 'Started by you' }).getByRole('listitem').filter({ hasText: oops });
+    await expect(item.getByText('pending', { exact: true })).toBeVisible();
+    await item.getByRole('button', { name: new RegExp(`^Cancel payment ${oops}$`) }).click();
+    await expect(item.getByText('rejected', { exact: true })).toBeVisible();
+    await expect(item.getByRole('button', { name: /Cancel payment/ })).toHaveCount(0);
+    expect(await balance(page.request, JOINT)).toBe(jointBefore);
+    // Bob's inbox no longer offers it.
+    expect((await approvals(bobApi)).inbox.some((a) => a.subject.description === oops)).toBe(false);
   });
 
   await bobApi.dispose();

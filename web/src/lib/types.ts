@@ -55,6 +55,7 @@ export interface Approval {
   decisions: Decision[];
   subject: { from_account_id: string; to_account_id: string; description: string };
   created_at: string;
+  expires_at: string;
   not_before?: string | null;
 }
 
@@ -70,6 +71,7 @@ export interface OpenDataRecord<D> {
   fetched_at: string;
   source_url: string;
   license: string;
+  license_url?: string;
   data: D;
 }
 
@@ -130,12 +132,18 @@ export interface AuditVerify {
   first_bad_seq: number | null;
 }
 
+/** Public view of an audit event: no actor or subject; hour precision; action class only. */
 export interface AuditEvent {
   seq: number;
   at: string;
   action: string;
-  subject: string;
-  actor_id: string | null;
+  hash_prefix: string;
+}
+
+/** GET /api/config */
+export interface AppConfig {
+  dev_test_login: boolean;
+  origin: string;
 }
 
 export interface FeeSchedule {

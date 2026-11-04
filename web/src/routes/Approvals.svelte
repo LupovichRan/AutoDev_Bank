@@ -2,10 +2,12 @@
   import Amount from '../components/Amount.svelte';
   import Card from '../components/Card.svelte';
   import Problem from '../components/Problem.svelte';
-  import { apiGet, apiPost } from '../lib/api';
+  import { apiGet, apiPost, ProblemError } from '../lib/api';
   import { formatDateTime } from '../lib/format';
+  import { approvePayloadHash } from '../lib/payload';
   import { status } from '../lib/status.svelte';
   import type { Approval, Me } from '../lib/types';
+  import { describeWebAuthnError, stepUp } from '../lib/webauthn';
 
   interface Props {
     me: Me;
@@ -62,12 +64,35 @@
     actionError = null;
     deciding = a.id;
     try {
+      if (approve) {
+        // Approving moves money: confirm with a passkey bound to this approval.
+        try {
+          await stepUp(await approvePayloadHash(a.id));
+        } catch (e) {
+          throw e instanceof ProblemError ? e : new Error(describeWebAuthnError(e));
+        }
+      }
       await apiPost(`/api/approvals/${encodeURIComponent(a.id)}/decide`, { approve, reason: why });
       status.announce(approve ? 'Approved.' : 'Rejected.');
       await load();
     } catch (e) {
       actionError = e;
       status.announce('Decision not recorded.');
+    } finally {
+      deciding = null;
+    }
+  }
+
+  async function cancel(a: Approval) {
+    actionError = null;
+    deciding = a.id;
+    try {
+      await apiPost(`/api/approvals/${encodeURIComponent(a.id)}/cancel`, {});
+      status.announce('Payment cancelled.');
+      await load();
+    } catch (e) {
+      actionError = e;
+      status.announce('Payment not cancelled.');
     } finally {
       deciding = null;
     }
@@ -120,6 +145,7 @@
       <div><dt>Created</dt><dd><time datetime={a.created_at}>{formatDateTime(a.created_at)}</time></dd></div>
       <div><dt>Approvals</dt><dd>{approvedCount(a)} of {a.required_approvals}</dd></div>
       {#if coolingOff(a)}<div><dt>Not before</dt><dd>{coolingOff(a)}</dd></div>{/if}
+      {#if a.status === 'pending' && a.expires_at}<div><dt>Expires</dt><dd><time datetime={a.expires_at}>{formatDateTime(a.expires_at)}</time></dd></div>{/if}
     </dl>
     {#if actionable && canDecide(a)}
       <div class="row">
@@ -132,6 +158,12 @@
       </div>
     {:else if actionable && a.initiator.principal_id === me.principal_id}
       <p class="hint">You started this payment, so someone else must approve it.</p>
+    {:else if !actionable && a.status === 'pending' && a.initiator.principal_id === me.principal_id}
+      <div class="row">
+        <button type="button" class="secondary" onclick={() => cancel(a)} disabled={deciding !== null} aria-busy={deciding === a.id}>
+          Cancel payment<span class="visually-hidden"> {a.subject.description}</span>
+        </button>
+      </div>
     {/if}
   </li>
 {/snippet}

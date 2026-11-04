@@ -6,6 +6,7 @@ export interface ProviderInfo {
   fetchedAt: string;
   sourceUrl: string;
   license: string;
+  licenseUrl?: string;
 }
 
 /** One badge per provider: the most recently fetched record's metadata. */
@@ -20,6 +21,7 @@ export function providersOf<D>(records: OpenDataRecord<D>[]): ProviderInfo[] {
     fetchedAt: r.fetched_at,
     sourceUrl: r.source_url,
     license: r.license,
+    licenseUrl: r.license_url,
   }));
 }
 
