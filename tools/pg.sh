@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 # In-house local PostgreSQL 16 control (no Docker). Usage: tools/pg.sh start|stop|reset|status|createdb NAME
+# Overrides: PGBIN (server binaries, default /usr/lib/postgresql/16/bin; on
+# macOS/Homebrew e.g. PGBIN=$(brew --prefix postgresql@16)/bin), PGDATA,
+# PGPORT (55432), PGSOCK (/tmp), PGDATABASE (bank).
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PGBIN="${PGBIN:-/usr/lib/postgresql/16/bin}"
@@ -15,8 +18,12 @@ as_pg() { # run a command as the postgres OS user when we are root
 ensure_dir() {
   mkdir -p "$PGDATA"
   if [ "$(id -u)" = "0" ]; then chown postgres "$PGDATA"; chmod 700 "$PGDATA"; touch "$PGLOG"; chown postgres "$PGLOG"; fi
-  # the postgres user must be able to traverse to PGDATA
-  local d="$PGDATA"; while [ "$d" != "/" ]; do chmod o+x "$d" 2>/dev/null || true; d="$(dirname "$d")"; done
+  # As root the server runs as the postgres user, which must be able to
+  # traverse to PGDATA. Otherwise the server runs as the caller and no
+  # permissions are touched.
+  if [ "$(id -u)" = "0" ]; then
+    local d="$PGDATA"; while [ "$d" != "/" ]; do chmod o+x "$d" 2>/dev/null || true; d="$(dirname "$d")"; done
+  fi
 }
 url() { echo "postgres://postgres@localhost:$PGPORT/$DB?sslmode=disable"; }
 running() { as_pg "$PGBIN/pg_ctl -D '$PGDATA' status" >/dev/null 2>&1; }

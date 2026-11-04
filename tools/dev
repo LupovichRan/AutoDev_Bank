@@ -9,9 +9,11 @@ export PATH="$PATH:$(go env GOPATH 2>/dev/null)/bin"
 usage() {
   cat <<USAGE
 usage: ./dev <command>
+  demo                         see the product: pg start, migrate, seed, refresh, build web,
+                               serve on http://localhost:8080 with demo sign-in (dev only)
   pg start|stop|reset|status   local PostgreSQL 16 under .pgdata (no Docker)
   migrate                      apply migrations/*.sql
-  seed                         load demo principals and accounts
+  seed [--force]               load demo principals and accounts (localhost origins only unless --force)
   refresh                      fetch live open data into the cache
   test                         go test ./...   (integration tests use DATABASE_URL)
   run                          build web (if npm present) and serve on \$BANK_ADDR (default :8080)
@@ -21,17 +23,37 @@ usage: ./dev <command>
 USAGE
 }
 
+build_web() {
+  if [ -f web/package.json ] && command -v npm >/dev/null; then
+    [ -d web/node_modules ] || npm --prefix web ci
+    npm --prefix web run build
+  fi
+}
+
 case "${1:-}" in
+  demo)
+    # Local demo only: BANK_DEV_TEST_LOGIN=1 adds passkey-free "Demo sign-in"
+    # buttons for the seeded users. Never use this outside your machine.
+    # Use a PostgreSQL already reachable at DATABASE_URL, else start the local one.
+    if ! psql "$DATABASE_URL" -qtAc 'select 1' >/dev/null 2>&1; then
+      tools/pg.sh start >/dev/null
+    fi
+    go run ./cmd/bank migrate
+    BANK_ORIGIN=http://localhost:8080 go run ./cmd/bank seed
+    go run ./cmd/bank opendata-refresh || echo "dev: open-data refresh failed; recorded fixtures will be served" >&2
+    build_web
+    # The web build overwrites the tracked web/dist/index.html placeholder;
+    # put it back when the server stops.
+    trap 'git checkout -- web/dist/index.html 2>/dev/null || true' EXIT
+    echo "dev: open http://localhost:8080 and use a Demo sign-in button (Ctrl-C stops the server)" >&2
+    BANK_DEV_TEST_LOGIN=1 BANK_ORIGIN=http://localhost:8080 BANK_ADDR=:8080 go run ./cmd/bank serve ;;
   pg) shift; tools/pg.sh "$@" ;;
   migrate) go run ./cmd/bank migrate ;;
-  seed) go run ./cmd/bank seed ;;
+  seed) shift; go run ./cmd/bank seed "$@" ;;
   refresh) go run ./cmd/bank opendata-refresh ;;
   test) shift; go test ./... "$@" ;;
   run)
-    if [ -f web/package.json ] && command -v npm >/dev/null; then
-      [ -d web/node_modules ] || npm --prefix web ci
-      npm --prefix web run build
-    fi
+    build_web
     go run ./cmd/bank serve ;;
   web) npm --prefix web run dev ;;
   e2e) shift; tools/e2e.sh "$@" ;;
