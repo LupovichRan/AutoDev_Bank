@@ -1,0 +1,18 @@
+{
+  "name": "AutoDev Bank",
+  "short_name": "AutoDev",
+  "description": "Open-source bank: passkeys, maker-checker approvals, live open finance data and a verifiable audit chain.",
+  "id": "/",
+  "start_url": "/#/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#ffffff",
+  "theme_color": "#0b5cad",
+  "lang": "en",
+  "categories": ["finance"],
+  "icons": [
+    { "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icons/icon-maskable.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

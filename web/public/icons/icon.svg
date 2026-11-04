@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="AutoDev Bank">
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="#0b5cad"/>
+  <path d="M14 26 32 14l18 12v4H14z" fill="#ffffff"/>
+  <path d="M18 33h5v13h-5zM29.5 33h5v13h-5zM41 33h5v13h-5z" fill="#ffffff"/>
+  <rect x="14" y="48" width="36" height="4" rx="1" fill="#ffffff"/>
+</svg>

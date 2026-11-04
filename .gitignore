@@ -9,3 +9,6 @@ coverage/
 .pgdata/
 .superpowers/
 .claude/worktrees/
+!web/dist/
+web/dist/*
+!web/dist/index.html

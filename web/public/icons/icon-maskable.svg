@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="AutoDev Bank">
+  <!-- Full-bleed background; the glyph sits inside the 80% maskable safe zone. -->
+  <rect width="64" height="64" fill="#0b5cad"/>
+  <g transform="translate(32 32) scale(0.62) translate(-32 -32)">
+    <path d="M14 26 32 14l18 12v4H14z" fill="#ffffff"/>
+    <path d="M18 33h5v13h-5zM29.5 33h5v13h-5zM41 33h5v13h-5z" fill="#ffffff"/>
+    <rect x="14" y="48" width="36" height="4" rx="1" fill="#ffffff"/>
+  </g>
+</svg>
