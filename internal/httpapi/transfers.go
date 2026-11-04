@@ -108,7 +108,7 @@ func validDescription(s string) bool {
 		return false
 	}
 	for _, r := range s {
-		if unicode.IsControl(r) || r == ' ' || r == ' ' || r == utf8.RuneError {
+		if unicode.IsControl(r) || r == '\u2028' || r == '\u2029' || r == utf8.RuneError {
 			return false
 		}
 	}

@@ -180,3 +180,71 @@ func TestAppend_LargeIntegerPayloadSurvivesVerify(t *testing.T) {
 	testutil.NoError(t, err)
 	testutil.False(t, bytes.Equal(h1, h2), "2^53 and 2^53+1 must hash differently")
 }
+
+func TestRoot_ReadOnlyAndMissing(t *testing.T) {
+	r, pool := newRecorder(t)
+	ctx := context.Background()
+	yesterday := time.Now().UTC().AddDate(0, 0, -1)
+
+	_, ok, err := r.Root(ctx, yesterday)
+	testutil.NoError(t, err)
+	testutil.False(t, ok, "no stored root yet")
+
+	appendOne(t, r, pool, Event{Action: "a", Subject: "s"})
+	signed, err := r.SignDailyRoot(ctx, yesterday)
+	testutil.NoError(t, err)
+	got, ok, err := r.Root(ctx, yesterday)
+	testutil.NoError(t, err)
+	testutil.True(t, ok, "stored root found")
+	testutil.Equal(t, signed.Day, got.Day)
+	testutil.Equal(t, signed.HeadSeq, got.HeadSeq)
+	testutil.Equal(t, signed.HeadHash, got.HeadHash)
+	testutil.True(t, bytes.Equal(signed.Signature, got.Signature), "same signature")
+	testutil.True(t, VerifyRoot(r.PublicKey(), got), "stored root verifies")
+
+	var n int
+	testutil.NoError(t, pool.QueryRow(ctx, `select count(*) from control.audit_roots`).Scan(&n))
+	testutil.Equal(t, 1, n)
+}
+
+func TestSignDailyRootIfMissing_NeverOverwrites(t *testing.T) {
+	r, pool := newRecorder(t)
+	ctx := context.Background()
+	yesterday := time.Now().UTC().AddDate(0, 0, -1)
+
+	first, created, err := r.SignDailyRootIfMissing(ctx, yesterday)
+	testutil.NoError(t, err)
+	testutil.True(t, created, "first call stores the root")
+	testutil.True(t, VerifyRoot(r.PublicKey(), first), "verifies")
+
+	// Corrupt the stored signature; a second call must return it unchanged.
+	bad := bytes.Repeat([]byte{7}, ed25519.SignatureSize)
+	_, err = pool.Exec(ctx, `update control.audit_roots set signature = $1`, bad)
+	testutil.NoError(t, err)
+	again, created, err := r.SignDailyRootIfMissing(ctx, yesterday)
+	testutil.NoError(t, err)
+	testutil.False(t, created, "existing root is kept")
+	testutil.True(t, bytes.Equal(bad, again.Signature), "stored signature returned as is")
+	testutil.False(t, VerifyRoot(r.PublicKey(), again), "corrupted root does not verify")
+
+	var sig []byte
+	testutil.NoError(t, pool.QueryRow(ctx, `select signature from control.audit_roots`).Scan(&sig))
+	testutil.True(t, bytes.Equal(bad, sig), "row not rewritten")
+
+	// An unfinished day is never persisted.
+	_, _, err = r.SignDailyRootIfMissing(ctx, time.Now().UTC())
+	testutil.Error(t, err)
+}
+
+func TestComputeRoot_DoesNotPersist(t *testing.T) {
+	r, pool := newRecorder(t)
+	ctx := context.Background()
+	seq := appendOne(t, r, pool, Event{Action: "a", Subject: "s"})
+	root, err := r.ComputeRoot(ctx, time.Now().UTC())
+	testutil.NoError(t, err)
+	testutil.Equal(t, seq, root.HeadSeq)
+	testutil.True(t, VerifyRoot(r.PublicKey(), root), "verifies")
+	var n int
+	testutil.NoError(t, pool.QueryRow(ctx, `select count(*) from control.audit_roots`).Scan(&n))
+	testutil.Equal(t, 0, n)
+}

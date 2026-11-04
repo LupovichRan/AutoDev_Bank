@@ -1,15 +1,14 @@
 package httpapi
 
 import (
+	"context"
 	_ "embed"
 	"encoding/base64"
-	"encoding/hex"
 	"errors"
 	"net/http"
 	"strconv"
+	"sync"
 	"time"
-
-	"github.com/jackc/pgx/v5"
 
 	"github.com/LupovichRan/AutoDev_Bank/internal/audit"
 )
@@ -26,9 +25,37 @@ func (a *api) fees(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write(feesJSON)
 }
 
-// GET /api/transparency/audit/verify
+// verifyCacheTTL is how long a chain verification report is reused.
+const verifyCacheTTL = 30 * time.Second
+
+// verifyCache single-flights Verify (a full chain scan) and reuses its
+// report for verifyCacheTTL: concurrent callers wait on mu while one runs.
+type verifyCache struct {
+	mu  sync.Mutex
+	at  time.Time
+	rep audit.Report
+	ok  bool
+}
+
+func (a *api) cachedVerify(ctx context.Context) (audit.Report, error) {
+	c := &a.verify
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	now := a.now()
+	if c.ok && now.Sub(c.at) < verifyCacheTTL {
+		return c.rep, nil
+	}
+	rep, err := a.Audit.Verify(ctx)
+	if err != nil {
+		return audit.Report{}, err // errors are not cached
+	}
+	c.rep, c.at, c.ok = rep, now, true
+	return rep, nil
+}
+
+// GET /api/transparency/audit/verify (cached for verifyCacheTTL)
 func (a *api) auditVerify(w http.ResponseWriter, r *http.Request) {
-	rep, err := a.Audit.Verify(r.Context())
+	rep, err := a.cachedVerify(r.Context())
 	if err != nil {
 		WriteErr(w, r, err)
 		return
@@ -83,11 +110,14 @@ func (a *api) auditRecent(w http.ResponseWriter, r *http.Request) {
 const maxRootAgeDays = 3660
 
 // GET /api/transparency/audit/root?day=YYYY-MM-DD (default: yesterday, UTC).
-// A finished day's stored root is returned as is; a missing one, or one
-// signed under a previous key, is signed on demand. Today's root is
-// re-signed on every request because the day (and its head) is not over.
+//
+// A finished day's stored root is returned exactly as stored, never
+// re-signed, with verified reporting whether its signature checks out under
+// the current public key. A finished day without a stored root is signed and
+// stored once. Today's root is signed in memory and not stored
+// (provisional: true), because the day and its head are not over.
 func (a *api) auditRoot(w http.ResponseWriter, r *http.Request) {
-	today := time.Now().UTC().Truncate(24 * time.Hour)
+	today := a.now().UTC().Truncate(24 * time.Hour)
 	day := today.AddDate(0, 0, -1)
 	if s := r.URL.Query().Get("day"); s != "" {
 		d, err := time.Parse("2006-01-02", s)
@@ -97,24 +127,28 @@ func (a *api) auditRoot(w http.ResponseWriter, r *http.Request) {
 		}
 		day = d
 	}
-	var root audit.Root
-	var head []byte
-	err := a.Pool.QueryRow(r.Context(), `select to_char(day, 'YYYY-MM-DD'), head_seq, head_hash, signature
-		from control.audit_roots where day = $1::date`, day.Format("2006-01-02")).
-		Scan(&root.Day, &root.HeadSeq, &head, &root.Signature)
-	root.HeadHash = hex.EncodeToString(head)
-	// Re-sign when missing, when the day is not over, or when the stored
-	// signature does not verify under the current key (the key was rotated).
-	if errors.Is(err, pgx.ErrNoRows) || (err == nil && (!day.Before(today) || !audit.VerifyRoot(a.Audit.PublicKey(), root))) {
-		root, err = a.Audit.SignDailyRoot(r.Context(), day)
+	var (
+		root        audit.Root
+		err         error
+		provisional bool
+	)
+	if day.Before(today) {
+		root, _, err = a.Audit.SignDailyRootIfMissing(r.Context(), day)
+	}
+	if !day.Before(today) || errors.Is(err, audit.ErrDayNotFinished) {
+		provisional = true
+		root, err = a.Audit.ComputeRoot(r.Context(), day)
 	}
 	if err != nil {
 		WriteErr(w, r, err)
 		return
 	}
+	pub := a.Audit.PublicKey()
 	JSON(w, http.StatusOK, map[string]any{
 		"day": root.Day, "head_seq": root.HeadSeq, "head_hash": root.HeadHash,
-		"signature":  base64.StdEncoding.EncodeToString(root.Signature),
-		"public_key": base64.StdEncoding.EncodeToString(a.Audit.PublicKey()),
+		"signature":   base64.StdEncoding.EncodeToString(root.Signature),
+		"public_key":  base64.StdEncoding.EncodeToString(pub),
+		"verified":    audit.VerifyRoot(pub, root),
+		"provisional": provisional,
 	})
 }

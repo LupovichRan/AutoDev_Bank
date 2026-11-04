@@ -248,13 +248,17 @@ func rootMessage(day string, headSeq int64, headHash string) ([]byte, error) {
 	return CanonicalJSON(map[string]any{"day": day, "head_seq": headSeq, "head_hash": headHash})
 }
 
-// SignDailyRoot signs the chain head as of the end of day (UTC) and upserts
-// it into control.audit_roots. The day's head is chosen by each event's
+func dayStart(day time.Time) time.Time {
+	d := day.UTC()
+	return time.Date(d.Year(), d.Month(), d.Day(), 0, 0, 0, 0, time.UTC)
+}
+
+// ComputeRoot signs the chain head as of the end of day (UTC) in memory,
+// without storing it. The day's head is chosen by each event's
 // application-assigned timestamp (the app clock at Append), so the result is
 // only exact when all app servers have synchronised clocks.
-func (r *Recorder) SignDailyRoot(ctx context.Context, day time.Time) (Root, error) {
-	d := day.UTC()
-	start := time.Date(d.Year(), d.Month(), d.Day(), 0, 0, 0, 0, time.UTC)
+func (r *Recorder) ComputeRoot(ctx context.Context, day time.Time) (Root, error) {
+	start := dayStart(day)
 	end := start.AddDate(0, 0, 1)
 
 	var seq int64
@@ -273,6 +277,18 @@ func (r *Recorder) SignDailyRoot(ctx context.Context, day time.Time) (Root, erro
 		return Root{}, err
 	}
 	root.Signature = ed25519.Sign(r.signer, msg)
+	return root, nil
+}
+
+// SignDailyRoot signs the chain head as of the end of day (UTC) and upserts
+// it into control.audit_roots, replacing any stored root for that day. It is
+// for explicit operator use; automatic signing uses SignDailyRootIfMissing.
+func (r *Recorder) SignDailyRoot(ctx context.Context, day time.Time) (Root, error) {
+	root, err := r.ComputeRoot(ctx, day)
+	if err != nil {
+		return Root{}, err
+	}
+	head, _ := hex.DecodeString(root.HeadHash)
 	_, err = r.pool.Exec(ctx, `
 		insert into control.audit_roots (day, head_seq, head_hash, signature, signed_at)
 		values ($1::date, $2, $3, $4, now())
@@ -284,6 +300,59 @@ func (r *Recorder) SignDailyRoot(ctx context.Context, day time.Time) (Root, erro
 		return Root{}, err
 	}
 	return root, nil
+}
+
+// ErrDayNotFinished is returned when a root would be stored for a UTC day
+// that has not ended yet.
+var ErrDayNotFinished = errors.New("audit: day is not finished")
+
+// SignDailyRootIfMissing stores a signed root for a finished UTC day unless
+// one is already stored, in which case the stored root is returned
+// unchanged (even if its signature no longer verifies). created reports
+// whether this call stored it.
+func (r *Recorder) SignDailyRootIfMissing(ctx context.Context, day time.Time) (root Root, created bool, err error) {
+	if !dayStart(day).Before(dayStart(time.Now())) {
+		return Root{}, false, ErrDayNotFinished
+	}
+	if stored, ok, err := r.Root(ctx, day); err != nil || ok {
+		return stored, false, err
+	}
+	root, err = r.ComputeRoot(ctx, day)
+	if err != nil {
+		return Root{}, false, err
+	}
+	head, _ := hex.DecodeString(root.HeadHash)
+	tag, err := r.pool.Exec(ctx, `
+		insert into control.audit_roots (day, head_seq, head_hash, signature, signed_at)
+		values ($1::date, $2, $3, $4, now())
+		on conflict (day) do nothing`,
+		root.Day, root.HeadSeq, head, root.Signature)
+	if err != nil {
+		return Root{}, false, err
+	}
+	if tag.RowsAffected() == 0 { // lost a race with another signer
+		stored, _, err := r.Root(ctx, day)
+		return stored, false, err
+	}
+	return root, true, nil
+}
+
+// Root returns the stored root for day (UTC), if any. It never writes.
+func (r *Recorder) Root(ctx context.Context, day time.Time) (Root, bool, error) {
+	var root Root
+	var head []byte
+	err := r.pool.QueryRow(ctx, `
+		select to_char(day, 'YYYY-MM-DD'), head_seq, head_hash, signature
+		from control.audit_roots where day = $1::date`, dayStart(day).Format("2006-01-02")).
+		Scan(&root.Day, &root.HeadSeq, &head, &root.Signature)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return Root{}, false, nil
+	}
+	if err != nil {
+		return Root{}, false, err
+	}
+	root.HeadHash = hex.EncodeToString(head)
+	return root, true, nil
 }
 
 // VerifyRoot reports whether r carries a valid signature under pub.

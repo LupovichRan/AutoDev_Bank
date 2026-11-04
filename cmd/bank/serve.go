@@ -4,13 +4,18 @@ import (
 	"context"
 	"crypto/ed25519"
 	"crypto/rand"
+	"crypto/sha256"
+	"encoding/base64"
 	"encoding/hex"
 	"errors"
 	"fmt"
 	"io/fs"
 	"log/slog"
+	"net"
 	"net/http"
 	"net/url"
+	"strings"
+	"sync"
 	"time"
 
 	"github.com/LupovichRan/AutoDev_Bank/internal/approvals"
@@ -29,6 +34,19 @@ import (
 // daily audit-root signer, and serves the API and web app on cfg.Addr until
 // ctx is cancelled (SIGINT/SIGTERM), then shuts down gracefully.
 func runServe(ctx context.Context, cfg Config, log *slog.Logger) error {
+	signer, err := auditSignerFor(cfg)
+	if err != nil {
+		return err
+	}
+	if cfg.AuditSigningKey == "" {
+		pub := signer.Public().(ed25519.PublicKey)
+		fp := sha256.Sum256(pub)
+		log.Warn("BANK_AUDIT_SIGNING_KEY is not set; using an ephemeral audit signing key (dev origin only). "+
+			"Roots signed with it cannot be verified after a restart.",
+			"public_key", base64.StdEncoding.EncodeToString(pub),
+			"fingerprint", "sha256:"+hex.EncodeToString(fp[:8]))
+	}
+
 	pool, err := db.Connect(ctx, cfg.DatabaseURL)
 	if err != nil {
 		return err
@@ -40,10 +58,6 @@ func runServe(ctx context.Context, cfg Config, log *slog.Logger) error {
 	}
 	log.Info("migrations applied", "count", len(applied))
 
-	signer, err := auditSigner(cfg.AuditSigningKey, log)
-	if err != nil {
-		return err
-	}
 	origin, err := url.Parse(cfg.Origin)
 	if err != nil || origin.Hostname() == "" {
 		return fmt.Errorf("BANK_ORIGIN %q is not a valid origin", cfg.Origin)
@@ -52,9 +66,9 @@ func runServe(ctx context.Context, cfg Config, log *slog.Logger) error {
 	rec := audit.New(pool, signer)
 	led := ledger.New(pool)
 	ap := approvals.New(pool, led, rec, approvals.DefaultPolicy())
-	rateLimit := 10
+	rateLimit, publicRate := 10, 60
 	if cfg.DevTestLogin {
-		rateLimit = 600
+		rateLimit, publicRate = 600, 600
 		log.Warn("BANK_DEV_TEST_LOGIN=1: POST /api/auth/dev-login signs anyone in; never enable this in production")
 	}
 	authSvc, err := auth.New(pool, auth.Config{
@@ -90,12 +104,26 @@ func runServe(ctx context.Context, cfg Config, log *slog.Logger) error {
 	handler := httpapi.New(httpapi.Deps{
 		Pool: pool, Ledger: led, Audit: rec, Approvals: ap, Auth: authSvc,
 		OpenData: od, Static: static, Log: log,
+		Origin: cfg.Origin, PublicRateLimitPerMinute: publicRate,
 	})
 
+	// The background goroutines use pool; stop and wait for them before the
+	// deferred pool.Close runs.
 	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-	go refresher.Run(ctx, 6*time.Hour) // refreshes once now, then every 6 hours
-	go signDailyRoots(ctx, rec, log)
+	var wg sync.WaitGroup
+	defer func() {
+		cancel()
+		wg.Wait()
+	}()
+	wg.Add(2)
+	go func() {
+		defer wg.Done()
+		refresher.Run(ctx, 6*time.Hour) // refreshes once now, then every 6 hours
+	}()
+	go func() {
+		defer wg.Done()
+		signDailyRoots(ctx, rec, log)
+	}()
 
 	srv := &http.Server{
 		Addr:              cfg.Addr,
@@ -128,36 +156,60 @@ func runServe(ctx context.Context, cfg Config, log *slog.Logger) error {
 	return nil
 }
 
-// auditSigner decodes BANK_AUDIT_SIGNING_KEY (hex 32-byte Ed25519 seed) or,
-// when empty, generates a key and logs its seed so a developer can persist it.
-func auditSigner(hexSeed string, log *slog.Logger) (ed25519.PrivateKey, error) {
-	if hexSeed != "" {
-		seed, err := hex.DecodeString(hexSeed)
+// auditSignerFor returns the Ed25519 audit signing key: the 32-byte seed in
+// BANK_AUDIT_SIGNING_KEY (64 hex characters) when set; otherwise a freshly
+// generated ephemeral key, but only for a development origin (localhost,
+// *.localhost or a loopback IP). Any other origin without a key is an error,
+// so a public deployment never signs roots with a key nobody can keep.
+func auditSignerFor(cfg Config) (ed25519.PrivateKey, error) {
+	if cfg.AuditSigningKey != "" {
+		seed, err := hex.DecodeString(cfg.AuditSigningKey)
 		if err != nil || len(seed) != ed25519.SeedSize {
 			return nil, errors.New("BANK_AUDIT_SIGNING_KEY must be 64 hex characters (a 32-byte Ed25519 seed)")
 		}
 		return ed25519.NewKeyFromSeed(seed), nil
 	}
-	seed := make([]byte, ed25519.SeedSize)
-	if _, err := rand.Read(seed); err != nil {
+	if !isDevOrigin(cfg.Origin) {
+		return nil, fmt.Errorf("BANK_AUDIT_SIGNING_KEY is required when BANK_ORIGIN (%q) is not localhost or a loopback address; "+
+			"set it to 64 hex characters (a 32-byte Ed25519 seed), e.g. from `openssl rand -hex 32`", cfg.Origin)
+	}
+	_, priv, err := ed25519.GenerateKey(rand.Reader)
+	if err != nil {
 		return nil, err
 	}
-	log.Warn("WARNING: BANK_AUDIT_SIGNING_KEY is not set; generated an ephemeral audit signing key. "+
-		"Roots signed with it cannot be verified after a restart unless you persist it.",
-		"BANK_AUDIT_SIGNING_KEY", hex.EncodeToString(seed))
-	return ed25519.NewKeyFromSeed(seed), nil
+	return priv, nil
 }
 
-// signDailyRoots signs yesterday's (UTC) audit root at startup and then
-// every 24 hours until ctx is done.
+// isDevOrigin reports whether origin's host is localhost, *.localhost or a
+// loopback IP.
+func isDevOrigin(origin string) bool {
+	u, err := url.Parse(origin)
+	if err != nil {
+		return false
+	}
+	host := strings.ToLower(u.Hostname())
+	if host == "localhost" || strings.HasSuffix(host, ".localhost") {
+		return true
+	}
+	ip := net.ParseIP(host)
+	return ip != nil && ip.IsLoopback()
+}
+
+// signDailyRoots stores yesterday's (UTC) audit root at startup if it is
+// missing, then checks again every hour, until ctx is done. It never
+// overwrites a stored root.
 func signDailyRoots(ctx context.Context, rec *audit.Recorder, log *slog.Logger) {
-	t := time.NewTicker(24 * time.Hour)
+	t := time.NewTicker(time.Hour)
 	defer t.Stop()
 	for {
 		day := time.Now().UTC().AddDate(0, 0, -1)
-		if root, err := rec.SignDailyRoot(ctx, day); err != nil {
-			log.Error("audit root signing failed", "day", day.Format("2006-01-02"), "err", err)
-		} else {
+		root, created, err := rec.SignDailyRootIfMissing(ctx, day)
+		switch {
+		case err != nil:
+			if ctx.Err() == nil {
+				log.Error("audit root signing failed", "day", day.Format("2006-01-02"), "err", err)
+			}
+		case created:
 			log.Info("audit root signed", "day", root.Day, "head_seq", root.HeadSeq, "head_hash", root.HeadHash)
 		}
 		select {

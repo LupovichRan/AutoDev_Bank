@@ -55,7 +55,7 @@ func TestValidateTransferBody(t *testing.T) {
 	bad := map[string]func(b *transferBody){
 		"invalid_amount":      func(b *transferBody) { b.Amount = 0 },
 		"invalid_currency":    func(b *transferBody) { b.Currency = "ils" },
-		"invalid_description": func(b *transferBody) { b.Description = "line sep" },
+		"invalid_description": func(b *transferBody) { b.Description = "line\u2028sep" },
 		"invalid_account":     func(b *transferBody) { b.FromAccountID = "nope" },
 	}
 	for want, mut := range bad {

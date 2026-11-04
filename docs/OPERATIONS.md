@@ -27,7 +27,7 @@ First run:
 ./dev run
 ```
 
-The binary has four subcommands: `serve`, `migrate`, `seed`, `opendata-refresh`. `serve` applies pending migrations at startup, refreshes open data once and then every six hours, signs yesterday's audit root at startup and then daily, and shuts down gracefully on SIGINT/SIGTERM. `seed` is idempotent: it creates (or finds) the demo principals `alice`, `bob` (customers), `carol` (staff: `payments.approver`, `staff.ops`) and `dave` (staff: `payments.initiator`), their ILS/EUR and joint accounts with opening balances funded from `bank.equity.*`, and prints a table of ids and balances.
+The binary has four subcommands: `serve`, `migrate`, `seed`, `opendata-refresh`. `serve` applies pending migrations at startup, refreshes open data once and then every six hours, stores yesterday's audit root at startup if it is missing (checking again hourly; a stored root is never overwritten), and shuts down gracefully on SIGINT/SIGTERM. `seed` is idempotent: it creates (or finds) the demo principals `alice`, `bob` (customers), `carol` (staff: `payments.approver`, `staff.ops`) and `dave` (staff: `payments.initiator`), their ILS/EUR and joint accounts with opening balances funded from `bank.equity.*`, and prints a table of ids and balances.
 
 ## Environment variables
 
@@ -38,7 +38,7 @@ Read once at startup in `cmd/bank/main.go`, plus the Enable Banking variables re
 | `DATABASE_URL` | PostgreSQL connection string. | `postgres://postgres@localhost:55432/bank?sslmode=disable` |
 | `BANK_ADDR` | HTTP listen address. | `:8080` |
 | `BANK_ORIGIN` | Public origin. Used as the WebAuthn relying-party origin, so it must match the browser URL. | `http://localhost:8080` |
-| `BANK_AUDIT_SIGNING_KEY` | Hex-encoded 32-byte Ed25519 seed that signs daily audit roots. If empty, a key is generated and logged, and is lost on restart. Set it in any real deployment. | empty |
+| `BANK_AUDIT_SIGNING_KEY` | Hex-encoded 32-byte Ed25519 seed that signs daily audit roots. Required unless the host of `BANK_ORIGIN` is `localhost`, `*.localhost` or a loopback IP; then an ephemeral key is generated (only its public key and fingerprint are logged) and is lost on restart. | empty |
 | `BANK_DEV_TEST_LOGIN` | `1` enables `POST /api/auth/dev-login` and `POST /api/auth/dev-stepup`. Tests only. See Security notes. | off |
 | `BANK_OPENDATA_FIXTURES` | `1` serves recorded fixtures instead of live upstreams. | off |
 | `ENABLE_BANKING_APP_ID` | Enable Banking application id. | empty (provider off) |
@@ -85,7 +85,9 @@ Verify a daily root with the public key:
 3. The signed message is the canonical JSON `{"day":"<day>","head_hash":"<hex>","head_seq":<n>}` (keys sorted, no spaces). Check the signature with `audit.VerifyRoot(pub, root)` or any Ed25519 verifier.
 4. Check that the root's `head_hash` equals the `hash` of row `head_seq` in `audit_events`.
 
-Publish each root outside the database (object-locked storage or a public page). A root kept only in the same database does not protect against someone who controls the database. If `BANK_AUDIT_SIGNING_KEY` was left empty, roots are signed with a throwaway key that cannot be recovered.
+Publish each root outside the database (object-locked storage or a public page). A root kept only in the same database does not protect against someone who controls the database. If `BANK_AUDIT_SIGNING_KEY` was left empty (dev origins only), roots are signed with a throwaway key that cannot be recovered.
+
+`GET /api/transparency/audit/root?day=YYYY-MM-DD` (public, rate limited) returns a finished day's stored root exactly as stored, with `verified` (does it check out under the current public key) and `provisional: false`; a finished day without a stored root is signed and stored once. Today's root is signed in memory, not stored, and marked `provisional: true`. To replace a stored root deliberately, an operator calls `audit.Recorder.SignDailyRoot`.
 
 ## Enable Banking setup
 

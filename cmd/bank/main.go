@@ -19,7 +19,7 @@ type Config struct {
 	DatabaseURL     string // DATABASE_URL
 	Addr            string // BANK_ADDR, default :8080
 	Origin          string // BANK_ORIGIN, default http://localhost:8080
-	AuditSigningKey string // BANK_AUDIT_SIGNING_KEY, hex Ed25519 seed (generated if empty)
+	AuditSigningKey string // BANK_AUDIT_SIGNING_KEY, hex Ed25519 seed (required unless BANK_ORIGIN is localhost/loopback)
 	DevTestLogin    bool   // BANK_DEV_TEST_LOGIN=1 enables POST /api/auth/dev-login (tests only)
 	OpenDataFixture bool   // BANK_OPENDATA_FIXTURES=1 serves recorded fixtures when upstreams fail
 }

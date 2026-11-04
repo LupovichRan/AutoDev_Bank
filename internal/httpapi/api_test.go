@@ -18,6 +18,8 @@ import (
 	"testing/fstest"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgxpool"
+
 	"github.com/LupovichRan/AutoDev_Bank/internal/approvals"
 	"github.com/LupovichRan/AutoDev_Bank/internal/audit"
 	"github.com/LupovichRan/AutoDev_Bank/internal/auth"
@@ -34,6 +36,7 @@ type testEnv struct {
 	srv  *httptest.Server
 	auth *auth.Service
 	rec  *audit.Recorder
+	pool *pgxpool.Pool
 	seed seed.Result
 }
 
@@ -44,6 +47,12 @@ var testStatic = fstest.MapFS{
 }
 
 func newEnv(t *testing.T) *testEnv {
+	t.Helper()
+	return newEnvWith(t, nil)
+}
+
+// newEnvWith is newEnv with a hook to adjust Deps before the handler is built.
+func newEnvWith(t *testing.T, opt func(*Deps)) *testEnv {
 	t.Helper()
 	ctx := context.Background()
 	pool := db.TestPool(t)
@@ -66,12 +75,16 @@ func newEnv(t *testing.T) *testEnv {
 	res, err := seed.Run(ctx, pool, led, ap)
 	testutil.NoError(t, err)
 
-	srv := httptest.NewServer(New(Deps{
+	deps := Deps{
 		Pool: pool, Ledger: led, Audit: rec, Approvals: ap, Auth: authSvc,
 		OpenData: od, Static: testStatic, Log: log,
-	}))
+	}
+	if opt != nil {
+		opt(&deps)
+	}
+	srv := httptest.NewServer(New(deps))
 	t.Cleanup(srv.Close)
-	return &testEnv{t: t, srv: srv, auth: authSvc, rec: rec, seed: res}
+	return &testEnv{t: t, srv: srv, auth: authSvc, rec: rec, pool: pool, seed: res}
 }
 
 func (e *testEnv) account(code string) string {
@@ -622,7 +635,7 @@ func TestSecurityHeadersAndProblemShape(t *testing.T) {
 		h := resp.Header
 		testutil.Equal(t, "nosniff", h.Get("X-Content-Type-Options"), path)
 		testutil.Equal(t, "same-origin", h.Get("Referrer-Policy"), path)
-		testutil.Equal(t, "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; connect-src 'self'",
+		testutil.Equal(t, ContentSecurityPolicy,
 			h.Get("Content-Security-Policy"), path)
 		testutil.Equal(t, "geolocation=(self)", h.Get("Permissions-Policy"), path)
 		testutil.True(t, h.Get("X-Request-Id") != "", "generated request id")
@@ -636,5 +649,5 @@ func TestSecurityHeadersAndProblemShape(t *testing.T) {
 	decodeProblem(t, resp, raw)
 	big := map[string]any{"approve": true, "reason": strings.Repeat("x", 70<<10)}
 	resp, raw = alice.do("POST", "/api/approvals/0192f000-0000-7000-8000-000000000009/decide", big, nil)
-	testutil.True(t, resp.StatusCode == http.StatusRequestEntityTooLarge || resp.StatusCode == http.StatusBadRequest, string(raw))
+	testutil.Equal(t, http.StatusRequestEntityTooLarge, resp.StatusCode, string(raw))
 }

@@ -135,7 +135,7 @@ export interface AuditEvent {
   at: string;
   action: string;
   subject: string;
-  actor_id: string;
+  actor_id: string | null;
 }
 
 export interface FeeSchedule {

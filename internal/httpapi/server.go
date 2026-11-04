@@ -35,22 +35,40 @@ type Deps struct {
 	OpenData  *opendata.Handlers // its RequireStaff is set by New
 	Static    fs.FS              // the built web app (index.html at the root); nil serves nothing
 	Log       *slog.Logger
+	// Origin is the public origin (BANK_ORIGIN); an https origin adds HSTS.
+	Origin string
+	// PublicRateLimitPerMinute is the per-IP budget for /api/transparency/*
+	// and /api/opendata/* (0 means 60).
+	PublicRateLimitPerMinute int
+
+	now func() time.Time // test hook; nil means time.Now
 }
 
 // RoleStaffOps may trigger an open-data refresh.
 const RoleStaffOps = "staff.ops"
 
 // ContentSecurityPolicy is sent on every response.
-const ContentSecurityPolicy = "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; connect-src 'self'"
+const ContentSecurityPolicy = "default-src 'self'; img-src 'self' data:; style-src 'self'; connect-src 'self'; " +
+	"base-uri 'none'; form-action 'self'; frame-ancestors 'none'; object-src 'none'"
+
+// hstsValue is sent when the public origin is https.
+const hstsValue = "max-age=63072000; includeSubDomains"
 
 type api struct {
 	Deps
+	verify verifyCache
 }
 
 // New returns the bank's HTTP handler.
 func New(d Deps) http.Handler {
 	if d.Log == nil {
 		d.Log = slog.Default()
+	}
+	if d.now == nil {
+		d.now = time.Now
+	}
+	if d.PublicRateLimitPerMinute <= 0 {
+		d.PublicRateLimitPerMinute = defaultPublicRatePerMinute
 	}
 	a := &api{Deps: d}
 	mux := http.NewServeMux()
@@ -76,9 +94,12 @@ func New(d Deps) http.Handler {
 	})
 	mux.Handle("/", staticHandler(d.Static))
 
-	// Outermost first: request id, access log, recover, headers, session.
+	// Outermost first: request id, access log, recover, headers, body cap,
+	// public rate limit, session.
 	var h http.Handler = authenticate(d.Auth, mux)
-	h = securityHeaders(h)
+	h = publicRateLimit(newRateLimiter(d.PublicRateLimitPerMinute, time.Minute, d.now), h)
+	h = limitBody(h)
+	h = securityHeaders(strings.HasPrefix(d.Origin, "https://"), h)
 	h = recoverer(h)
 	h = accessLog(h)
 	h = withRequestID(d.Log, h)
@@ -215,13 +236,15 @@ func recoverer(next http.Handler) http.Handler {
 	})
 }
 
-// authenticate attaches the session for every route except /api/auth/*:
+// authenticate attaches the session for /api/* routes except /api/auth/*:
 // those routes authenticate themselves, after their per-IP rate limiter, so
-// throttled ceremony requests never reach the session store.
+// throttled ceremony requests never reach the session store. Static files
+// and /healthz need no session, so they skip the lookup too.
 func authenticate(a *auth.Service, next http.Handler) http.Handler {
 	withSession := a.Authenticate(next)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if strings.HasPrefix(r.URL.Path, "/api/auth/") {
+		p := r.URL.Path
+		if !strings.HasPrefix(p, "/api/") || strings.HasPrefix(p, "/api/auth/") {
 			next.ServeHTTP(w, r)
 			return
 		}
@@ -229,7 +252,18 @@ func authenticate(a *auth.Service, next http.Handler) http.Handler {
 	})
 }
 
-func securityHeaders(next http.Handler) http.Handler {
+// limitBody caps every request body at maxBodyBytes; handlers reading past
+// it get *http.MaxBytesError (decodeJSON maps it to 413).
+func limitBody(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Body != nil && r.Body != http.NoBody {
+			r.Body = http.MaxBytesReader(w, r.Body, maxBodyBytes)
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
+func securityHeaders(hsts bool, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		h := w.Header()
 		h.Set("X-Content-Type-Options", "nosniff")
@@ -237,6 +271,9 @@ func securityHeaders(next http.Handler) http.Handler {
 		h.Set("Content-Security-Policy", ContentSecurityPolicy)
 		h.Set("Permissions-Policy", "geolocation=(self)")
 		h.Set("X-Frame-Options", "DENY")
+		if hsts {
+			h.Set("Strict-Transport-Security", hstsValue)
+		}
 		if r.URL.Path == "/api" || strings.HasPrefix(r.URL.Path, "/api/") {
 			h.Set("Cache-Control", "no-store")
 		}
