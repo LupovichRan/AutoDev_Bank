@@ -8,8 +8,8 @@ test('register with a passkey, sign out, sign back in with it', async ({ page })
 
   await page.goto('/#/sign-in');
   await expect(page.getByRole('heading', { level: 1, name: 'Sign in' })).toBeVisible();
-  await page.getByLabel('Handle').fill(handle);
-  await page.getByLabel('Display name').fill(displayName);
+  await page.getByLabel('Handle', { exact: true }).fill(handle);
+  await page.getByLabel('Display name', { exact: true }).fill(displayName);
   await page.getByRole('button', { name: 'Create account' }).click();
 
   await expect(page.getByRole('heading', { level: 1, name: `Hello, ${displayName}` })).toBeVisible();

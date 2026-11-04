@@ -262,6 +262,12 @@ func (s *Service) handleDevLogin(w http.ResponseWriter, r *http.Request) {
 // assertion, e.g. so a dev-login principal (who has no credential) can add
 // its first passkey. NEVER enable it in production.
 func (s *Service) handleDevStepUp(w http.ResponseWriter, r *http.Request) {
+	// Defense in depth: the route is only mounted with AllowTestLogin, but the
+	// handler must not work without it either.
+	if !s.cfg.AllowTestLogin {
+		http.NotFound(w, r)
+		return
+	}
 	sess, _ := FromContext(r.Context())
 	var req struct {
 		PayloadHash string `json:"payload_hash"`

@@ -34,7 +34,7 @@ case "${1:-}" in
     fi
     go run ./cmd/bank serve ;;
   web) npm --prefix web run dev ;;
-  e2e) tools/e2e.sh ;;
+  e2e) shift; tools/e2e.sh "$@" ;;
   ci)
     go vet ./...
     go test -race ./...

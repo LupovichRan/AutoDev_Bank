@@ -394,3 +394,14 @@ func TestHandlers_DevStepUpDisabled(t *testing.T) {
 	c := newTestClient(t, s)
 	testutil.Equal(t, http.StatusNotFound, c.do("POST", "/api/auth/dev-stepup", map[string]string{"payload_hash": "00"}).Code)
 }
+
+// The route is not mounted without AllowTestLogin, but the handler itself
+// must also refuse when called directly.
+func TestHandlers_DevStepUpHandlerRefusesWhenDisabled(t *testing.T) {
+	s, aud := newTestService(t, func(c *Config) { c.AllowTestLogin = false })
+	req := httptest.NewRequest("POST", "/api/auth/dev-stepup", strings.NewReader(`{"payload_hash":"`+strings.Repeat("00", 32)+`"}`))
+	w := httptest.NewRecorder()
+	s.handleDevStepUp(w, req)
+	testutil.Equal(t, http.StatusNotFound, w.Code)
+	testutil.False(t, aud.has("auth.dev_stepup"), "nothing audited")
+}

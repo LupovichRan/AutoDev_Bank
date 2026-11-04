@@ -24,7 +24,7 @@ test('FX reference rates with a live-data badge', async ({ page }) => {
   expect(await source.getAttribute('href')).toMatch(/^https:\/\//);
 
   // The converter answers from the same rates.
-  await fx.getByLabel('Amount').fill('100');
+  await fx.getByLabel('Amount', { exact: true }).fill('100');
   await expect(fx.getByText(/^≈/)).toBeVisible();
 });
 
@@ -40,8 +40,8 @@ test('UK current account products', async ({ page }) => {
 
 test('nearby ATMs for manually entered coordinates', async ({ page }) => {
   const nearby = page.getByRole('region', { name: 'Nearby ATMs and branches' });
-  await nearby.getByLabel('ATMs').check();
-  await nearby.getByLabel('Near (latitude,longitude)').fill('51.5138,-0.0984');
+  await nearby.getByLabel('ATMs', { exact: true }).check();
+  await nearby.getByLabel('Near (latitude,longitude)', { exact: true }).fill('51.5138,-0.0984');
   await nearby.getByRole('button', { name: 'Search' }).click();
   const places = nearby.getByRole('list').filter({ has: page.getByRole('link', { name: /^Map/ }) });
   await expect(places.getByRole('listitem').first()).toBeVisible();

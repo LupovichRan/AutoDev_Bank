@@ -6,6 +6,9 @@ const chromium = process.env['E2E_CHROMIUM'];
 
 export default defineConfig({
   testDir: 'e2e',
+  // One worker, serial: specs share one seeded database (joint account balances).
+  workers: 1,
+  fullyParallel: false,
   retries: 0,
   forbidOnly: !!process.env['CI'],
   timeout: 60_000,

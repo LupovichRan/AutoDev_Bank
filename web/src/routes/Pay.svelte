@@ -152,6 +152,7 @@
 {:else if accounts === null}
   <p aria-busy="true">Loading accounts…</p>
 {:else if outcome}
+  <div data-testid="pay-outcome">
   <Card title={outcome.kind === 'sent' ? 'Sent' : 'Awaiting approval'} id="outcome">
     {#if outcome.kind === 'sent'}
       <p class="ok big">Sent {sentSummary}.</p>
@@ -168,6 +169,7 @@
       <a class="button secondary" href={href('/')}>Back to Home</a>
     </div>
   </Card>
+  </div>
 {:else if accounts.length === 0}
   <p>You need an account before you can pay.</p>
 {:else}
