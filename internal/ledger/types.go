@@ -26,8 +26,8 @@ type PostRequest struct {
 	// same payload returns the original transaction.
 	IdempotencyKey string
 	Description    string
-	// EffectiveDate is the accounting date (only its calendar date in its own
-	// location is used). The zero value means today in UTC.
+	// EffectiveDate is the accounting date: the calendar date of this instant
+	// in UTC. The zero value means today (UTC).
 	EffectiveDate time.Time
 	Lines         []Line
 	Currency      string
@@ -42,6 +42,7 @@ type Transaction struct {
 	ID             uuid.UUID
 	IdempotencyKey string
 	Description    string
+	Currency       string // currency of all its entries
 	Status         string
 	EffectiveDate  time.Time
 	CreatedAt      time.Time

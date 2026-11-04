@@ -2,6 +2,19 @@
 // ledger. The SQL triggers (migration 0002) enforce the invariants; this
 // package validates requests early, makes posting idempotent, takes account
 // locks in a deterministic order, and maps schema errors to typed errors.
+//
+// Isolation rule: money movement (Post, Resolve, ExpireHolds) runs under READ
+// COMMITTED with explicit FOR UPDATE locks, taken in ascending id order, on
+// every row it reads and then writes (accounts, and the transaction row in
+// Resolve). Every such row is locked, so SERIALIZABLE would add nothing but
+// 40001 retry storms on hot accounts. Callers of PostTx must run READ
+// COMMITTED (db.WithTxLevel(..., pgx.ReadCommitted, ...)) and must not make
+// decisions from unlocked reads; they must also pass the commit error
+// through MapError, because the zero-sum check is a deferred trigger.
+//
+// Dates: every accounting date (PostRequest.EffectiveDate, ClosePeriod's
+// through) is the calendar date of that instant in UTC,
+// t.UTC().Format("2006-01-02"), for hashing, storing and closing alike.
 package ledger
 
 import (
@@ -9,7 +22,6 @@ import (
 	"cmp"
 	"context"
 	"crypto/sha256"
-	"encoding/binary"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -28,23 +40,24 @@ import (
 
 const dateLayout = "2006-01-02"
 
-// lockStripes is the number of in-process account lock stripes (see lockAccountsLocal).
-const lockStripes = 256
+// maxAbsAmount bounds |Line.Amount|; larger magnitudes are ErrInvalidRequest.
+const maxAbsAmount = math.MaxInt64 / 2
 
-// Service is the ledger API. It is safe for concurrent use; construct it with New.
+// Service is the ledger API. It is safe for concurrent use and holds no
+// in-process locks: all serialisation is by database row locks, so any number
+// of Services (or processes) may share one database.
 type Service struct {
 	pool *pgxpool.Pool
-	// stripes are 1-slot semaphores, one per account-id stripe.
-	stripes [lockStripes]chan struct{}
 }
 
 // New returns a Service backed by pool.
 func New(pool *pgxpool.Pool) *Service {
-	s := &Service{pool: pool}
-	for i := range s.stripes {
-		s.stripes[i] = make(chan struct{}, 1)
-	}
-	return s
+	return &Service{pool: pool}
+}
+
+// withTx runs fn in a READ COMMITTED transaction (see the package comment).
+func (s *Service) withTx(ctx context.Context, fn func(context.Context, pgx.Tx) error) error {
+	return db.WithTxLevel(ctx, s.pool, pgx.ReadCommitted, fn)
 }
 
 // querier is satisfied by both *pgxpool.Pool and pgx.Tx.
@@ -57,32 +70,35 @@ type querier interface {
 // ---------------------------------------------------------------------------
 // Posting
 
-// Post records req in its own serializable transaction (retried on
-// serialization failures). See PostTx.
+// Post records req in its own READ COMMITTED transaction (retried on
+// deadlock). See PostTx.
+//
+// Replaying an IdempotencyKey with the same payload returns the transaction's
+// current state (for a hold resolved since, its new status and resolved_at),
+// not a copy of the original response.
 func (s *Service) Post(ctx context.Context, req PostRequest) (Transaction, error) {
-	unlock, err := s.lockAccountsLocal(ctx, req.Lines)
-	if err != nil {
-		return Transaction{}, err
-	}
-	defer unlock()
 	var out Transaction
-	err = db.WithTx(ctx, s.pool, func(ctx context.Context, tx pgx.Tx) (err error) {
+	err := s.withTx(ctx, func(ctx context.Context, tx pgx.Tx) (err error) {
 		out, err = s.PostTx(ctx, tx, req)
 		return err
 	})
 	if err != nil {
-		return Transaction{}, mapErr(err) // commit-time (deferred) trigger errors land here
+		return Transaction{}, MapError(err) // commit-time (deferred) trigger errors land here
 	}
 	return out, nil
 }
 
-// PostTx records req inside the caller's transaction. Replaying an
-// IdempotencyKey with the same payload returns the existing transaction and
-// writes nothing; with a different payload it fails with
-// ErrIdempotencyConflict. On any error the caller must roll back.
+// PostTx records req inside the caller's transaction, which must be READ
+// COMMITTED (db.WithTxLevel(ctx, pool, pgx.ReadCommitted, ...)); the caller
+// must not base decisions on rows it has not locked. Replaying an
+// IdempotencyKey with the same payload returns the existing transaction (in
+// its current state) and writes nothing; with a different payload it fails
+// with ErrIdempotencyConflict. On any error the caller must roll back. The
+// zero-sum check is deferred to commit, so the caller must pass the commit
+// (or WithTxLevel) error through MapError to get typed errors.
 func (s *Service) PostTx(ctx context.Context, tx pgx.Tx, req PostRequest) (Transaction, error) {
 	out, err := postTx(ctx, tx, req)
-	return out, mapErr(err)
+	return out, MapError(err)
 }
 
 func postTx(ctx context.Context, tx pgx.Tx, req PostRequest) (Transaction, error) {
@@ -117,7 +133,11 @@ func postTx(ctx context.Context, tx pgx.Tx, req PostRequest) (Transaction, error
 	if err := lockAccounts(ctx, tx, req); err != nil {
 		return Transaction{}, err
 	}
-	for _, l := range req.Lines {
+	// Credits first, so a request like [A -600, A +600] does not trip the
+	// per-entry available-funds check on an intermediate state.
+	lines := slices.Clone(req.Lines)
+	slices.SortStableFunc(lines, func(a, b Line) int { return cmp.Compare(isDebit(a), isDebit(b)) })
+	for _, l := range lines {
 		if _, err := tx.Exec(ctx, `insert into ledger.entries (id, transaction_id, account_id, amount, currency)
 			values ($1, $2, $3, $4, $5)`, ids.New(), id, l.AccountID, l.Amount, req.Currency); err != nil {
 			return Transaction{}, fmt.Errorf("ledger: insert entry: %w", err)
@@ -138,43 +158,12 @@ func replay(ctx context.Context, tx pgx.Tx, req PostRequest, hash []byte) (Trans
 	}
 	if req.EffectiveDate.IsZero() {
 		// "Today" was defaulted; a retry after midnight must still match.
-		hash = payloadHash(req, storedDate.Format(dateLayout))
+		hash = payloadHash(req, utcDate(storedDate))
 	}
 	if !bytes.Equal(stored, hash) {
 		return Transaction{}, fmt.Errorf("%w: key %q", ErrIdempotencyConflict, req.IdempotencyKey)
 	}
 	return getTransaction(ctx, tx, id)
-}
-
-// lockAccountsLocal serialises, within this process, Posts that touch the
-// same account stripe, taking stripes in ascending order (deadlock-free).
-// Under SERIALIZABLE a transaction that waits on another's FOR UPDATE row
-// lock fails with 40001 once the holder commits, so many concurrent postings
-// on one hot account would exhaust db.WithTx's retries; queueing them here,
-// before the snapshot is taken, avoids that retry storm. Database locks
-// (lockAccounts) and retries still guarantee correctness across processes.
-// PostTx does not use it: the caller's snapshot already exists.
-func (s *Service) lockAccountsLocal(ctx context.Context, lines []Line) (unlock func(), err error) {
-	idx := make([]int, 0, len(lines))
-	for _, l := range lines {
-		idx = append(idx, int(binary.BigEndian.Uint64(l.AccountID[8:])%lockStripes))
-	}
-	slices.Sort(idx)
-	idx = slices.Compact(idx)
-	release := func(held []int) {
-		for _, i := range held {
-			<-s.stripes[i]
-		}
-	}
-	for n, i := range idx {
-		select {
-		case s.stripes[i] <- struct{}{}:
-		case <-ctx.Done():
-			release(idx[:n])
-			return nil, ctx.Err()
-		}
-	}
-	return func() { release(idx) }, nil
 }
 
 // lockAccounts locks every account in req in ascending id order (so
@@ -238,6 +227,9 @@ func validatePost(req PostRequest) error {
 		if l.Amount == 0 {
 			return fmt.Errorf("%w: line %d has a zero amount", ErrInvalidRequest, i)
 		}
+		if l.Amount > maxAbsAmount || l.Amount < -maxAbsAmount {
+			return fmt.Errorf("%w: line %d amount %d exceeds magnitude %d", ErrInvalidRequest, i, l.Amount, int64(maxAbsAmount))
+		}
 		if (l.Amount > 0 && sum > math.MaxInt64-l.Amount) || (l.Amount < 0 && sum < math.MinInt64-l.Amount) {
 			return fmt.Errorf("%w: line amounts overflow", ErrInvalidRequest)
 		}
@@ -249,13 +241,24 @@ func validatePost(req PostRequest) error {
 	return nil
 }
 
-// effectiveDate renders t as YYYY-MM-DD in t's own location; zero means today (UTC).
+// isDebit orders credits (0) before debits (1).
+func isDebit(l Line) int {
+	if l.Amount < 0 {
+		return 1
+	}
+	return 0
+}
+
+// effectiveDate renders t as its UTC calendar date; zero means today (UTC).
 func effectiveDate(t time.Time) string {
 	if t.IsZero() {
-		t = time.Now().UTC()
+		t = time.Now()
 	}
-	return t.Format(dateLayout)
+	return utcDate(t)
 }
+
+// utcDate is the calendar date of t in UTC, this package's only date convention.
+func utcDate(t time.Time) string { return t.UTC().Format(dateLayout) }
 
 // payloadHash is sha256 over canonical JSON (keys sorted, lines sorted by
 // account id then amount) of the fields that define a posting's meaning.
@@ -298,12 +301,12 @@ func payloadHash(req PostRequest, date string) []byte {
 // (voiding an expired hold is allowed).
 func (s *Service) Resolve(ctx context.Context, txID uuid.UUID, post bool) (Transaction, error) {
 	var out Transaction
-	err := db.WithTx(ctx, s.pool, func(ctx context.Context, tx pgx.Tx) (err error) {
+	err := s.withTx(ctx, func(ctx context.Context, tx pgx.Tx) (err error) {
 		out, err = resolveTx(ctx, tx, txID, post)
 		return err
 	})
 	if err != nil {
-		return Transaction{}, mapErr(err)
+		return Transaction{}, MapError(err)
 	}
 	return out, nil
 }
@@ -342,7 +345,9 @@ func resolveTx(ctx context.Context, tx pgx.Tx, id uuid.UUID, post bool) (Transac
 }
 
 // ExpireHolds voids every pending transaction whose expires_at has passed,
-// each in its own transaction, and returns how many it voided.
+// each in its own transaction, and returns how many it voided. A failure on
+// one hold does not stop the others; failures are returned joined
+// (errors.Join) alongside the count.
 func (s *Service) ExpireHolds(ctx context.Context) (voided int, err error) {
 	rows, err := s.pool.Query(ctx, `select id from ledger.transactions
 		where status = 'pending' and expires_at < now() order by expires_at`)
@@ -353,23 +358,29 @@ func (s *Service) ExpireHolds(ctx context.Context) (voided int, err error) {
 	if err != nil {
 		return 0, fmt.Errorf("ledger: list expired holds: %w", err)
 	}
+	var errs []error
 	for _, id := range expired {
+		if err := ctx.Err(); err != nil {
+			errs = append(errs, err)
+			break
+		}
 		_, err := s.Resolve(ctx, id, false)
 		if errors.Is(err, ErrAlreadyResolved) {
 			continue // resolved concurrently
 		}
 		if err != nil {
-			return voided, err
+			errs = append(errs, fmt.Errorf("ledger: expire hold %s: %w", id, err))
+			continue
 		}
 		voided++
 	}
-	return voided, nil
+	return voided, errors.Join(errs...)
 }
 
 // ---------------------------------------------------------------------------
 // Period close
 
-// ClosePeriod closes currency through the calendar date of through: no
+// ClosePeriod closes currency through the UTC calendar date of through: no
 // entries with an effective date on or before it can be added afterwards.
 // Closing never moves backwards; an earlier date is a no-op.
 func (s *Service) ClosePeriod(ctx context.Context, currency string, through time.Time) error {
@@ -381,7 +392,7 @@ func (s *Service) ClosePeriod(ctx context.Context, currency string, through time
 		on conflict (currency) do update
 		  set closed_through = excluded.closed_through, closed_at = now()
 		  where ledger.period_closes.closed_through < excluded.closed_through`,
-		currency, through.Format(dateLayout))
+		currency, utcDate(through))
 	if err != nil {
 		return fmt.Errorf("ledger: close period: %w", err)
 	}
@@ -497,6 +508,9 @@ func getTransaction(ctx context.Context, q querier, id uuid.UUID) (Transaction, 
 	}
 	if t.Entries, err = pgx.CollectRows(rows, scanEntry); err != nil {
 		return Transaction{}, fmt.Errorf("ledger: load entries: %w", err)
+	}
+	if len(t.Entries) > 0 {
+		t.Currency = t.Entries[0].Currency // every entry has the request currency
 	}
 	return t, nil
 }

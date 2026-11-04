@@ -22,10 +22,18 @@ const (
 // function on serialization failures (SQLSTATE 40001) or deadlocks (40P01),
 // up to five attempts with jittered backoff between 10 and 200 ms.
 // fn must be idempotent with respect to side effects outside the database.
+// It is the default for control-plane writes; see WithTxLevel.
 func WithTx(ctx context.Context, pool *pgxpool.Pool, fn func(ctx context.Context, tx pgx.Tx) error) error {
+	return WithTxLevel(ctx, pool, pgx.Serializable, fn)
+}
+
+// WithTxLevel is WithTx at an explicit isolation level, with the same retry
+// loop. Ledger money movement uses pgx.ReadCommitted together with explicit,
+// ordered SELECT ... FOR UPDATE on every row it reads and then writes.
+func WithTxLevel(ctx context.Context, pool *pgxpool.Pool, level pgx.TxIsoLevel, fn func(ctx context.Context, tx pgx.Tx) error) error {
 	var last error
 	for attempt := 1; attempt <= maxAttempts; attempt++ {
-		err := runOnce(ctx, pool, fn)
+		err := runOnce(ctx, pool, level, fn)
 		if err == nil {
 			return nil
 		}
@@ -48,8 +56,8 @@ func WithTx(ctx context.Context, pool *pgxpool.Pool, fn func(ctx context.Context
 	return fmt.Errorf("db: transaction failed after %d attempts: %w", maxAttempts, last)
 }
 
-func runOnce(ctx context.Context, pool *pgxpool.Pool, fn func(context.Context, pgx.Tx) error) (err error) {
-	tx, err := pool.BeginTx(ctx, pgx.TxOptions{IsoLevel: pgx.Serializable})
+func runOnce(ctx context.Context, pool *pgxpool.Pool, level pgx.TxIsoLevel, fn func(context.Context, pgx.Tx) error) (err error) {
+	tx, err := pool.BeginTx(ctx, pgx.TxOptions{IsoLevel: level})
 	if err != nil {
 		return fmt.Errorf("db: begin: %w", err)
 	}

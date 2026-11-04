@@ -48,3 +48,24 @@ func TestIsRetryable(t *testing.T) {
 	testutil.False(t, IsRetryable(context.Canceled))
 	testutil.False(t, IsRetryable(nil))
 }
+
+func TestWithTxLevel_UsesRequestedIsolation(t *testing.T) {
+	pool := TestPool(t)
+	ctx := context.Background()
+	show := func(ctx context.Context, tx pgx.Tx, out *string) error {
+		return tx.QueryRow(ctx, `show transaction_isolation`).Scan(out)
+	}
+	for level, want := range map[pgx.TxIsoLevel]string{
+		pgx.ReadCommitted: "read committed",
+		pgx.Serializable:  "serializable",
+	} {
+		var got string
+		testutil.NoError(t, WithTxLevel(ctx, pool, level, func(ctx context.Context, tx pgx.Tx) error {
+			return show(ctx, tx, &got)
+		}))
+		testutil.Equal(t, want, got)
+	}
+	var got string
+	testutil.NoError(t, WithTx(ctx, pool, func(ctx context.Context, tx pgx.Tx) error { return show(ctx, tx, &got) }))
+	testutil.Equal(t, "serializable", got, "WithTx stays SERIALIZABLE")
+}

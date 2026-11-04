@@ -2,7 +2,9 @@ package ledger
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"math"
 	"sync"
 	"testing"
 	"time"
@@ -11,6 +13,7 @@ import (
 	"github.com/LupovichRan/AutoDev_Bank/internal/ids"
 	"github.com/LupovichRan/AutoDev_Bank/internal/testutil"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 )
 
 // Service-level tests: behaviour of the Go API on top of the SQL invariants.
@@ -73,6 +76,7 @@ func TestPost_TransfersBetweenAccounts(t *testing.T) {
 	testutil.NoError(t, err)
 	testutil.Equal(t, StatusPosted, txn.Status)
 	testutil.Equal(t, "t1", txn.IdempotencyKey)
+	testutil.Equal(t, "ILS", txn.Currency)
 	testutil.Len(t, txn.Entries, 2)
 	byAcct := map[uuid.UUID]Entry{}
 	for _, e := range txn.Entries {
@@ -357,12 +361,21 @@ func TestAccountsByOwner(t *testing.T) {
 	testutil.ErrorIs(t, err, ErrNotFound)
 }
 
+// TestPost_ConcurrentHotAccount drains one under-funded account from 48
+// goroutines (480 transfers, funded for 470) through four independent Service
+// instances (no shared in-process state, like four bank processes) and through
+// PostTx inside caller-owned READ COMMITTED transactions (the approvals path).
+// The database alone must serialise the debits: exactly 10 transfers fail with
+// ErrInsufficientFunds, nothing else fails, the hot account ends at exactly 0
+// and is never negative, and money is conserved.
 func TestPost_ConcurrentHotAccount(t *testing.T) {
-	s := newService(t)
+	pool := db.TestPool(t)
 	ctx := context.Background()
-	const workers, perWorker, amount = 50, 10, 3
+	const workers, perWorker, amount, short = 48, 10, 3, 10
+	services := []*Service{New(pool), New(pool), New(pool), New(pool)}
+	s := services[0]
 	hot := newAccount(t, s, "liability", "ILS", false)
-	fund(t, s, hot, workers*perWorker*amount)
+	fund(t, s, hot, (workers*perWorker-short)*amount)
 	var dests []Account
 	for range 5 {
 		dests = append(dests, newAccount(t, s, "liability", "ILS", false))
@@ -376,26 +389,51 @@ func TestPost_ConcurrentHotAccount(t *testing.T) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
+			svc := services[w%len(services)]
 			for i := range perWorker {
-				to := dests[(w+i)%len(dests)]
-				_, err := s.Post(ctx, transfer(fmt.Sprintf("hot-%d-%d", w, i), hot.ID, to.ID, amount))
-				if err != nil {
-					errs <- err
+				req := transfer(fmt.Sprintf("hot-%d-%d", w, i), hot.ID, dests[(w+i)%len(dests)].ID, amount)
+				var err error
+				if (w+i)%2 == 0 {
+					_, err = svc.Post(ctx, req)
+				} else {
+					err = db.WithTxLevel(ctx, pool, pgx.ReadCommitted, func(ctx context.Context, tx pgx.Tx) error {
+						_, err := svc.PostTx(ctx, tx, req)
+						return err
+					})
+					err = MapError(err)
 				}
+				errs <- err
 			}
 		}()
 	}
 	wg.Wait()
 	close(errs)
+	insufficient := 0
 	for err := range errs {
-		t.Errorf("transfer failed: %v", err)
+		switch {
+		case err == nil:
+		case errors.Is(err, ErrInsufficientFunds):
+			insufficient++
+		default:
+			t.Errorf("transfer failed: %v", err)
+		}
 	}
+	testutil.Equal(t, short, insufficient, "ErrInsufficientFunds count")
 
-	testutil.Equal(t, before, totalBalance(t, s, all))
-	for _, a := range all {
-		testutil.True(t, mustAccount(t, s, a.ID).Balance >= 0, "no negative balance")
-	}
+	testutil.Equal(t, before, totalBalance(t, s, all), "sum of balances unchanged")
 	testutil.Equal(t, int64(0), mustAccount(t, s, hot.ID).Balance)
+	var negative int
+	testutil.NoError(t, pool.QueryRow(ctx, `select count(*) from ledger.available_balances
+		where available < 0 and account_id = any($1)`, []uuid.UUID{hot.ID}).Scan(&negative))
+	testutil.Equal(t, 0, negative, "available never negative now")
+	var minAfter int64
+	testutil.NoError(t, pool.QueryRow(ctx, `select coalesce(min(balance_after), 0) from ledger.entries
+		where account_id = $1`, hot.ID).Scan(&minAfter))
+	testutil.True(t, minAfter >= 0, "available never negative after any entry")
+	var n int
+	testutil.NoError(t, pool.QueryRow(ctx, `select count(*) from ledger.entries
+		where account_id = $1 and amount < 0`, hot.ID).Scan(&n))
+	testutil.Equal(t, workers*perWorker-short, n, "successful debits")
 }
 
 func totalBalance(t *testing.T, s *Service, accts []Account) int64 {
@@ -405,4 +443,74 @@ func totalBalance(t *testing.T, s *Service, accts []Account) int64 {
 		sum += mustAccount(t, s, a.ID).Balance
 	}
 	return sum
+}
+
+func TestPost_CreditsAppliedBeforeDebits(t *testing.T) {
+	s := newService(t)
+	a := newAccount(t, s, "liability", "ILS", false)
+	b := newAccount(t, s, "liability", "ILS", false)
+	fund(t, s, a, 100)
+	// In request order A would dip to -500 before its credit arrives.
+	txn, err := s.Post(context.Background(), PostRequest{
+		IdempotencyKey: "net", Currency: "ILS",
+		Lines: []Line{{a.ID, -600}, {b.ID, 50}, {a.ID, 550}},
+	})
+	testutil.NoError(t, err)
+	testutil.Len(t, txn.Entries, 3)
+	testutil.Equal(t, int64(50), mustAccount(t, s, a.ID).Balance)
+	testutil.Equal(t, int64(50), mustAccount(t, s, b.ID).Balance)
+}
+
+func TestPost_RejectsHugeAmountsAndMapsOverflow(t *testing.T) {
+	s := newService(t)
+	ctx := context.Background()
+	src := newAccount(t, s, "equity", "ILS", true)
+	dst := newAccount(t, s, "liability", "ILS", true)
+	for _, amt := range []int64{math.MinInt64, -(math.MaxInt64/2 + 1), math.MaxInt64/2 + 1} {
+		_, err := s.Post(ctx, PostRequest{IdempotencyKey: fmt.Sprint("huge", amt), Currency: "ILS",
+			Lines: []Line{{src.ID, amt}, {dst.ID, -amt}}})
+		testutil.ErrorIs(t, err, ErrInvalidRequest)
+	}
+	// Each posting is within bounds, but the third overflows dst's bigint balance.
+	var err error
+	for i := range 3 {
+		_, err = s.Post(ctx, PostRequest{IdempotencyKey: fmt.Sprint("big", i), Currency: "ILS",
+			Lines: []Line{{src.ID, -math.MaxInt64 / 2}, {dst.ID, math.MaxInt64 / 2}}})
+		if i < 2 {
+			testutil.NoError(t, err)
+		}
+	}
+	testutil.ErrorIs(t, err, ErrInvalidRequest)
+	testutil.Equal(t, "22003", db.PgCode(err))
+}
+
+func TestDates_AreUTCCalendarDates(t *testing.T) {
+	s := newService(t)
+	ctx := context.Background()
+	a := newAccount(t, s, "liability", "ILS", true)
+	b := newAccount(t, s, "liability", "ILS", true)
+	plus5 := time.FixedZone("UTC+5", 5*3600)
+	// 2026-01-05 01:30 at +05:00 is 2026-01-04 20:30 UTC.
+	local := time.Date(2026, 1, 5, 1, 30, 0, 0, plus5)
+	req := transfer("tz", a.ID, b.ID, 10)
+	req.EffectiveDate = local
+	txn, err := s.Post(ctx, req)
+	testutil.NoError(t, err)
+	testutil.Equal(t, "2026-01-04", txn.EffectiveDate.UTC().Format("2006-01-02"))
+	// The same instant written in UTC is the same payload.
+	req.EffectiveDate = local.UTC()
+	again, err := s.Post(ctx, req)
+	testutil.NoError(t, err)
+	testutil.Equal(t, txn.ID, again.ID)
+
+	// ClosePeriod uses the same convention: closing through `local` closes 2026-01-04 only.
+	testutil.NoError(t, s.ClosePeriod(ctx, "ILS", local))
+	back := transfer("tz-back", a.ID, b.ID, 10)
+	back.EffectiveDate = time.Date(2026, 1, 4, 12, 0, 0, 0, time.UTC)
+	_, err = s.Post(ctx, back)
+	testutil.ErrorIs(t, err, ErrPeriodClosed)
+	next := transfer("tz-next", a.ID, b.ID, 10)
+	next.EffectiveDate = time.Date(2026, 1, 5, 0, 0, 0, 0, time.UTC)
+	_, err = s.Post(ctx, next)
+	testutil.NoError(t, err)
 }

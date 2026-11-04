@@ -39,10 +39,16 @@ var pgPrefixes = []struct {
 	{"ledger_transaction_missing", ErrNotFound},
 }
 
-// mapErr translates schema errors into typed errors, keeping the original
+// sqlNumericOutOfRange is SQLSTATE 22003 (e.g. a bigint balance overflow).
+const sqlNumericOutOfRange = "22003"
+
+// MapError translates schema errors into typed errors, keeping the original
 // PgError in the chain (both satisfy errors.Is / errors.As). Other errors,
 // including retryable serialization failures, are returned unchanged.
-func mapErr(err error) error {
+// Callers of PostTx must pass their commit error through it: the zero-sum
+// check is a deferred trigger that fires at commit. Numeric overflow
+// (SQLSTATE 22003) maps to ErrInvalidRequest.
+func MapError(err error) error {
 	if err == nil {
 		return nil
 	}
@@ -50,6 +56,9 @@ func mapErr(err error) error {
 		if errors.Is(err, s) {
 			return err
 		}
+	}
+	if db.PgCode(err) == sqlNumericOutOfRange {
+		return fmt.Errorf("%w: %w", ErrInvalidRequest, err)
 	}
 	msg := db.PgMessage(err)
 	for _, p := range pgPrefixes {
