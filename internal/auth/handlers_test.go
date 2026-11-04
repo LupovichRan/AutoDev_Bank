@@ -200,6 +200,9 @@ func TestMiddleware_RequireRole(t *testing.T) {
 	s, _ := newTestService(t)
 	ctx := context.Background()
 	pid := mustPrincipal(t, s, "nina")
+	// Payment roles are for staff only (trigger roles_static_sod).
+	_, err := s.pool.Exec(ctx, `update control.principals set kind = 'staff' where id = $1`, pid)
+	testutil.NoError(t, err)
 	sess, err := s.TestLogin(ctx, pid)
 	testutil.NoError(t, err)
 	h := s.Authenticate(s.RequireRole("payments.approver")(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

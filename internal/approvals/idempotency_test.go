@@ -30,7 +30,7 @@ func TestIdempotency_PostedKeyThenApprovalPath(t *testing.T) {
 	ctx := context.Background()
 	alice := e.principal(t, "customer")
 	from := e.account(t, 2_000_000, alice)
-	to := e.account(t, 0)
+	to := e.payee(t)
 
 	small := e.transfer(alice, from, to, 5000)
 	out, err := e.svc.SubmitTransfer(ctx, small)
@@ -62,7 +62,7 @@ func TestIdempotency_ApprovalKeyThenPostPath(t *testing.T) {
 	ctx := context.Background()
 	alice := e.principal(t, "customer")
 	from := e.account(t, 2_000_000, alice)
-	to := e.account(t, 0)
+	to := e.payee(t)
 
 	big := e.transfer(alice, from, to, 200000)
 	out, err := e.svc.SubmitTransfer(ctx, big)
@@ -94,7 +94,7 @@ func TestIdempotency_PostReplayAuditedOnce(t *testing.T) {
 	ctx := context.Background()
 	alice := e.principal(t, "customer")
 	from := e.account(t, 100000, alice)
-	to := e.account(t, 0)
+	to := e.payee(t)
 	in := e.transfer(alice, from, to, 5000)
 	a, err := e.svc.SubmitTransfer(ctx, in)
 	testutil.NoError(t, err)

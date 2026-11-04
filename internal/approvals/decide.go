@@ -60,7 +60,7 @@ func (s *Service) decideTx(ctx context.Context, tx pgx.Tx, approvalID, approverI
 	}
 
 	// Lock order: accounts -> holders/roles -> approval row -> ledger -> audit.
-	if _, err := lockTransferAccounts(ctx, tx, ap.Subject); err != nil {
+	if err := lockTransferAccounts(ctx, tx, ap.Subject); err != nil {
 		return err
 	}
 	holders, err := lockHolders(ctx, tx, ap.Subject.FromAccountID)
@@ -71,9 +71,9 @@ func (s *Service) decideTx(ctx context.Context, tx pgx.Tx, approvalID, approverI
 	if err != nil {
 		return err
 	}
-	var early bool
-	if err := tx.QueryRow(ctx, `select status, coalesce(not_before > now(), false)
-		from control.approvals where id = $1 for update`, approvalID).Scan(&ap.Status, &early); err != nil {
+	var early, expired bool
+	if err := tx.QueryRow(ctx, `select status, coalesce(not_before > now(), false), expires_at <= now()
+		from control.approvals where id = $1 for update`, approvalID).Scan(&ap.Status, &early, &expired); err != nil {
 		return fmt.Errorf("approvals: lock approval: %w", err)
 	}
 
@@ -85,6 +85,9 @@ func (s *Service) decideTx(ctx context.Context, tx pgx.Tx, approvalID, approverI
 	}
 	if ap.Status != StatusPending {
 		return fmt.Errorf("%w: status is %s", ErrNotPending, ap.Status)
+	}
+	if expired { // past expires_at; the hourly sweep will mark it expired
+		return fmt.Errorf("%w: approval expired", ErrNotPending)
 	}
 	if early && approve { // not_before delays execution; a rejection may come any time
 		return ErrNotBefore

@@ -66,6 +66,13 @@ func (e *env) account(t *testing.T, balance int64, holders ...Principal) ledger.
 	return a
 }
 
+// payee creates an empty ILS account held by a fresh customer: a valid
+// transfer destination.
+func (e *env) payee(t *testing.T) ledger.Account {
+	t.Helper()
+	return e.account(t, 0, e.principal(t, "customer"))
+}
+
 func (e *env) transfer(initiator Principal, from, to ledger.Account, amount int64) TransferInput {
 	return TransferInput{
 		IdempotencyKey: "tr-" + ids.New().String(), InitiatorID: initiator.ID,
@@ -121,7 +128,7 @@ func TestSubmitTransfer_SmallAmountPostsImmediately(t *testing.T) {
 	ctx := context.Background()
 	alice := e.principal(t, "customer")
 	from := e.account(t, 50000, alice)
-	to := e.account(t, 0)
+	to := e.payee(t)
 
 	out, err := e.svc.SubmitTransfer(ctx, e.transfer(alice, from, to, 12345))
 	testutil.NoError(t, err)
@@ -146,7 +153,7 @@ func TestSubmitTransfer_LargeAmountCreatesApproval(t *testing.T) {
 	ctx := context.Background()
 	alice := e.principal(t, "customer")
 	from := e.account(t, 1_000_000, alice)
-	to := e.account(t, 0)
+	to := e.payee(t)
 
 	in := e.transfer(alice, from, to, 200000)
 	out, err := e.svc.SubmitTransfer(ctx, in)
@@ -190,7 +197,7 @@ func TestDecide_ApproveExecutesLedgerPost(t *testing.T) {
 	checker := e.principal(t, "staff")
 	testutil.NoError(t, e.svc.GrantRole(ctx, checker.ID, RoleApprover))
 	from := e.account(t, 1_000_000, alice)
-	to := e.account(t, 0)
+	to := e.payee(t)
 
 	out, err := e.svc.SubmitTransfer(ctx, e.transfer(alice, from, to, 200000))
 	testutil.NoError(t, err)
@@ -241,7 +248,7 @@ func TestDecide_TwoApproversForTier2(t *testing.T) {
 	testutil.NoError(t, e.svc.GrantRole(ctx, c1.ID, RoleApprover))
 	testutil.NoError(t, e.svc.GrantRole(ctx, c2.ID, RoleApprover))
 	from := e.account(t, 2_000_000, alice)
-	to := e.account(t, 0)
+	to := e.payee(t)
 
 	out, err := e.svc.SubmitTransfer(ctx, e.transfer(alice, from, to, 1_500_000))
 	testutil.NoError(t, err)
@@ -269,7 +276,7 @@ func TestDecide_RejectLeavesLedgerUnchanged(t *testing.T) {
 	checker := e.principal(t, "staff")
 	testutil.NoError(t, e.svc.GrantRole(ctx, checker.ID, RoleApprover))
 	from := e.account(t, 1_000_000, alice)
-	to := e.account(t, 0)
+	to := e.payee(t)
 
 	out, err := e.svc.SubmitTransfer(ctx, e.transfer(alice, from, to, 200000))
 	testutil.NoError(t, err)
@@ -301,7 +308,7 @@ func TestDecide_SelfApprovalRejected(t *testing.T) {
 	ctx := context.Background()
 	alice, bob := e.principal(t, "customer"), e.principal(t, "customer")
 	from := e.account(t, 100000, alice, bob) // joint account
-	to := e.account(t, 0)
+	to := e.payee(t)
 
 	// Below the tier, but the joint account needs the other holder.
 	out, err := e.svc.SubmitTransfer(ctx, e.transfer(alice, from, to, 5000))
@@ -330,7 +337,7 @@ func TestDecide_NotBeforeBlocksEarlyExecution(t *testing.T) {
 	checker := e.principal(t, "staff")
 	testutil.NoError(t, e.svc.GrantRole(ctx, checker.ID, RoleApprover))
 	from := e.account(t, 1_000_000, alice)
-	to := e.account(t, 0)
+	to := e.payee(t)
 
 	out, err := e.svc.SubmitTransfer(ctx, e.transfer(alice, from, to, 200000))
 	testutil.NoError(t, err)
@@ -381,7 +388,7 @@ func TestDecide_RejectAllowedBeforeNotBefore(t *testing.T) {
 	checker := e.principal(t, "staff")
 	testutil.NoError(t, e.svc.GrantRole(ctx, checker.ID, RoleApprover))
 	from := e.account(t, 1_000_000, alice)
-	to := e.account(t, 0)
+	to := e.payee(t)
 
 	out, err := e.svc.SubmitTransfer(ctx, e.transfer(alice, from, to, 200000))
 	testutil.NoError(t, err)
@@ -400,7 +407,7 @@ func TestDecide_JointAccountStaffApprovalDoesNotReplaceCoHolder(t *testing.T) {
 	checker := e.principal(t, "staff")
 	testutil.NoError(t, e.svc.GrantRole(ctx, checker.ID, RoleApprover))
 	from := e.account(t, 100000, alice, bob) // joint account
-	to := e.account(t, 0)
+	to := e.payee(t)
 
 	out, err := e.svc.SubmitTransfer(ctx, e.transfer(alice, from, to, 5000))
 	testutil.NoError(t, err)
@@ -434,7 +441,7 @@ func TestDecide_JointAccountTier2NeedsCoHolderAmongApprovers(t *testing.T) {
 	testutil.NoError(t, e.svc.GrantRole(ctx, c1.ID, RoleApprover))
 	testutil.NoError(t, e.svc.GrantRole(ctx, c2.ID, RoleApprover))
 	from := e.account(t, 2_000_000, alice, bob)
-	to := e.account(t, 0)
+	to := e.payee(t)
 
 	out, err := e.svc.SubmitTransfer(ctx, e.transfer(alice, from, to, 1_500_000))
 	testutil.NoError(t, err)
@@ -460,7 +467,7 @@ func TestSubmitTransfer_StaffInitiatedCustomerDebitNeedsApproval(t *testing.T) {
 	clerk := e.principal(t, "staff")
 	testutil.NoError(t, e.svc.GrantRole(ctx, clerk.ID, RoleInitiator))
 	from := e.account(t, 100000, alice)
-	to := e.account(t, 0)
+	to := e.payee(t)
 
 	out, err := e.svc.SubmitTransfer(ctx, e.transfer(clerk, from, to, 100)) // far below tier 1
 	testutil.NoError(t, err)

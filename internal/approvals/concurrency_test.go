@@ -17,7 +17,7 @@ func TestDecide_ConcurrentLastApprovers(t *testing.T) {
 	ctx := context.Background()
 	alice := e.principal(t, "customer")
 	from := e.account(t, 1_000_000, alice)
-	to := e.account(t, 0)
+	to := e.payee(t)
 	const n = 8
 	checkers := make([]Principal, n)
 	for i := range checkers {

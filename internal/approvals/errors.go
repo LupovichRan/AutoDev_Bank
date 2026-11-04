@@ -19,6 +19,10 @@ var (
 	// ErrRoleNotAllowed: the role may not be granted to this kind of
 	// principal (customers never hold payments.initiator/approver).
 	ErrRoleNotAllowed = errors.New("approvals: role not allowed for this principal kind")
+	// ErrInvalidDestination: the to-account does not exist, is in another
+	// currency or is not a payee the initiator may pay. The cases are not
+	// told apart, so the API is no account-existence oracle.
+	ErrInvalidDestination = errors.New("approvals: invalid destination account")
 )
 
 // pgPrefixes maps migration 0005's raise-message prefixes to typed errors.
@@ -27,6 +31,8 @@ var pgPrefixes = []struct {
 	err    error
 }{
 	{"sod_conflict", ErrSoDConflict},
+	{"sod_role_not_allowed", ErrRoleNotAllowed},
+	{"sod_not_eligible", ErrNotAuthorized},
 	{"sod_self_approval", ErrSelfApproval},
 	{"approval_not_pending", ErrNotPending},
 }

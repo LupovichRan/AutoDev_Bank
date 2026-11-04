@@ -10,13 +10,13 @@ import (
 )
 
 const approvalCols = `a.id, a.kind, a.subject, a.amount, a.currency, a.initiator_id, a.required_approvals,
-	a.requires_holder_approval, a.not_before, a.status, a.created_at, a.ledger_transaction_id`
+	a.requires_holder_approval, a.not_before, a.status, a.created_at, a.expires_at, a.ledger_transaction_id`
 
 func scanApproval(row pgx.Row) (Approval, error) {
 	var ap Approval
 	var subject []byte
 	err := row.Scan(&ap.ID, &ap.Kind, &subject, &ap.Amount, &ap.Currency, &ap.InitiatorID, &ap.RequiredApprovals,
-		&ap.RequiresHolderApproval, &ap.NotBefore, &ap.Status, &ap.CreatedAt, &ap.LedgerTransactionID)
+		&ap.RequiresHolderApproval, &ap.NotBefore, &ap.Status, &ap.CreatedAt, &ap.ExpiresAt, &ap.LedgerTransactionID)
 	if err != nil {
 		return Approval{}, err
 	}
@@ -91,7 +91,7 @@ func (s *Service) Get(ctx context.Context, id uuid.UUID) (Approval, error) {
 // by them, not yet decided by them, and on an account they hold or (with
 // payments.approver) any account. Oldest first.
 func (s *Service) Inbox(ctx context.Context, principalID uuid.UUID) ([]Approval, error) {
-	return listApprovals(ctx, s.pool, `a.status = 'pending' and a.initiator_id <> $1
+	return listApprovals(ctx, s.pool, `a.status = 'pending' and a.expires_at > now() and a.initiator_id <> $1
 		and not exists (select 1 from control.approval_decisions d where d.approval_id = a.id and d.approver_id = $1)
 		and (exists (select 1 from control.account_holders h
 		             where h.account_id = (a.subject->>'from_account_id')::uuid and h.principal_id = $1)

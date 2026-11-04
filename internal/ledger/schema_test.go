@@ -278,3 +278,80 @@ func TestAvailableBalanceSubtractsPendingDebits(t *testing.T) {
 	testutil.Equal(t, int64(300), pending)
 	testutil.Equal(t, int64(700), available)
 }
+
+// I1(a): a committed transaction (posted or pending) never takes more
+// entries, even balanced ones inserted with raw SQL.
+func TestCommittedTransactionRejectsLaterEntries(t *testing.T) {
+	pool := db.TestPool(t)
+	ctx := context.Background()
+	a := mkAccount(t, pool, "a", "ILS", true)
+	b := mkAccount(t, pool, "b", "ILS", true)
+	for _, status := range []string{"posted", "pending"} {
+		id := mkTx(t, pool, "k-"+status, status, a, b, 5)
+		err := db.WithTx(ctx, pool, func(ctx context.Context, tx pgx.Tx) error {
+			if err := rawEntry(ctx, tx, id, a, -1000, "ILS"); err != nil {
+				return err
+			}
+			return rawEntry(ctx, tx, id, b, 1000, "ILS")
+		})
+		testutil.ErrorContains(t, err, "ledger_immutable", status)
+	}
+	bal, _, _, _ := balances(t, pool, b)
+	testutil.Equal(t, int64(5), bal, "only the original posting moved money")
+
+	// A posted transaction is stamped resolved when it is created.
+	var created, resolved *time.Time
+	testutil.NoError(t, pool.QueryRow(ctx, `select created_at, resolved_at from ledger.transactions
+		where idempotency_key = 'k-posted'`).Scan(&created, &resolved))
+	testutil.True(t, resolved != nil && resolved.Equal(*created), "posted: resolved_at = created_at")
+}
+
+// I1(b): posting a hold into a closed period is refused; voiding it (which
+// moves no posted balance) stays possible so holds can still expire.
+func TestResolvingHoldIntoClosedPeriodRejected(t *testing.T) {
+	pool := db.TestPool(t)
+	ctx := context.Background()
+	a := mkAccount(t, pool, "a", "ILS", true)
+	b := mkAccount(t, pool, "b", "ILS", true)
+	mkHold := func(key string) uuid.UUID {
+		var id uuid.UUID
+		testutil.NoError(t, db.WithTx(ctx, pool, func(ctx context.Context, tx pgx.Tx) (err error) {
+			id, err = rawTx(ctx, tx, key, "pending", time.Now().AddDate(0, 0, -3))
+			if err != nil {
+				return err
+			}
+			if err := rawEntry(ctx, tx, id, a, -7, "ILS"); err != nil {
+				return err
+			}
+			return rawEntry(ctx, tx, id, b, 7, "ILS")
+		}))
+		return id
+	}
+	post, void := mkHold("hold-post"), mkHold("hold-void")
+	_, err := pool.Exec(ctx, `insert into ledger.period_closes (currency, closed_through) values ('ILS', current_date - 1)`)
+	testutil.NoError(t, err)
+
+	_, err = pool.Exec(ctx, `update ledger.transactions set status='posted' where id=$1`, post)
+	testutil.ErrorContains(t, err, "ledger_period_closed")
+	_, err = pool.Exec(ctx, `update ledger.transactions set status='voided' where id=$1`, void)
+	testutil.NoError(t, err)
+	bal, pd, _, _ := balances(t, pool, a)
+	testutil.Equal(t, []int64{0, 7}, []int64{bal, pd}, "the refused hold still reserves its funds")
+}
+
+// I1(c): only an account's name and owner may change after creation.
+func TestAccountColumnsImmutableExceptNameAndOwner(t *testing.T) {
+	pool := db.TestPool(t)
+	ctx := context.Background()
+	a := mkAccount(t, pool, "a", "ILS", false)
+	for _, set := range []string{
+		`allow_negative = true`,
+		`code = 'renamed'`,
+		`version = version + 1`,
+	} {
+		_, err := pool.Exec(ctx, `update ledger.accounts set `+set+` where id=$1`, a)
+		testutil.ErrorContains(t, err, "ledger_immutable", set)
+	}
+	_, err := pool.Exec(ctx, `update ledger.accounts set name = 'New name', owner_id = $2 where id=$1`, a, ids.New())
+	testutil.NoError(t, err)
+}

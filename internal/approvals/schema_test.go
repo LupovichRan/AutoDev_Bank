@@ -18,7 +18,7 @@ func (e *env) pendingApproval(t *testing.T) (uuid.UUID, Principal) {
 	checker := e.principal(t, "staff")
 	testutil.NoError(t, e.svc.GrantRole(ctx, checker.ID, RoleApprover))
 	from := e.account(t, 1_000_000, alice)
-	to := e.account(t, 0)
+	to := e.payee(t)
 	out, err := e.svc.SubmitTransfer(ctx, e.transfer(alice, from, to, 200000))
 	testutil.NoError(t, err)
 	testutil.True(t, out.Approval != nil, "expected an approval")

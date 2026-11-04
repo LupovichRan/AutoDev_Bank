@@ -70,7 +70,7 @@ func (s *Service) SubmitTransfer(ctx context.Context, in TransferInput) (Outcome
 
 func (s *Service) submitTx(ctx context.Context, tx pgx.Tx, in TransferInput, logIn map[string]any, res *submitResult) error {
 	// 1. accounts, 2. holders and the initiator's roles, all locked.
-	fromKind, err := lockTransferAccounts(ctx, tx, in)
+	accts, err := lockAccountRows(ctx, tx, in)
 	if err != nil {
 		return err
 	}
@@ -87,9 +87,34 @@ func (s *Service) submitTx(ctx context.Context, tx pgx.Tx, in TransferInput, log
 	if err != nil {
 		return err
 	}
-	if initiatorKind == "" || !(isHolderOf(holders, in.InitiatorID) || hasRole) {
+	// R2: a customer debits only accounts they hold; staff need
+	// payments.initiator. An unknown from-account is refused the same way
+	// as someone else's, so the answer reveals nothing about it.
+	from, fromExists := accts[in.FromAccountID]
+	isHolder := isHolderOf(holders, in.InitiatorID)
+	allowed := isHolder || (hasRole && initiatorKind != "customer")
+	if initiatorKind == "" || !fromExists || !allowed {
 		return fmt.Errorf("%w: principal %s may not initiate transfers from account %s",
 			ErrNotAuthorized, in.InitiatorID, in.FromAccountID)
+	}
+	if from.currency != in.Currency {
+		return fmt.Errorf("%w: account %s is %s, transfer is %s", ledger.ErrCurrencyMismatch, in.FromAccountID, from.currency, in.Currency)
+	}
+	// The destination must exist, be in the transfer's currency and, for a
+	// customer initiator, be a payee (an account with a holder, not one of
+	// the bank's internal accounts). Every failure is the same error.
+	to, toExists := accts[in.ToAccountID]
+	if !toExists || to.currency != in.Currency {
+		return fmt.Errorf("%w: %s", ErrInvalidDestination, in.ToAccountID)
+	}
+	if initiatorKind == "customer" {
+		n, err := holderCount(ctx, tx, in.ToAccountID)
+		if err != nil {
+			return err
+		}
+		if n == 0 {
+			return fmt.Errorf("%w: %s", ErrInvalidDestination, in.ToAccountID)
+		}
 	}
 
 	customers := 0
@@ -100,8 +125,9 @@ func (s *Service) submitTx(ctx context.Context, tx pgx.Tx, in TransferInput, log
 	}
 	d := s.policy.Evaluate(Input{
 		Amount: in.Amount, Currency: in.Currency, InitiatorID: in.InitiatorID,
-		HolderIDs: holderIDs(holders), AccountKind: fromKind,
+		HolderIDs: holderIDs(holders), AccountKind: from.kind,
 		InitiatorKind: initiatorKind, CustomerHolders: customers,
+		InitiatorIsHolder: isHolder, FromAllowNegative: from.allowNegative, FromHolderCount: len(holders),
 	})
 	logIn["required"] = d.Required
 	logIn["requires_holder"] = d.RequiresHolder

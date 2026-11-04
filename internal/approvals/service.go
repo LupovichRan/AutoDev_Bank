@@ -79,8 +79,10 @@ type Approval struct {
 	NotBefore              *time.Time
 	Status                 string
 	CreatedAt              time.Time
-	LedgerTransactionID    *uuid.UUID
-	Decisions              []ApprovalDecision
+	// ExpiresAt: a pending approval not executed by then expires (R3: 7 days).
+	ExpiresAt           time.Time
+	LedgerTransactionID *uuid.UUID
+	Decisions           []ApprovalDecision
 }
 
 // Service runs the maker-checker workflow and the principal registry.
@@ -139,41 +141,66 @@ func postRequest(in TransferInput, meta map[string]any) ledger.PostRequest {
 	}
 }
 
-// lockTransferAccounts locks both accounts of a transfer FOR UPDATE in
-// ascending id order (the order ledger.PostTx uses, so a later PostTx in the
-// same transaction takes no new account lock and opposite transfers cannot
-// deadlock) and checks that they exist and are in the transfer's currency.
-// It returns the from-account's kind.
-func lockTransferAccounts(ctx context.Context, tx pgx.Tx, in TransferInput) (fromKind string, err error) {
-	rows, err := tx.Query(ctx, `select id, kind, currency from ledger.accounts
+// lockedAccount is one transfer account as read under its row lock.
+type lockedAccount struct {
+	kind, currency string
+	allowNegative  bool
+}
+
+// lockAccountRows locks both accounts of a transfer FOR UPDATE in ascending
+// id order (the order ledger.PostTx uses, so a later PostTx in the same
+// transaction takes no new account lock and opposite transfers cannot
+// deadlock) and returns those that exist.
+func lockAccountRows(ctx context.Context, tx pgx.Tx, in TransferInput) (map[uuid.UUID]lockedAccount, error) {
+	rows, err := tx.Query(ctx, `select id, kind, currency, allow_negative from ledger.accounts
 		where id = any($1) order by id for update`, []uuid.UUID{in.FromAccountID, in.ToAccountID})
 	if err != nil {
-		return "", fmt.Errorf("approvals: lock accounts: %w", err)
+		return nil, fmt.Errorf("approvals: lock accounts: %w", err)
 	}
-	type acct struct{ kind, currency string }
-	found := map[uuid.UUID]acct{}
+	found := map[uuid.UUID]lockedAccount{}
 	for rows.Next() {
 		var id uuid.UUID
-		var a acct
-		if err := rows.Scan(&id, &a.kind, &a.currency); err != nil {
+		var a lockedAccount
+		if err := rows.Scan(&id, &a.kind, &a.currency, &a.allowNegative); err != nil {
 			rows.Close()
-			return "", fmt.Errorf("approvals: lock accounts: %w", err)
+			return nil, fmt.Errorf("approvals: lock accounts: %w", err)
 		}
 		found[id] = a
 	}
 	if err := rows.Err(); err != nil {
-		return "", fmt.Errorf("approvals: lock accounts: %w", err)
+		return nil, fmt.Errorf("approvals: lock accounts: %w", err)
+	}
+	return found, nil
+}
+
+// lockTransferAccounts is lockAccountRows plus the check that both accounts
+// exist and are in the transfer's currency (used when deciding a stored
+// approval, whose accounts were validated at submission).
+func lockTransferAccounts(ctx context.Context, tx pgx.Tx, in TransferInput) error {
+	found, err := lockAccountRows(ctx, tx, in)
+	if err != nil {
+		return err
 	}
 	for _, id := range []uuid.UUID{in.FromAccountID, in.ToAccountID} {
 		a, ok := found[id]
 		if !ok {
-			return "", fmt.Errorf("%w: %w: account %s", ErrNotFound, ledger.ErrNotFound, id)
+			return fmt.Errorf("%w: %w: account %s", ErrNotFound, ledger.ErrNotFound, id)
 		}
 		if a.currency != in.Currency {
-			return "", fmt.Errorf("%w: account %s is %s, transfer is %s", ledger.ErrCurrencyMismatch, id, a.currency, in.Currency)
+			return fmt.Errorf("%w: account %s is %s, transfer is %s", ledger.ErrCurrencyMismatch, id, a.currency, in.Currency)
 		}
 	}
-	return found[in.FromAccountID].kind, nil
+	return nil
+}
+
+// holderCount counts an account's holders (no lock: used for the to-account,
+// whose holder set only decides whether it is a payee).
+func holderCount(ctx context.Context, tx pgx.Tx, accountID uuid.UUID) (int, error) {
+	var n int
+	if err := tx.QueryRow(ctx, `select count(*) from control.account_holders where account_id = $1`, accountID).Scan(&n); err != nil {
+		return 0, fmt.Errorf("approvals: holders: %w", err)
+	}
+	return n, nil
 }
 
 // holder is one holder of an account, as read under lock.

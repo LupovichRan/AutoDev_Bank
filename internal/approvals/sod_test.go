@@ -88,7 +88,7 @@ func TestDecide_InitiatorCannotApprove_DBLevel(t *testing.T) {
 	ctx := context.Background()
 	alice := e.principal(t, "customer")
 	from := e.account(t, 1_000_000, alice)
-	to := e.account(t, 0)
+	to := e.payee(t)
 
 	out, err := e.svc.SubmitTransfer(ctx, e.transfer(alice, from, to, 200000))
 	testutil.NoError(t, err)

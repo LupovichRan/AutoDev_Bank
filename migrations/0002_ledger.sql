@@ -76,7 +76,13 @@ begin
   if txn.status = 'voided' then
     raise exception 'ledger_immutable: cannot add entries to a voided transaction';
   end if;
-  if txn.resolved_at is not null then
+  -- Entries belong to the database transaction that created the ledger
+  -- transaction (created_at is forced to now() on insert): once committed,
+  -- a posted or pending transaction never takes more entries, balanced or not.
+  if txn.created_at <> now() then
+    raise exception 'ledger_immutable: transaction % is committed; entries can only be added when it is created', txn.id;
+  end if;
+  if txn.status = 'pending' and txn.resolved_at is not null then
     raise exception 'ledger_immutable: cannot add entries to a resolved transaction';
   end if;
 
@@ -155,9 +161,30 @@ end $$;
 create constraint trigger transaction_has_entries after insert on ledger.transactions
   deferrable initially deferred for each row execute function ledger.transaction_has_entries();
 
+-- Transactions are stamped by the database: created_at is the inserting
+-- transaction's start (entries_before_insert relies on it), and a posted
+-- transaction is resolved at creation.
+create function ledger.transactions_before_insert() returns trigger language plpgsql as $$
+begin
+  new.created_at := now();
+  if new.status = 'posted' then
+    new.resolved_at := new.created_at;
+  else
+    new.resolved_at := null;
+  end if;
+  if new.status = 'voided' then
+    raise exception 'ledger_immutable: a transaction cannot be created voided';
+  end if;
+  return new;
+end $$;
+create trigger transactions_before_insert before insert on ledger.transactions
+  for each row execute function ledger.transactions_before_insert();
+
 -- Transactions: only pending -> posted|voided, exactly once; everything else immutable.
 create function ledger.transactions_before_update() returns trigger language plpgsql as $$
-declare e record;
+declare
+  e record;
+  closed date;
 begin
   if old.status <> 'pending' then
     raise exception 'ledger_immutable: transaction % is %', old.id, old.status;
@@ -171,7 +198,17 @@ begin
      or new.expires_at is distinct from old.expires_at then
     raise exception 'ledger_immutable: only status may change when resolving';
   end if;
-  new.resolved_at := coalesce(new.resolved_at, now());
+  -- Posting a hold moves balances on its effective date, so the period
+  -- close applies; voiding moves no posted balance and stays allowed.
+  if new.status = 'posted' then
+    for e in select distinct currency from ledger.entries where transaction_id = old.id loop
+      select closed_through into closed from ledger.period_closes where currency = e.currency;
+      if closed is not null and old.effective_date <= closed then
+        raise exception 'ledger_period_closed: % is closed through %', e.currency, closed;
+      end if;
+    end loop;
+  end if;
+  new.resolved_at := now();
 
   for e in select account_id, amount from ledger.entries where transaction_id = old.id loop
     if new.status = 'posted' then
@@ -197,13 +234,18 @@ create trigger transactions_before_update before update on ledger.transactions
 create trigger transactions_no_delete before delete on ledger.transactions
   for each row execute function ledger.raise_immutable();
 
--- Accounts: balance/pending columns may only be changed by the ledger triggers above.
+-- Accounts: only name and owner_id may be changed directly; balance,
+-- pending and version columns only by the ledger triggers above.
+-- allow_negative is fixed at creation (flipping it would let an account
+-- overdraw without any entry trail).
 create function ledger.accounts_guard() returns trigger language plpgsql as $$
 begin
-  if new.id <> old.id or new.currency <> old.currency or new.kind <> old.kind or new.created_at <> old.created_at then
-    raise exception 'ledger_immutable: account identity, currency and kind cannot change';
+  if new.id <> old.id or new.code <> old.code or new.currency <> old.currency or new.kind <> old.kind
+     or new.allow_negative <> old.allow_negative or new.created_at <> old.created_at then
+    raise exception 'ledger_immutable: account identity, code, currency, kind and allow_negative cannot change';
   end if;
-  if (new.balance <> old.balance or new.pending_debits <> old.pending_debits or new.pending_credits <> old.pending_credits)
+  if (new.balance <> old.balance or new.pending_debits <> old.pending_debits or new.pending_credits <> old.pending_credits
+      or new.version <> old.version)
      and pg_trigger_depth() <= 1 then
     raise exception 'ledger_immutable: balances change only through entries';
   end if;

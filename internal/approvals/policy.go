@@ -49,6 +49,12 @@ type Input struct {
 	InitiatorKind string
 	// CustomerHolders is how many of HolderIDs are customer principals.
 	CustomerHolders int
+	// InitiatorIsHolder: the initiator holds the from-account.
+	InitiatorIsHolder bool
+	// FromAllowNegative: the from-account may go negative (e.g. bank equity).
+	FromAllowNegative bool
+	// FromHolderCount is len(HolderIDs), the from-account's holder count.
+	FromHolderCount int
 }
 
 // Decision is the policy outcome: Required == 0 means post immediately.
@@ -62,8 +68,9 @@ type Decision struct {
 }
 
 // Evaluate returns the number of approvals in needs: the maximum of the
-// highest matching tier, the staff-initiator rule and the joint-account
-// rule (which also sets RequiresHolder).
+// highest matching tier, the always-checked rules (staff or service
+// initiator, allow-negative or holder-less source account: at least 1) and
+// the joint-account rule (which also sets RequiresHolder).
 func (p Policy) Evaluate(in Input) Decision {
 	d := Decision{Reason: "below approval threshold"}
 	var tier *Tier
@@ -81,10 +88,24 @@ func (p Policy) Evaluate(in Input) Decision {
 		}
 		d.Reason = fmt.Sprintf("amount >= %s requires %d %s", formatMinor(tier.Threshold), tier.Required, noun)
 	}
-	// A staff member debiting a customer's account always needs a checker.
-	if in.InitiatorKind == "staff" && in.CustomerHolders > 0 && d.Required < 1 {
-		d.Required = 1
-		d.Reason = "staff-initiated debit from a customer account requires 1 approver"
+	// R2: a staff (or service) initiator always needs a checker, whatever
+	// the account; so does any debit from an account that may go negative or
+	// has no holder (e.g. bank equity), whoever initiates it.
+	if d.Required < 1 {
+		switch {
+		case in.InitiatorKind != "customer" && in.CustomerHolders > 0:
+			d.Required = 1
+			d.Reason = "staff-initiated debit from a customer account requires 1 approver"
+		case in.InitiatorKind != "customer" || !in.InitiatorIsHolder:
+			d.Required = 1
+			d.Reason = "staff-initiated debit requires 1 approver"
+		case in.FromAllowNegative:
+			d.Required = 1
+			d.Reason = "debit from an allow-negative account requires 1 approver"
+		case in.FromHolderCount == 0:
+			d.Required = 1
+			d.Reason = "debit from an account without holders requires 1 approver"
+		}
 	}
 	// Joint accounts: another holder must be among the approvers; staff
 	// approvals count toward Required but never replace that holder.
