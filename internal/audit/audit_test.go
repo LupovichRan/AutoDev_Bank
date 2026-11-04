@@ -5,6 +5,8 @@ import (
 	"context"
 	"crypto/ed25519"
 	"crypto/rand"
+	"fmt"
+	"sync"
 	"testing"
 	"time"
 
@@ -128,4 +130,53 @@ func TestSignDailyRoot_VerifiesWithPublicKey(t *testing.T) {
 	testutil.NoError(t, err)
 	testutil.NoError(t, pool.QueryRow(context.Background(), `select count(*) from control.audit_roots`).Scan(&n))
 	testutil.Equal(t, 1, n)
+}
+
+func TestAppend_ConcurrentStaysLinear(t *testing.T) {
+	r, pool := newRecorder(t)
+	const workers, each = 16, 5
+	errs := make(chan error, workers*each)
+	var wg sync.WaitGroup
+	for w := 0; w < workers; w++ {
+		wg.Add(1)
+		go func(w int) {
+			defer wg.Done()
+			for i := 0; i < each; i++ {
+				err := db.WithTx(context.Background(), pool, func(ctx context.Context, tx pgx.Tx) error {
+					_, err := r.Append(ctx, tx, Event{Action: "c.append", Subject: fmt.Sprintf("w%d-%d", w, i)})
+					return err
+				})
+				if err != nil {
+					errs <- err
+				}
+			}
+		}(w)
+	}
+	wg.Wait()
+	close(errs)
+	for err := range errs {
+		t.Errorf("append failed: %v", err)
+	}
+	rep, err := r.Verify(context.Background())
+	testutil.NoError(t, err)
+	testutil.True(t, rep.OK, "chain must verify")
+	testutil.Equal(t, int64(workers*each), rep.Length)
+}
+
+func TestAppend_LargeIntegerPayloadSurvivesVerify(t *testing.T) {
+	r, pool := newRecorder(t)
+	appendOne(t, r, pool, Event{Action: "big", Subject: "s", Payload: map[string]any{"n": int64(9007199254740993), "m": int64(9223372036854775807)}})
+	rep, err := r.Verify(context.Background())
+	testutil.NoError(t, err)
+	testutil.True(t, rep.OK, "large integers must hash exactly")
+	testutil.Equal(t, int64(1), rep.Length)
+
+	// Integers above 2^53 must hash exactly, not via a rounded float64.
+	zero := make([]byte, 32)
+	at := time.Now().UTC().Truncate(time.Microsecond)
+	h1, err := computeHash(zero, at, nil, "a", "s", []byte(`{"n":9007199254740992}`))
+	testutil.NoError(t, err)
+	h2, err := computeHash(zero, at, nil, "a", "s", []byte(`{"n":9007199254740993}`))
+	testutil.NoError(t, err)
+	testutil.False(t, bytes.Equal(h1, h2), "2^53 and 2^53+1 must hash differently")
 }

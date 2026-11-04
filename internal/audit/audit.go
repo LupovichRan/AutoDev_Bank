@@ -7,6 +7,7 @@
 package audit
 
 import (
+	"bytes"
 	"context"
 	"crypto/ed25519"
 	"crypto/sha256"
@@ -20,9 +21,6 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
-
-// chainLockKey serialises chain growth across transactions.
-const chainLockKey = 7312
 
 // Event is one audit record. Seq, At and Hash are populated on read.
 type Event struct {
@@ -76,7 +74,10 @@ func computeHash(prev []byte, at time.Time, actor *uuid.UUID, action, subject st
 		actorVal = actor.String()
 	}
 	var pl any
-	if err := json.Unmarshal(payload, &pl); err != nil {
+	// UseNumber keeps integers beyond 2^53 exact instead of rounding via float64.
+	dec := json.NewDecoder(bytes.NewReader(payload))
+	dec.UseNumber()
+	if err := dec.Decode(&pl); err != nil {
 		return nil, err
 	}
 	body, err := CanonicalJSON(map[string]any{
@@ -95,20 +96,32 @@ func computeHash(prev []byte, at time.Time, actor *uuid.UUID, action, subject st
 	return h.Sum(nil), nil
 }
 
-// Append adds ev to the chain inside tx and returns its seq. The chain is
-// serialised with a transaction-scoped advisory lock, so concurrent appends
-// queue up until the earlier transaction commits.
+// Append adds ev to the chain inside tx and returns its seq.
+//
+// Chain growth is serialised through the single control.audit_head row, read
+// with SELECT ... FOR UPDATE as the first statement. We deliberately do not
+// use an advisory lock: db.WithTx runs at SERIALIZABLE, whose snapshot is
+// taken at the first statement, i.e. before any lock wait finishes, so after
+// waiting the transaction would read the chain head from a stale snapshot. A
+// row lock has the right semantics here: if the head row was updated by a
+// transaction that committed after our snapshot, FOR UPDATE raises 40001
+// (serialization_failure), which db.WithTx retries on a fresh snapshot. The
+// chain is therefore always linear; contention costs retries, not forks.
+//
+// As a cheap pre-serialiser, Append first takes LOCK TABLE audit_head IN
+// EXCLUSIVE MODE. LOCK is a utility statement that does not take a snapshot,
+// so when Append is the first statement of the transaction the wait happens
+// before the snapshot exists, the snapshot is fresh once the lock is granted,
+// and appenders queue instead of stampeding into 40001 retries. If earlier
+// statements already fixed the snapshot, the row lock below still detects the
+// concurrent append and forces a retry.
 func (r *Recorder) Append(ctx context.Context, tx pgx.Tx, ev Event) (int64, error) {
-	if _, err := tx.Exec(ctx, `select pg_advisory_xact_lock($1)`, int64(chainLockKey)); err != nil {
-		return 0, fmt.Errorf("audit: lock: %w", err)
+	if _, err := tx.Exec(ctx, `lock table control.audit_head in exclusive mode`); err != nil {
+		return 0, fmt.Errorf("audit: lock table: %w", err)
 	}
-	prev := make([]byte, 32)
-	err := tx.QueryRow(ctx, `select hash from control.audit_events order by seq desc limit 1`).Scan(&prev)
-	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-		return 0, fmt.Errorf("audit: read head: %w", err)
-	}
-	if errors.Is(err, pgx.ErrNoRows) {
-		prev = make([]byte, 32)
+	prev, err := lockHead(ctx, tx)
+	if err != nil {
+		return 0, err
 	}
 
 	payload := ev.Payload
@@ -133,7 +146,28 @@ func (r *Recorder) Append(ctx context.Context, tx pgx.Tx, ev Event) (int64, erro
 	if err != nil {
 		return 0, fmt.Errorf("audit: insert: %w", err)
 	}
+	if _, err := tx.Exec(ctx, `update control.audit_head set seq = $1, hash = $2 where id = 1`, seq, hash); err != nil {
+		return 0, fmt.Errorf("audit: advance head: %w", err)
+	}
 	return seq, nil
+}
+
+// lockHead row-locks the chain head and returns its hash. The migration seeds
+// the row; it is re-created lazily if absent (e.g. after a test truncate).
+func lockHead(ctx context.Context, tx pgx.Tx) ([]byte, error) {
+	var prev []byte
+	q := `select hash from control.audit_head where id = 1 for update`
+	err := tx.QueryRow(ctx, q).Scan(&prev)
+	if errors.Is(err, pgx.ErrNoRows) {
+		if _, err := tx.Exec(ctx, `insert into control.audit_head (id, seq, hash) values (1, 0, $1) on conflict (id) do nothing`, make([]byte, 32)); err != nil {
+			return nil, fmt.Errorf("audit: seed head: %w", err)
+		}
+		err = tx.QueryRow(ctx, q).Scan(&prev)
+	}
+	if err != nil {
+		return nil, fmt.Errorf("audit: lock head: %w", err)
+	}
+	return prev, nil
 }
 
 // Verify recomputes the whole chain in seq order and reports the first row
@@ -170,7 +204,7 @@ func (r *Recorder) Verify(ctx context.Context) (Report, error) {
 		if err != nil {
 			return Report{}, err
 		}
-		if !bytesEqual(storedPrev, prev) || !bytesEqual(storedHash, want) {
+		if !bytes.Equal(storedPrev, prev) || !bytes.Equal(storedHash, want) {
 			rep.OK = false
 			rep.FirstBadSeq = seq
 		}
@@ -183,17 +217,6 @@ func (r *Recorder) Verify(ctx context.Context) (Report, error) {
 		rep.HeadHash = hex.EncodeToString(head)
 	}
 	return rep, nil
-}
-
-func bytesEqual(a, b []byte) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	var d byte
-	for i := range a {
-		d |= a[i] ^ b[i]
-	}
-	return d == 0
 }
 
 // Recent returns the latest events, newest first.
@@ -226,7 +249,9 @@ func rootMessage(day string, headSeq int64, headHash string) ([]byte, error) {
 }
 
 // SignDailyRoot signs the chain head as of the end of day (UTC) and upserts
-// it into control.audit_roots.
+// it into control.audit_roots. The day's head is chosen by each event's
+// application-assigned timestamp (the app clock at Append), so the result is
+// only exact when all app servers have synchronised clocks.
 func (r *Recorder) SignDailyRoot(ctx context.Context, day time.Time) (Root, error) {
 	d := day.UTC()
 	start := time.Date(d.Year(), d.Month(), d.Day(), 0, 0, 0, 0, time.UTC)
