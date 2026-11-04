@@ -38,7 +38,7 @@ The directive adds a second outcome: connect to open banking APIs and show
   the research) plus an optional Enable Banking adapter for the developer's
   own accounts when credentials are supplied. No licensed TPP access is
   assumed.
-- Backend language Go 1.24 (sandbox floor), client Svelte 5 + Vite, Node 22.
+- Backend language Go 1.26 (the sandbox has Go 1.24 but auto-downloads the 1.26 toolchain via the module proxy), client Svelte 5 + Vite, Node 22.
 - Capacitor mobile shell, Keycloak staff SSO, OpenBao, Compose/k3s are
   later phases (need Docker or native toolchains not present in the sandbox).
 
