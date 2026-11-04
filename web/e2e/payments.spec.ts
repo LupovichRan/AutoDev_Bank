@@ -37,7 +37,7 @@ test('payments: step-up, maker-checker on the joint account, no self-approval', 
     const lunch = `e2e lunch ${run}`;
     await pay(page, aliceIls.id, bobIls.id, '50.00', lunch);
     await expect(page.getByRole('heading', { name: 'Sent', exact: true })).toBeVisible();
-    await expect(page.getByText(/^Sent .*50\.00/)).toBeVisible();
+    await expect(page.locator("#outcome").getByText(/^Sent .*50\.00/)).toBeVisible();
     expect((await accountByCode(page.request, ALICE_ILS)).balance).toBe(aliceIls.balance - 5000);
 
     await page.getByRole('link', { name: 'Back to Home' }).click();
