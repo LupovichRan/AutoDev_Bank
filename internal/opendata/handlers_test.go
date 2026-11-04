@@ -124,7 +124,7 @@ func TestHandlers_OtherKinds(t *testing.T) {
 
 func TestHandlers_BadQueryIsProblemJSON(t *testing.T) {
 	mux, _ := newAPI(t)
-	for _, q := range []string{"near=abc", "near=91,0", "near=1", "near=NaN,NaN", "near=Inf,0", "near=0,-Inf","limit=0", "limit=x", "limit=5000"} {
+	for _, q := range []string{"near=abc", "near=91,0", "near=1", "near=NaN,NaN", "near=Inf,0", "near=0,-Inf", "limit=0", "limit=x", "limit=5000"} {
 		rec := do(t, mux, "GET", "/api/opendata/atms?"+q)
 		testutil.Equal(t, http.StatusBadRequest, rec.Code, q)
 		testutil.Equal(t, "application/problem+json", rec.Header().Get("Content-Type"), q)

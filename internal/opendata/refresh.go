@@ -241,7 +241,7 @@ func (r *Refresher) store(ctx context.Context, o RefreshOutcome, res Result, fal
 }
 
 func (r *Refresher) logFailure(o RefreshOutcome) {
-	// Use a fresh context so a cancelled refresh still records why it stopped.
+	// Use a fresh context so a timed-out fetch still records why it failed (cancelled runs skip logging).
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	msg := truncateErr(o.Error)
