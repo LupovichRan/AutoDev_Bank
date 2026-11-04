@@ -27,7 +27,7 @@ First run:
 ./dev run
 ```
 
-The binary has four subcommands: `serve`, `migrate`, `seed`, `opendata-refresh`. At the time of writing `serve` and `seed` are stubs in the code base and return "not implemented yet"; they land with the HTTP wiring task.
+The binary has four subcommands: `serve`, `migrate`, `seed`, `opendata-refresh`. `serve` applies pending migrations at startup, refreshes open data once and then every six hours, signs yesterday's audit root at startup and then daily, and shuts down gracefully on SIGINT/SIGTERM. `seed` is idempotent: it creates (or finds) the demo principals `alice`, `bob` (customers), `carol` (staff: `payments.approver`, `staff.ops`) and `dave` (staff: `payments.initiator`), their ILS/EUR and joint accounts with opening balances funded from `bank.equity.*`, and prints a table of ids and balances.
 
 ## Environment variables
 
@@ -63,7 +63,7 @@ Read once at startup in `cmd/bank/main.go`, plus the Enable Banking variables re
 ## Open-data refresh
 
 - One-off: `./dev refresh` (same as `go run ./cmd/bank opendata-refresh`). It fetches every provider and stores the last good snapshot per provider and kind. A failed provider keeps its previous snapshot. The command exits non-zero only if nothing at all was stored.
-- Ticker: the refresher runs once at start and then every interval (default one hour) while the server is up.
+- Ticker: the refresher runs once at start and then every six hours while `serve` is up.
 - Fixture fallback: recorded fixtures are used only when a live fetch fails and nothing is cached yet (cold start). Set `BANK_OPENDATA_FIXTURES=1` to force fixtures, for offline work and tests.
 - Provenance: every record carries `fetched_at`, `source_url` and `license`. The web app shows the source, fetch time and licence next to the data. Keep that attribution when you add a provider.
 - Sources: OBIE Open Data v2.2 at UK banks, Frankfurter, ECB, Bank of Israel PublicApi, Bank of England IADB.

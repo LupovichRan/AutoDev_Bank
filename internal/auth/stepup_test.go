@@ -28,6 +28,21 @@ func TestStepUp_BoundToPayloadHash(t *testing.T) {
 	testutil.ErrorIs(t, s.RequireStepUp(ctx, sess, hashA[:]), ErrStepUpRequired, "consumed: one assertion = one transfer")
 }
 
+func TestTestMarkSteppedUp_OnlyWithTestLogin(t *testing.T) {
+	ctx := context.Background()
+	hash := sha256.Sum256([]byte("transfer"))
+
+	s, _ := newTestService(t)
+	sess, err := s.TestLogin(ctx, mustPrincipal(t, s, "trent"))
+	testutil.NoError(t, err)
+	testutil.ErrorIs(t, s.TestMarkSteppedUp(ctx, sess, hash[:4]), ErrBadPayloadHash)
+	testutil.NoError(t, s.TestMarkSteppedUp(ctx, sess, hash[:]))
+	testutil.NoError(t, s.RequireStepUp(ctx, sess, hash[:]))
+
+	off, _ := newTestService(t, func(c *Config) { c.AllowTestLogin = false })
+	testutil.ErrorIs(t, off.TestMarkSteppedUp(ctx, sess, hash[:]), ErrTestLoginDisabled)
+}
+
 func TestStepUp_ExpiresAfterTTL(t *testing.T) {
 	s, _ := newTestService(t)
 	ctx := context.Background()

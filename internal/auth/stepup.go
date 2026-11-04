@@ -153,6 +153,20 @@ func (s *Service) markSteppedUp(ctx context.Context, sess Session, payloadHash [
 	})
 }
 
+// TestMarkSteppedUp records a step-up for payloadHash on sess without a
+// passkey assertion, for integration tests of handlers that call
+// RequireStepUp. Like TestLogin it works only when Config.AllowTestLogin is
+// set and must never be enabled in production.
+func (s *Service) TestMarkSteppedUp(ctx context.Context, sess Session, payloadHash []byte) error {
+	if !s.cfg.AllowTestLogin {
+		return ErrTestLoginDisabled
+	}
+	if len(payloadHash) != sha256.Size {
+		return ErrBadPayloadHash
+	}
+	return s.markSteppedUp(ctx, sess, payloadHash)
+}
+
 func markSteppedUpTx(ctx context.Context, tx pgx.Tx, sess Session, payloadHash []byte) error {
 	tag, err := tx.Exec(ctx, `update control.sessions set stepped_up_at=now(), stepup_payload_hash=$3
 		where id=$1 and principal_id=$2 and expires_at > now()`, sess.ID, sess.PrincipalID, payloadHash)
