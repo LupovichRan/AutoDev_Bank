@@ -157,3 +157,14 @@ These are planned and not built:
 - Payment rails (SEPA, FPS) and payment orchestration with River.
 - KYC, sanctions screening and transaction monitoring.
 - Backups with a restore drill, observability stack, TLS termination.
+
+## Android test shell
+
+`android/` builds a debug APK (`cd android && ./gradlew assembleDebug`; the
+`android` GitHub Actions workflow uploads it as the artifact
+`autodev-bank-debug-apk`). The shell is a single `WebView` that loads the
+PWA from the server address the tester enters on first start (menu: "Change
+server…"). It allows cleartext http (`res/xml/network_security_config.xml`)
+and is only for testing against `./dev demo`; passkeys need an https origin,
+so inside the shell the web app uses the dev-mode step-up fallback, which the
+server honours only when `BANK_DEV_TEST_LOGIN=1`.

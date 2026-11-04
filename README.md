@@ -70,3 +70,21 @@ Apache-2.0. Open data served by the app carries its source, a short
 attribution and a link to the publisher's own terms (Open Banking Limited
 Open Licence, ECB, Bank of Israel, Bank of England, Frankfurter); the
 publisher's terms govern reuse.
+
+## Android test app
+
+`android/` is a deliberately tiny in-house shell: one Java `WebView` activity
+with no dependencies. It loads the PWA from a running bank server (same origin
+as the API, so cookies and CSP work exactly as in a browser) and asks for the
+server address on first start.
+
+```bash
+./dev demo                                   # on your laptop: server on :8080 with demo users
+cd android && ./gradlew assembleDebug        # or download the APK artifact from the "android" CI workflow
+adb install app/build/outputs/apk/debug/app-debug.apk
+```
+
+On the phone, enter `http://<your-laptop-LAN-IP>:8080` (emulator: `http://10.0.2.2:8080`).
+This test build allows plain http and relies on the server's dev mode for the
+passkey step-up (WebAuthn needs an https origin); a production build must use
+https, certificate pinning and the Capacitor plugins described in ADR 0003.

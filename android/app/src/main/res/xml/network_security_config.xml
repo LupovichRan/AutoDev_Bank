@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Test build: plain http is allowed so the shell can reach `bank serve` on a laptop's LAN address.
+     A production build must set cleartextTrafficPermitted="false" and pin the bank's certificate. -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

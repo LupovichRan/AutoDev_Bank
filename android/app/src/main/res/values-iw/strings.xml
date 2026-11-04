@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">אוטודב בנק</string>
+    <string name="server_title">כתובת שרת הבנק</string>
+    <string name="server_hint">http://192.168.1.10:8080</string>
+    <string name="server_help">הזינו את הכתובת שבה רץ `./dev demo`. מאמולטור אנדרואיד השתמשו ב-http://10.0.2.2:8080.</string>
+    <string name="connect">התחבר</string>
+    <string name="cancel">ביטול</string>
+    <string name="menu_server">שינוי שרת…</string>
+    <string name="menu_reload">טעינה מחדש</string>
+    <string name="error_title">לא ניתן להגיע לשרת הבנק</string>
+    <string name="error_body">%1$s\n\nודאו שהשרת פועל ושהטלפון מחובר לאותה רשת.</string>
+    <string name="retry">נסו שוב</string>
+</resources>

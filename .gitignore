@@ -15,3 +15,7 @@ web/dist/*
 .e2e/
 web/playwright-report/
 web/test-results/
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
