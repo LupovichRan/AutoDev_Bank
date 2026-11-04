@@ -45,16 +45,25 @@ type Input struct {
 	InitiatorID uuid.UUID
 	HolderIDs   []uuid.UUID // holders of the from-account
 	AccountKind string
+	// InitiatorKind is the initiator's principal kind (customer, staff, service).
+	InitiatorKind string
+	// CustomerHolders is how many of HolderIDs are customer principals.
+	CustomerHolders int
 }
 
 // Decision is the policy outcome: Required == 0 means post immediately.
 type Decision struct {
 	Required int
 	Reason   string
+	// RequiresHolder means at least one approval must come from a holder of
+	// the from-account other than the initiator (the joint-account rule);
+	// other approvals count toward Required but never replace it.
+	RequiresHolder bool
 }
 
 // Evaluate returns the number of approvals in needs: the maximum of the
-// highest matching tier and the joint-account rule.
+// highest matching tier, the staff-initiator rule and the joint-account
+// rule (which also sets RequiresHolder).
 func (p Policy) Evaluate(in Input) Decision {
 	d := Decision{Reason: "below approval threshold"}
 	var tier *Tier
@@ -72,9 +81,21 @@ func (p Policy) Evaluate(in Input) Decision {
 		}
 		d.Reason = fmt.Sprintf("amount >= %s requires %d %s", formatMinor(tier.Threshold), tier.Required, noun)
 	}
-	if p.JointRequiresOtherHolder && len(in.HolderIDs) > 1 && d.Required < 1 {
+	// A staff member debiting a customer's account always needs a checker.
+	if in.InitiatorKind == "staff" && in.CustomerHolders > 0 && d.Required < 1 {
 		d.Required = 1
-		d.Reason = "joint account requires another holder"
+		d.Reason = "staff-initiated debit from a customer account requires 1 approver"
+	}
+	// Joint accounts: another holder must be among the approvers; staff
+	// approvals count toward Required but never replace that holder.
+	if p.JointRequiresOtherHolder && len(in.HolderIDs) > 1 {
+		d.RequiresHolder = true
+		if d.Required < 1 {
+			d.Required = 1
+			d.Reason = "joint account requires another holder"
+		} else {
+			d.Reason += "; joint account requires another holder among them"
+		}
 	}
 	return d
 }

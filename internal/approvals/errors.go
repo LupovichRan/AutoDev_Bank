@@ -16,6 +16,9 @@ var (
 	ErrSoDConflict    = errors.New("approvals: role conflicts with separation of duties")
 	ErrNotFound       = errors.New("approvals: not found")
 	ErrAlreadyDecided = errors.New("approvals: principal has already decided this approval")
+	// ErrRoleNotAllowed: the role may not be granted to this kind of
+	// principal (customers never hold payments.initiator/approver).
+	ErrRoleNotAllowed = errors.New("approvals: role not allowed for this principal kind")
 )
 
 // pgPrefixes maps migration 0005's raise-message prefixes to typed errors.

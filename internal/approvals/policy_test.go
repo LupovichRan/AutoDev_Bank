@@ -50,3 +50,33 @@ func TestPolicy_JointAccountRequiresOtherHolder(t *testing.T) {
 	// A larger tier requirement wins over the joint rule.
 	testutil.Equal(t, 2, DefaultPolicy().Evaluate(policyInput(1000000, 2)).Required)
 }
+
+func TestPolicy_JointRuleRequiresHolder(t *testing.T) {
+	// The joint rule flags the decision whatever the tier says.
+	for _, amt := range []int64{500, 200000, 1000000} {
+		d := DefaultPolicy().Evaluate(policyInput(amt, 2))
+		testutil.True(t, d.RequiresHolder, "joint account requires a co-holder approval")
+	}
+	testutil.False(t, DefaultPolicy().Evaluate(policyInput(200000, 1)).RequiresHolder, "single holder")
+	p := DefaultPolicy()
+	p.JointRequiresOtherHolder = false
+	testutil.False(t, p.Evaluate(policyInput(500, 2)).RequiresHolder, "rule switched off")
+}
+
+func TestPolicy_StaffInitiatedCustomerDebitNeedsApproval(t *testing.T) {
+	in := policyInput(500, 1)
+	in.HolderIDs = []uuid.UUID{ids.New()} // the staff initiator is not a holder
+	in.InitiatorKind = "staff"
+	in.CustomerHolders = 1
+	d := DefaultPolicy().Evaluate(in)
+	testutil.Equal(t, 1, d.Required)
+	testutil.Equal(t, "staff-initiated debit from a customer account requires 1 approver", d.Reason)
+
+	// A higher tier still wins.
+	in.Amount = 1000000
+	testutil.Equal(t, 2, DefaultPolicy().Evaluate(in).Required)
+
+	// Staff moving money out of an account with no customer holders is tier-driven only.
+	in.Amount, in.CustomerHolders = 500, 0
+	testutil.Equal(t, 0, DefaultPolicy().Evaluate(in).Required)
+}

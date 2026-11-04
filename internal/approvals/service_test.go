@@ -392,3 +392,85 @@ func TestDecide_RejectAllowedBeforeNotBefore(t *testing.T) {
 	testutil.NoError(t, err)
 	testutil.Equal(t, StatusRejected, ap.Status)
 }
+
+func TestDecide_JointAccountStaffApprovalDoesNotReplaceCoHolder(t *testing.T) {
+	e := newEnv(t)
+	ctx := context.Background()
+	alice, bob := e.principal(t, "customer"), e.principal(t, "customer")
+	checker := e.principal(t, "staff")
+	testutil.NoError(t, e.svc.GrantRole(ctx, checker.ID, RoleApprover))
+	from := e.account(t, 100000, alice, bob) // joint account
+	to := e.account(t, 0)
+
+	out, err := e.svc.SubmitTransfer(ctx, e.transfer(alice, from, to, 5000))
+	testutil.NoError(t, err)
+	testutil.True(t, out.Approval != nil, "joint account needs approval")
+	testutil.Equal(t, 1, out.Approval.RequiredApprovals)
+	testutil.True(t, out.Approval.RequiresHolderApproval, "co-holder approval flagged")
+
+	// Staff approval reaches the count but not the co-holder rule.
+	ap, err := e.svc.Decide(ctx, out.Approval.ID, checker.ID, true, "staff ok")
+	testutil.NoError(t, err)
+	testutil.Equal(t, StatusPending, ap.Status)
+	testutil.Len(t, ap.Decisions, 1)
+	testutil.Equal(t, checker.ID, ap.Decisions[0].ApproverID)
+	testutil.True(t, ap.LedgerTransactionID == nil, "not executed")
+	testutil.Equal(t, int64(100000), e.balance(t, from.ID))
+	testutil.Equal(t, []string{"approved"}, e.logOutcomes(t, checker.ID))
+
+	ap, err = e.svc.Decide(ctx, out.Approval.ID, bob.ID, true, "co-holder ok")
+	testutil.NoError(t, err)
+	testutil.Equal(t, StatusExecuted, ap.Status)
+	testutil.Len(t, ap.Decisions, 2)
+	testutil.Equal(t, int64(95000), e.balance(t, from.ID))
+	testutil.Equal(t, int64(5000), e.balance(t, to.ID))
+}
+
+func TestDecide_JointAccountTier2NeedsCoHolderAmongApprovers(t *testing.T) {
+	e := newEnv(t)
+	ctx := context.Background()
+	alice, bob := e.principal(t, "customer"), e.principal(t, "customer")
+	c1, c2 := e.principal(t, "staff"), e.principal(t, "staff")
+	testutil.NoError(t, e.svc.GrantRole(ctx, c1.ID, RoleApprover))
+	testutil.NoError(t, e.svc.GrantRole(ctx, c2.ID, RoleApprover))
+	from := e.account(t, 2_000_000, alice, bob)
+	to := e.account(t, 0)
+
+	out, err := e.svc.SubmitTransfer(ctx, e.transfer(alice, from, to, 1_500_000))
+	testutil.NoError(t, err)
+	testutil.Equal(t, 2, out.Approval.RequiredApprovals)
+
+	_, err = e.svc.Decide(ctx, out.Approval.ID, c1.ID, true, "")
+	testutil.NoError(t, err)
+	ap, err := e.svc.Decide(ctx, out.Approval.ID, c2.ID, true, "")
+	testutil.NoError(t, err)
+	testutil.Equal(t, StatusPending, ap.Status) // two approvals, no co-holder
+	testutil.Equal(t, int64(2_000_000), e.balance(t, from.ID))
+
+	ap, err = e.svc.Decide(ctx, out.Approval.ID, bob.ID, true, "")
+	testutil.NoError(t, err)
+	testutil.Equal(t, StatusExecuted, ap.Status)
+	testutil.Equal(t, int64(500_000), e.balance(t, from.ID))
+}
+
+func TestSubmitTransfer_StaffInitiatedCustomerDebitNeedsApproval(t *testing.T) {
+	e := newEnv(t)
+	ctx := context.Background()
+	alice := e.principal(t, "customer")
+	clerk := e.principal(t, "staff")
+	testutil.NoError(t, e.svc.GrantRole(ctx, clerk.ID, RoleInitiator))
+	from := e.account(t, 100000, alice)
+	to := e.account(t, 0)
+
+	out, err := e.svc.SubmitTransfer(ctx, e.transfer(clerk, from, to, 100)) // far below tier 1
+	testutil.NoError(t, err)
+	testutil.True(t, out.Approval != nil, "staff-initiated customer debit needs approval")
+	testutil.Equal(t, 1, out.Approval.RequiredApprovals)
+	testutil.Equal(t, int64(100000), e.balance(t, from.ID))
+
+	// The account holder may approve it.
+	ap, err := e.svc.Decide(ctx, out.Approval.ID, alice.ID, true, "")
+	testutil.NoError(t, err)
+	testutil.Equal(t, StatusExecuted, ap.Status)
+	testutil.Equal(t, int64(99900), e.balance(t, from.ID))
+}

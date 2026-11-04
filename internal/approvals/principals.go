@@ -65,10 +65,26 @@ func (s *Service) GetPrincipalByHandle(ctx context.Context, handle string) (Prin
 
 // GrantRole grants role to the principal (idempotent). Granting
 // payments.initiator and payments.approver to the same principal fails with
-// ErrSoDConflict (trigger roles_static_sod).
+// ErrSoDConflict (trigger roles_static_sod). The payment roles are staff and
+// service roles: granting either to a customer fails with ErrRoleNotAllowed.
+// An unknown principal is ErrNotFound.
 func (s *Service) GrantRole(ctx context.Context, principalID uuid.UUID, role string) error {
 	err := db.WithTx(ctx, s.pool, func(ctx context.Context, tx pgx.Tx) error {
-		_, err := tx.Exec(ctx, `insert into control.roles (principal_id, role) values ($1, $2)
+		// Same lock mode as roles_static_sod takes, so grants to one
+		// principal queue here without a lock-upgrade deadlock.
+		var kind string
+		err := tx.QueryRow(ctx, `select kind from control.principals where id = $1 for no key update`,
+			principalID).Scan(&kind)
+		if errors.Is(err, pgx.ErrNoRows) {
+			return fmt.Errorf("%w: principal %s", ErrNotFound, principalID)
+		}
+		if err != nil {
+			return err
+		}
+		if kind == "customer" && (role == RoleInitiator || role == RoleApprover) {
+			return fmt.Errorf("%w: %s cannot be granted to a customer", ErrRoleNotAllowed, role)
+		}
+		_, err = tx.Exec(ctx, `insert into control.roles (principal_id, role) values ($1, $2)
 			on conflict do nothing`, principalID, role)
 		return err
 	})
@@ -139,33 +155,4 @@ func (s *Service) AccountsForHolder(ctx context.Context, principalID uuid.UUID) 
 		return nil, fmt.Errorf("approvals: accounts for holder: %w", err)
 	}
 	return accts, nil
-}
-
-// querier is satisfied by *pgxpool.Pool and pgx.Tx.
-type querier interface {
-	QueryRow(ctx context.Context, sql string, args ...any) pgx.Row
-}
-
-func isHolder(ctx context.Context, q querier, accountID, principalID uuid.UUID) (bool, error) {
-	var ok bool
-	err := q.QueryRow(ctx, `select exists(select 1 from control.account_holders
-		where account_id = $1 and principal_id = $2)`, accountID, principalID).Scan(&ok)
-	return ok, err
-}
-
-func hasRole(ctx context.Context, q querier, principalID uuid.UUID, role string) (bool, error) {
-	var ok bool
-	err := q.QueryRow(ctx, `select exists(select 1 from control.roles
-		where principal_id = $1 and role = $2)`, principalID, role).Scan(&ok)
-	return ok, err
-}
-
-// eligible reports whether principalID may act on accountID: as one of its
-// holders, or as a staff member holding role.
-func eligible(ctx context.Context, q querier, accountID, principalID uuid.UUID, role string) (bool, error) {
-	ok, err := isHolder(ctx, q, accountID, principalID)
-	if err != nil || ok {
-		return ok, err
-	}
-	return hasRole(ctx, q, principalID, role)
 }

@@ -6,8 +6,11 @@
 --     payments.approver;
 --   * dynamic (decisions_dynamic_sod): nobody decides an approval they
 --     initiated, and only pending approvals take decisions.
+-- The approval lifecycle is a state machine (approvals_state_machine):
+-- pending -> approved|rejected|expired, approved -> executed; the request
+-- columns never change and decisions are append-only.
 -- Trigger errors are SQLSTATE P0001 with messages prefixed sod_conflict,
--- sod_self_approval or approval_not_pending.
+-- sod_self_approval, approval_not_pending or approval_immutable.
 --
 -- control.principals / control.roles are also declared (identically, with
 -- "if not exists") by 0006_auth.sql, so either migration may land first.
@@ -70,6 +73,9 @@ create table control.approvals (
   currency              char(3) not null,
   initiator_id          uuid not null references control.principals(id),
   required_approvals    int not null check (required_approvals >= 1),
+  -- joint-account rule: one approve decision must come from a holder of
+  -- the from-account other than the initiator.
+  requires_holder_approval boolean not null default false,
   not_before            timestamptz null,
   status                text not null default 'pending'
                         check (status in ('pending','approved','rejected','executed','expired')),
@@ -80,6 +86,34 @@ create table control.approvals (
 create unique index approvals_idempotency_key_idx on control.approvals ((subject->>'idempotency_key'));
 create index approvals_initiator_idx on control.approvals (initiator_id, created_at desc);
 create index approvals_pending_idx on control.approvals (created_at) where status = 'pending';
+
+create function control.approvals_state_machine() returns trigger language plpgsql as $$
+begin
+  if tg_op = 'DELETE' then
+    raise exception 'approval_immutable: approval % cannot be deleted', old.id;
+  end if;
+  if new.id <> old.id or new.kind <> old.kind or new.subject <> old.subject
+     or new.amount <> old.amount or new.currency <> old.currency
+     or new.initiator_id <> old.initiator_id or new.required_approvals <> old.required_approvals
+     or new.requires_holder_approval <> old.requires_holder_approval
+     or new.created_at <> old.created_at then
+    raise exception 'approval_immutable: approval % request columns cannot change', old.id;
+  end if;
+  if old.status in ('executed','rejected','expired') then
+    raise exception 'approval_immutable: approval % is % (terminal)', old.id, old.status;
+  end if;
+  if new.status <> old.status and not (
+       (old.status = 'pending'  and new.status in ('approved','rejected','expired'))
+    or (old.status = 'approved' and new.status = 'executed')) then
+    raise exception 'approval_immutable: approval % cannot go from % to %', old.id, old.status, new.status;
+  end if;
+  return new;
+end;
+$$;
+
+create trigger approvals_state_machine
+  before update or delete on control.approvals
+  for each row execute function control.approvals_state_machine();
 
 create table control.approval_decisions (
   approval_id uuid not null references control.approvals(id),
@@ -94,7 +128,9 @@ create function control.decisions_dynamic_sod() returns trigger language plpgsql
 declare
   a record;
 begin
-  select initiator_id, status into a from control.approvals where id = new.approval_id;
+  -- for share: a concurrent status change waits for this decision (and
+  -- vice versa), so the pending check cannot go stale before commit.
+  select initiator_id, status into a from control.approvals where id = new.approval_id for share;
   if not found then
     return new; -- the foreign key reports the missing approval
   end if;
@@ -112,6 +148,18 @@ $$;
 create trigger decisions_dynamic_sod
   before insert or update on control.approval_decisions
   for each row execute function control.decisions_dynamic_sod();
+
+-- Decisions are append-only evidence.
+create function control.decisions_append_only() returns trigger language plpgsql as $$
+begin
+  raise exception 'approval_immutable: decisions on approval % cannot be %d',
+    old.approval_id, lower(tg_op);
+end;
+$$;
+
+create trigger decisions_append_only
+  before update or delete on control.approval_decisions
+  for each row execute function control.decisions_append_only();
 
 -- One row per policy evaluation or decision attempt, including refusals.
 create table control.decision_log (
