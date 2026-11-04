@@ -34,6 +34,20 @@ type Refresher struct {
 
 	Timeout     time.Duration // per fetch; default 90s
 	Concurrency int           // providers refreshed in parallel; default 4
+
+	running sync.Mutex // held for the duration of RefreshAll
+}
+
+// ErrRefreshInProgress is returned by RefreshAll when another run is active.
+var ErrRefreshInProgress = errors.New("opendata: a refresh is already in progress")
+
+const maxErrText = 2000
+
+func truncateErr(s string) string {
+	if len(s) > maxErrText {
+		s = s[:maxErrText]
+	}
+	return strings.ToValidUTF8(s, "?")
 }
 
 func NewRefresher(pool *pgxpool.Pool, providers []Provider, log *slog.Logger) *Refresher {
@@ -57,8 +71,13 @@ type RefreshOutcome struct {
 }
 
 // RefreshAll refreshes every provider/kind once and returns outcomes sorted
-// by provider then kind.
-func (r *Refresher) RefreshAll(ctx context.Context) []RefreshOutcome {
+// by provider then kind. Runs never overlap: while one is in progress,
+// RefreshAll returns ErrRefreshInProgress.
+func (r *Refresher) RefreshAll(ctx context.Context) ([]RefreshOutcome, error) {
+	if !r.running.TryLock() {
+		return nil, ErrRefreshInProgress
+	}
+	defer r.running.Unlock()
 	conc := max(r.Concurrency, 1)
 	sem := make(chan struct{}, conc)
 	var mu sync.Mutex
@@ -85,7 +104,7 @@ func (r *Refresher) RefreshAll(ctx context.Context) []RefreshOutcome {
 		}
 		return out[i].Kind < out[j].Kind
 	})
-	return out
+	return out, nil
 }
 
 // Run refreshes immediately and then every interval until ctx is done.
@@ -96,8 +115,12 @@ func (r *Refresher) Run(ctx context.Context, every time.Duration) {
 	t := time.NewTicker(every)
 	defer t.Stop()
 	for {
-		for _, o := range r.RefreshAll(ctx) {
-			r.logOutcome(o)
+		if outs, err := r.RefreshAll(ctx); err != nil {
+			r.log.Warn("opendata refresh skipped", "err", err)
+		} else {
+			for _, o := range outs {
+				r.logOutcome(o)
+			}
 		}
 		select {
 		case <-ctx.Done():
@@ -151,7 +174,7 @@ func (r *Refresher) refreshOne(ctx context.Context, p Provider, k Kind) RefreshO
 		if live, lerr := r.hasLiveSnapshot(ctx, p.ID(), k); lerr == nil && !live {
 			if fres, ferr := r.fetch(ctx, fb, k); ferr == nil {
 				fres.SourceURL += fixtureSuffix
-				msg := "fixture fallback; live fetch failed: " + o.Error
+				msg := truncateErr("fixture fallback; live fetch failed: " + o.Error)
 				if serr := r.store(ctx, o, fres, msg, time.Since(start)); serr == nil {
 					o.Fallback, o.Records, o.Error = true, len(fres.Records), msg
 					o.DurationMS = time.Since(start).Milliseconds()
@@ -161,6 +184,12 @@ func (r *Refresher) refreshOne(ctx context.Context, p Provider, k Kind) RefreshO
 		}
 	}
 	o.DurationMS = time.Since(start).Milliseconds()
+	if ctx.Err() != nil {
+		// Shutdown or cancelled request: not a provider failure, so leave no
+		// ok=false row behind.
+		o.Error = "cancelled: " + o.Error
+		return o
+	}
 	r.logFailure(o)
 	return o
 }
@@ -215,12 +244,9 @@ func (r *Refresher) logFailure(o RefreshOutcome) {
 	// Use a fresh context so a cancelled refresh still records why it stopped.
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	msg := o.Error
-	if len(msg) > 2000 {
-		msg = msg[:2000]
-	}
+	msg := truncateErr(o.Error)
 	if _, err := r.pool.Exec(ctx, `insert into opendata.refresh_log (provider, kind, at, ok, error, duration_ms)
-		values ($1, $2, $3, false, $4, $5)`, o.Provider, string(o.Kind), o.FetchedAt, strings.ToValidUTF8(msg, "?"), int(o.DurationMS)); err != nil {
+		values ($1, $2, $3, false, $4, $5)`, o.Provider, string(o.Kind), o.FetchedAt, msg, int(o.DurationMS)); err != nil {
 		r.log.Error("opendata: write refresh_log", "provider", o.Provider, "kind", o.Kind, "err", err)
 	}
 }

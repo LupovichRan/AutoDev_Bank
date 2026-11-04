@@ -19,7 +19,7 @@ func newAPI(t *testing.T) (*http.ServeMux, *opendata.Handlers) {
 	t.Helper()
 	pool := db.TestPool(t)
 	ref := opendata.NewRefresher(pool, providers.FixtureProviders(providers.Fixtures), quiet)
-	for _, o := range ref.RefreshAll(t.Context()) {
+	for _, o := range mustRefresh(t, ref) {
 		testutil.True(t, o.OK, o.Provider+" "+string(o.Kind)+": "+o.Error)
 	}
 	h := opendata.NewHandlers(opendata.NewStore(pool), ref)
@@ -124,7 +124,7 @@ func TestHandlers_OtherKinds(t *testing.T) {
 
 func TestHandlers_BadQueryIsProblemJSON(t *testing.T) {
 	mux, _ := newAPI(t)
-	for _, q := range []string{"near=abc", "near=91,0", "near=1", "limit=0", "limit=x", "limit=5000"} {
+	for _, q := range []string{"near=abc", "near=91,0", "near=1", "near=NaN,NaN", "near=Inf,0", "near=0,-Inf","limit=0", "limit=x", "limit=5000"} {
 		rec := do(t, mux, "GET", "/api/opendata/atms?"+q)
 		testutil.Equal(t, http.StatusBadRequest, rec.Code, q)
 		testutil.Equal(t, "application/problem+json", rec.Header().Get("Content-Type"), q)

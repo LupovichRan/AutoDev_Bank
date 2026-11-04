@@ -12,6 +12,7 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"os"
@@ -36,13 +37,10 @@ type EnableBanking struct {
 }
 
 // NewEnableBanking returns (nil, false) when appID or the key is missing or
-// the PEM is not an RSA private key (PKCS#8 or PKCS#1).
+// the PEM is not an RSA private key (PKCS#8 or PKCS#1) or no account uid is
+// configured.
 func NewEnableBanking(appID string, privateKeyPEM []byte, accountUIDs []string, client *http.Client) (opendata.Provider, bool) {
 	if strings.TrimSpace(appID) == "" || len(privateKeyPEM) == 0 {
-		return nil, false
-	}
-	key, err := parseRSAKey(privateKeyPEM)
-	if err != nil {
 		return nil, false
 	}
 	var uids []string
@@ -50,6 +48,15 @@ func NewEnableBanking(appID string, privateKeyPEM []byte, accountUIDs []string, 
 		if u = strings.TrimSpace(u); u != "" {
 			uids = append(uids, u)
 		}
+	}
+	if len(uids) == 0 {
+		return nil, false
+	}
+	key, err := parseRSAKey(privateKeyPEM)
+	if err != nil {
+		// The error carries only the parser's reason, never key material.
+		slog.Warn("enablebanking: private key rejected; provider disabled", "err", err)
+		return nil, false
 	}
 	return &EnableBanking{BaseURL: "https://api.enablebanking.com", appID: strings.TrimSpace(appID),
 		key: key, accountUIDs: uids, client: client, now: time.Now}, true
@@ -69,6 +76,16 @@ func EnableBankingFromEnv(client *http.Client) (opendata.Provider, bool) {
 	}
 	return NewEnableBanking(os.Getenv("ENABLE_BANKING_APP_ID"), pemKey,
 		strings.Split(os.Getenv("ENABLE_BANKING_ACCOUNT_UIDS"), ","), client)
+}
+
+// maskUID keeps the first 4 characters so logs and /status stay correlatable
+// without exposing the full account identifier.
+func maskUID(uid string) string {
+	r := []rune(uid)
+	if len(r) <= 4 {
+		return "…"
+	}
+	return string(r[:4]) + "…"
 }
 
 func parseRSAKey(b []byte) (*rsa.PrivateKey, error) {
@@ -133,7 +150,8 @@ func (p *EnableBanking) Fetch(ctx context.Context, kind opendata.Kind) (opendata
 			} `json:"balances"`
 		}
 		if err := getJSON(ctx, p.client, base+"/accounts/"+url.PathEscape(uid)+"/balances", hdr, &doc); err != nil {
-			return opendata.Result{}, fmt.Errorf("enablebanking: account %s: %w", uid, err)
+			return opendata.Result{}, fmt.Errorf("enablebanking: account %s: %s", maskUID(uid), strings.NewReplacer(
+				url.PathEscape(uid), maskUID(uid), uid, maskUID(uid)).Replace(err.Error()))
 		}
 		for _, b := range doc.Balances {
 			res.Records = append(res.Records, opendata.Record{

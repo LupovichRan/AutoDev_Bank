@@ -33,7 +33,10 @@ func runRefresh(ctx context.Context, cfg Config, log *slog.Logger) error {
 	r.Fallback = providers.FixtureProviders(providers.Fixtures)
 	r.UseFixtures = cfg.OpenDataFixture
 
-	outcomes := r.RefreshAll(ctx)
+	outcomes, err := r.RefreshAll(ctx)
+	if err != nil {
+		return err
+	}
 	stored := 0
 	for _, o := range outcomes {
 		attrs := []any{"provider", o.Provider, "kind", o.Kind, "records", o.Records, "duration_ms", o.DurationMS}

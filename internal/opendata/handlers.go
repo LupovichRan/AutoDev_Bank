@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"log/slog"
+	"math"
 	"net/http"
 	"strconv"
 	"strings"
@@ -77,7 +78,7 @@ func parseFilter(r *http.Request, allowNear bool) (Filter, error) {
 		lat, lon, ok := strings.Cut(s, ",")
 		la, err1 := strconv.ParseFloat(strings.TrimSpace(lat), 64)
 		lo, err2 := strconv.ParseFloat(strings.TrimSpace(lon), 64)
-		if !ok || err1 != nil || err2 != nil || la < -90 || la > 90 || lo < -180 || lo > 180 {
+		if !ok || err1 != nil || err2 != nil || math.IsNaN(la) || math.IsInf(la, 0) || math.IsNaN(lo) || math.IsInf(lo, 0) || la < -90 || la > 90 || lo < -180 || lo > 180 {
 			return f, errors.New("near must be lat,lon in decimal degrees, e.g. near=51.5074,-0.1278")
 		}
 		f.Near = &LatLon{Lat: la, Lon: lo}
@@ -92,6 +93,12 @@ func (h *Handlers) status(w http.ResponseWriter, r *http.Request) {
 		problem(w, http.StatusInternalServerError, "Open data unavailable", "the refresh log could not be read")
 		return
 	}
+	// /status is public: bound the length of stored error text.
+	for i := range st {
+		if rs := []rune(st[i].Error); len(rs) > 300 {
+			st[i].Error = string(rs[:300]) + "…"
+		}
+	}
 	writeJSON(w, http.StatusOK, map[string]any{"providers": st})
 }
 
@@ -100,7 +107,17 @@ func (h *Handlers) refresh(w http.ResponseWriter, r *http.Request) {
 		problem(w, http.StatusServiceUnavailable, "Refresh unavailable", "no refresher is configured")
 		return
 	}
-	writeJSON(w, http.StatusOK, map[string]any{"outcomes": h.Refresher.RefreshAll(r.Context())})
+	outs, err := h.Refresher.RefreshAll(r.Context())
+	if errors.Is(err, ErrRefreshInProgress) {
+		problem(w, http.StatusConflict, "Refresh in progress", "a refresh is already running; try again when it finishes")
+		return
+	}
+	if err != nil {
+		h.logger().Error("opendata: refresh", "err", err)
+		problem(w, http.StatusInternalServerError, "Refresh failed", "the refresh could not be run")
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"outcomes": outs})
 }
 
 func (h *Handlers) logger() *slog.Logger {

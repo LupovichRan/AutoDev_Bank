@@ -34,6 +34,8 @@ func newSwitchServer(t *testing.T) *switchServer {
 		switch s.mode.Load().(string) {
 		case "empty":
 			_, _ = w.Write([]byte(`{}`))
+		case "garbage":
+			_, _ = w.Write([]byte("<html>not json</html>"))
 		case "500":
 			http.Error(w, "upstream down", http.StatusInternalServerError)
 		default:
@@ -83,7 +85,7 @@ func TestRefresh_StoresSnapshotAndLog(t *testing.T) {
 	s := newSwitchServer(t)
 	r := opendata.NewRefresher(pool, []opendata.Provider{providers.NewFrankfurter(s.srv.URL, s.srv.Client())}, quiet)
 
-	out := r.RefreshAll(t.Context())
+	out := mustRefresh(t, r)
 	testutil.Len(t, out, 1)
 	testutil.True(t, out[0].OK, out[0].Error)
 	testutil.Equal(t, "frankfurter", out[0].Provider)
@@ -105,11 +107,11 @@ func testKeepsPrevious(t *testing.T, mode, wantErr string) {
 	pool := db.TestPool(t)
 	s := newSwitchServer(t)
 	r := opendata.NewRefresher(pool, []opendata.Provider{providers.NewFrankfurter(s.srv.URL, s.srv.Client())}, quiet)
-	testutil.True(t, r.RefreshAll(t.Context())[0].OK)
+	testutil.True(t, mustRefresh(t, r)[0].OK)
 	before, _ := readSnap(t, pool, "frankfurter", opendata.KindFXRate)
 
 	s.mode.Store(mode)
-	out := r.RefreshAll(t.Context())
+	out := mustRefresh(t, r)
 	testutil.False(t, out[0].OK)
 	testutil.ErrorContains(t, errString(out[0].Error), wantErr)
 
@@ -143,7 +145,7 @@ func TestRefresh_FixtureFallbackOnlyWithoutLiveSnapshot(t *testing.T) {
 	r.Fallback = providers.FixtureProviders(providers.Fixtures)
 	r.UseFixtures = true
 
-	out := r.RefreshAll(t.Context())
+	out := mustRefresh(t, r)
 	testutil.False(t, out[0].OK, "live fetch failed")
 	testutil.True(t, out[0].Fallback, "fixture stored")
 	sn, ok := readSnap(t, pool, "frankfurter", opendata.KindFXRate)
@@ -154,13 +156,13 @@ func TestRefresh_FixtureFallbackOnlyWithoutLiveSnapshot(t *testing.T) {
 
 	// A live success replaces the fixture...
 	s.mode.Store("good")
-	testutil.True(t, r.RefreshAll(t.Context())[0].OK)
+	testutil.True(t, mustRefresh(t, r)[0].OK)
 	live, _ := readSnap(t, pool, "frankfurter", opendata.KindFXRate)
 	testutil.Equal(t, s.srv.URL+"/v1/latest?base=EUR", live.sourceURL)
 
 	// ...and a later failure never downgrades live data back to the fixture.
 	s.mode.Store("500")
-	out = r.RefreshAll(t.Context())
+	out = mustRefresh(t, r)
 	testutil.False(t, out[0].Fallback)
 	kept, _ := readSnap(t, pool, "frankfurter", opendata.KindFXRate)
 	testutil.Equal(t, live, kept)
@@ -172,7 +174,7 @@ func TestRefresh_FixturesDisabledByDefault(t *testing.T) {
 	s.mode.Store("500")
 	r := opendata.NewRefresher(pool, []opendata.Provider{providers.NewFrankfurter(s.srv.URL, s.srv.Client())}, quiet)
 	r.Fallback = providers.FixtureProviders(providers.Fixtures)
-	out := r.RefreshAll(t.Context())
+	out := mustRefresh(t, r)
 	testutil.False(t, out[0].Fallback)
 	_, ok := readSnap(t, pool, "frankfurter", opendata.KindFXRate)
 	testutil.False(t, ok)

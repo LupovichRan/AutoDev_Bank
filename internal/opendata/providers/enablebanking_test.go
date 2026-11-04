@@ -49,7 +49,7 @@ func TestEnableBanking_DisabledWithoutConfig(t *testing.T) {
 
 func TestEnableBanking_JWTIsValidRS256(t *testing.T) {
 	key, pemKey := testKey(t)
-	p, ok := NewEnableBanking("app-123", pemKey, nil, http.DefaultClient)
+	p, ok := NewEnableBanking("app-123", pemKey, []string{"u"}, http.DefaultClient)
 	testutil.True(t, ok)
 	eb := p.(*EnableBanking)
 	now := time.Unix(1_793_000_000, 0)
@@ -77,7 +77,7 @@ func TestEnableBanking_JWTIsValidRS256(t *testing.T) {
 func TestEnableBanking_PKCS1KeyAccepted(t *testing.T) {
 	key, _ := testKey(t)
 	pem1 := pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(key)})
-	_, ok := NewEnableBanking("app", pem1, nil, http.DefaultClient)
+	_, ok := NewEnableBanking("app", pem1, []string{"u"}, http.DefaultClient)
 	testutil.True(t, ok)
 }
 

@@ -53,7 +53,7 @@ func (p *OBUK) Fetch(ctx context.Context, kind opendata.Kind) (opendata.Result, 
 	if err := getJSON(ctx, p.client, url, hdr, &doc); err != nil {
 		return opendata.Result{}, err
 	}
-	res := opendata.Result{SourceURL: url, License: doc.Meta.License}
+	res := opendata.Result{SourceURL: url, License: licenseOrDefault(doc.Meta.License)}
 	seen := map[string]bool{}
 	add := func(id string, data map[string]any) {
 		key := p.cfg.ID + ":" + string(kind) + ":" + id
@@ -101,8 +101,8 @@ func (p *OBUK) place(name string, a obukAddress, access24h bool) map[string]any 
 		"access24h": access24h,
 	}
 	if a.GeoLocation != nil {
-		lat, okLat := parseNum(a.GeoLocation.GeographicCoordinates.Latitude)
-		lon, okLon := parseNum(a.GeoLocation.GeographicCoordinates.Longitude)
+		lat, okLat := parseNum(string(a.GeoLocation.GeographicCoordinates.Latitude))
+		lon, okLon := parseNum(string(a.GeoLocation.GeographicCoordinates.Longitude))
 		if okLat && okLon && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180 && (lat != 0 || lon != 0) {
 			d["lat"], d["lon"] = lat, lon
 		}
@@ -232,8 +232,8 @@ type obukAddress struct {
 	PostCode       string   `json:"PostCode"`
 	GeoLocation    *struct {
 		GeographicCoordinates struct {
-			Latitude  string `json:"Latitude"`
-			Longitude string `json:"Longitude"`
+			Latitude  flexNum `json:"Latitude"`
+			Longitude flexNum `json:"Longitude"`
 		} `json:"GeographicCoordinates"`
 	} `json:"GeoLocation"`
 }
@@ -292,6 +292,27 @@ func (o *oneOrMany[T]) UnmarshalJSON(b []byte) error {
 	}
 }
 
+// flexNum accepts a JSON number or a string and keeps its decimal text.
+type flexNum string
+
+func (f *flexNum) UnmarshalJSON(b []byte) error {
+	b = bytes.TrimSpace(b)
+	if bytes.Equal(b, []byte("null")) {
+		*f = ""
+		return nil
+	}
+	if len(b) > 0 && b[0] == '"' {
+		var s string
+		if err := json.Unmarshal(b, &s); err != nil {
+			return err
+		}
+		*f = flexNum(s)
+		return nil
+	}
+	*f = flexNum(b)
+	return nil
+}
+
 // flexBool accepts true/false or the strings "true"/"false".
 type flexBool bool
 
@@ -299,4 +320,13 @@ func (f *flexBool) UnmarshalJSON(b []byte) error {
 	s := strings.Trim(strings.TrimSpace(string(b)), `"`)
 	*f = flexBool(strings.EqualFold(s, "true"))
 	return nil
+}
+
+const obukDefaultLicense = "https://www.openbanking.org.uk/open-licence"
+
+func licenseOrDefault(s string) string {
+	if strings.TrimSpace(s) == "" {
+		return obukDefaultLicense
+	}
+	return s
 }
