@@ -16,5 +16,5 @@
     "noEmit": true,
     "allowJs": false
   },
-  "include": ["src/**/*.ts", "src/**/*.svelte", "vite.config.ts", "svelte.config.js"]
+  "include": ["src/**/*.ts", "src/**/*.svelte", "e2e/**/*.ts", "vite.config.ts", "playwright.config.ts", "svelte.config.js"]
 }

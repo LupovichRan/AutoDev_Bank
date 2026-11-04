@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
@@ -25,8 +26,11 @@ const maxBody = 128 << 10
 // middleware; the ceremony endpoints are rate limited per client IP, and
 // the limiter runs first so throttled requests never reach the database.
 //
-// POST /api/auth/dev-login is mounted only when Config.AllowTestLogin is
-// set. It signs anyone in by handle and must never be enabled in production.
+// POST /api/auth/dev-login and POST /api/auth/dev-stepup are mounted only
+// when Config.AllowTestLogin is set. dev-login signs anyone in by handle;
+// dev-stepup marks the caller's session as stepped up for a payload hash
+// without a passkey. Both exist for the Playwright harness and must never
+// be enabled in production.
 func (s *Service) Mount(mux *http.ServeMux) {
 	limited := func(h http.HandlerFunc) http.Handler { return s.rateLimit(s.Authenticate(h)) }
 	authed := func(h http.HandlerFunc) http.Handler {
@@ -45,6 +49,7 @@ func (s *Service) Mount(mux *http.ServeMux) {
 	mux.Handle("GET /api/me", authed(s.handleMe))
 	if s.cfg.AllowTestLogin {
 		mux.Handle("POST /api/auth/dev-login", s.Authenticate(http.HandlerFunc(s.handleDevLogin)))
+		mux.Handle("POST /api/auth/dev-stepup", authed(s.handleDevStepUp))
 	}
 }
 
@@ -250,6 +255,41 @@ func (s *Service) handleDevLogin(w http.ResponseWriter, r *http.Request) {
 	}
 	s.setSessionCookie(w, sess)
 	writeJSON(w, http.StatusOK, map[string]string{"principal_id": pid.String()})
+}
+
+// handleDevStepUp is mounted only when AllowTestLogin is set. It records a
+// step-up for {payload_hash} on the caller's session without a passkey
+// assertion, e.g. so a dev-login principal (who has no credential) can add
+// its first passkey. NEVER enable it in production.
+func (s *Service) handleDevStepUp(w http.ResponseWriter, r *http.Request) {
+	sess, _ := FromContext(r.Context())
+	var req struct {
+		PayloadHash string `json:"payload_hash"`
+	}
+	if !decodeJSON(w, r, &req) {
+		return
+	}
+	hash, err := hex.DecodeString(req.PayloadHash)
+	if err != nil {
+		problem(w, http.StatusBadRequest, "payload_hash must be hex")
+		return
+	}
+	if len(hash) != sha256.Size {
+		s.writeErr(w, r, ErrBadPayloadHash)
+		return
+	}
+	err = db.WithTx(r.Context(), s.pool, func(ctx context.Context, tx pgx.Tx) error {
+		if err := markSteppedUpTx(ctx, tx, sess, hash); err != nil {
+			return err
+		}
+		return s.audit(ctx, tx, "auth.dev_stepup", "principal:"+sess.PrincipalID.String(), &sess.PrincipalID,
+			map[string]any{"payload_hash": req.PayloadHash})
+	})
+	if err != nil {
+		s.writeErr(w, r, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]bool{"stepped_up": true})
 }
 
 // secureCookie is true when ANY configured origin is https (see Config.AllowMixedOrigins).

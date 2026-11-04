@@ -12,3 +12,6 @@ coverage/
 !web/dist/
 web/dist/*
 !web/dist/index.html
+.e2e/
+web/playwright-report/
+web/test-results/

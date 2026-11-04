@@ -367,3 +367,30 @@ func TestHandlers_RateLimitRunsBeforeSessionLookup(t *testing.T) {
 	probe("198.51.100.200:1") // an unthrottled client does reach the lookup
 	testutil.True(t, strings.Contains(logs.String(), "auth: load session"), "probe is sensitive")
 }
+
+func TestHandlers_DevStepUp(t *testing.T) {
+	s, aud := newTestService(t)
+	c := newTestClient(t, s)
+	hash := hex.EncodeToString(AddCredentialPayloadHash("uma"))
+	// Needs a session.
+	testutil.Equal(t, http.StatusUnauthorized, c.do("POST", "/api/auth/dev-stepup", map[string]string{"payload_hash": hash}).Code)
+	testutil.Equal(t, http.StatusOK, c.do("POST", "/api/auth/dev-login", map[string]string{"handle": "uma"}).Code)
+	testutil.Equal(t, http.StatusBadRequest, c.do("POST", "/api/auth/dev-stepup", map[string]string{"payload_hash": "zz"}).Code)
+	testutil.Equal(t, http.StatusBadRequest, c.do("POST", "/api/auth/dev-stepup", map[string]string{"payload_hash": "abcd"}).Code)
+
+	// A dev-login principal has no passkey; adding one needs a step-up.
+	testutil.Equal(t, http.StatusForbidden, c.do("POST", "/api/auth/register/begin", map[string]string{"handle": "uma"}).Code)
+	w := c.do("POST", "/api/auth/dev-stepup", map[string]string{"payload_hash": hash})
+	testutil.Equal(t, http.StatusOK, w.Code, w.Body.String())
+	testutil.True(t, aud.has("auth.dev_stepup"), "dev step-up audited")
+	b := decode[beginResp](t, c.do("POST", "/api/auth/register/begin", map[string]string{"handle": "uma"}))
+	w = c.do("POST", "/api/auth/register/finish", map[string]any{"challenge_id": b.ChallengeID, "credential": newSoftAuthenticator(t).create(t, b.Options)})
+	testutil.Equal(t, http.StatusOK, w.Code, w.Body.String())
+	testutil.True(t, aud.has("auth.credential_added"), "credential added")
+}
+
+func TestHandlers_DevStepUpDisabled(t *testing.T) {
+	s, _ := newTestService(t, func(c *Config) { c.AllowTestLogin = false })
+	c := newTestClient(t, s)
+	testutil.Equal(t, http.StatusNotFound, c.do("POST", "/api/auth/dev-stepup", map[string]string{"payload_hash": "00"}).Code)
+}

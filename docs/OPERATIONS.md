@@ -15,7 +15,7 @@ All commands go through `./dev`.
 | `./dev test` | `go test ./...`. Integration tests need `DATABASE_URL`. |
 | `./dev run` | Build the web app (if npm is present) and serve on `$BANK_ADDR`. |
 | `./dev web` | Vite dev server with an `/api` proxy. |
-| `./dev e2e` | Playwright suite. It starts its own server. |
+| `./dev e2e` | Playwright suite (`tools/e2e.sh`). It recreates database `bank_e2e` (from `DATABASE_URL`, or `E2E_DATABASE_URL`), builds web and server, seeds, and serves on `E2E_PORT` (default 8080). |
 | `./dev ci` | `go vet`, `go test -race`, web build, check and test. |
 
 First run:
@@ -39,7 +39,7 @@ Read once at startup in `cmd/bank/main.go`, plus the Enable Banking variables re
 | `BANK_ADDR` | HTTP listen address. | `:8080` |
 | `BANK_ORIGIN` | Public origin. Used as the WebAuthn relying-party origin, so it must match the browser URL. | `http://localhost:8080` |
 | `BANK_AUDIT_SIGNING_KEY` | Hex-encoded 32-byte Ed25519 seed that signs daily audit roots. If empty, a key is generated and logged, and is lost on restart. Set it in any real deployment. | empty |
-| `BANK_DEV_TEST_LOGIN` | `1` enables `POST /api/auth/dev-login`. Tests only. See Security notes. | off |
+| `BANK_DEV_TEST_LOGIN` | `1` enables `POST /api/auth/dev-login` and `POST /api/auth/dev-stepup`. Tests only. See Security notes. | off |
 | `BANK_OPENDATA_FIXTURES` | `1` serves recorded fixtures instead of live upstreams. | off |
 | `ENABLE_BANKING_APP_ID` | Enable Banking application id. | empty (provider off) |
 | `ENABLE_BANKING_PRIVATE_KEY` | RS256 private key in PEM form. | empty |
@@ -107,7 +107,7 @@ Requests are signed with RS256 JWTs. Other people's accounts cannot be read in t
 
 ## Security notes
 
-- `BANK_DEV_TEST_LOGIN` must never be set in production. It opens a login endpoint that skips passkeys. Use it only in tests and the e2e harness.
+- `BANK_DEV_TEST_LOGIN` must never be set in production. It opens a login endpoint and a step-up endpoint (`dev-stepup`, marks the session stepped up for a payload hash) that skip passkeys. Use it only in tests and the e2e harness.
 - Login and registration rate limiting is keyed on the client IP, taken from the transport peer address (`RemoteAddr`). Proxy headers are not trusted. Behind a reverse proxy every request then appears to come from the proxy, so all users share one limit. Before deploying behind a proxy, add trusted-proxy handling (accept `X-Forwarded-For` only from configured proxy addresses) or have the proxy preserve the client address.
 - Set `BANK_ORIGIN` to the exact public HTTPS origin. WebAuthn will not work on a mismatch.
 - Always set `BANK_AUDIT_SIGNING_KEY` and keep it out of the repository.
