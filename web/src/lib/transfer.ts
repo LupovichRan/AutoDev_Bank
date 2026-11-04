@@ -4,6 +4,7 @@
 // drops after the request leaves, re-sending the same Attempt can never pay
 // twice: the server replays the stored result for a known key.
 import { apiPostWithStatus, ProblemError } from './api';
+import { t } from './i18n.svelte';
 import { payloadHash, type TransferBody } from './payload';
 import type { TransferResult } from './types';
 
@@ -49,7 +50,7 @@ export function toOutcome(status: number, data: TransferResult): Outcome {
   if (data.approval) {
     return { kind: 'pending', approvalId: data.approval.id, requiredApprovals: data.approval.required_approvals, status: data.approval.status };
   }
-  throw new Error('Unexpected response from the server.');
+  throw new Error(t('transfer.unexpected'));
 }
 
 /**

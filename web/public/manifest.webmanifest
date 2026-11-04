@@ -1,7 +1,7 @@
 {
-  "name": "AutoDev Bank",
+  "name": "AutoDev Bank — אוטודב בנק",
   "short_name": "AutoDev",
-  "description": "Open-source bank: passkeys, maker-checker approvals, live open finance data and a verifiable audit chain.",
+  "description": "בנק בקוד פתוח: מפתחות גישה, אישורי ארבע עיניים, נתוני פיננסים פתוחים חיים ושרשרת ביקורת ניתנת לאימות.",
   "id": "/",
   "start_url": "/#/",
   "scope": "/",
@@ -9,7 +9,8 @@
   "orientation": "any",
   "background_color": "#ffffff",
   "theme_color": "#0b5cad",
-  "lang": "en",
+  "lang": "he",
+  "dir": "rtl",
   "categories": ["finance"],
   "icons": [
     { "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },

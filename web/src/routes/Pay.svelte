@@ -4,7 +4,8 @@
   import Problem from '../components/Problem.svelte';
   import { apiGet, NetworkError, ProblemError } from '../lib/api';
   import { SubmitFlow } from './pay/submit.svelte';
-  import { formatMinor, parseToMinor } from '../lib/money';
+  import { t, tValue } from '../lib/i18n.svelte';
+  import { formatMinor, parseToMinor, minorExponent } from '../lib/money';
   import { connectivity } from '../lib/online.svelte';
   import type { TransferBody } from '../lib/payload';
   import { href } from '../lib/router';
@@ -94,20 +95,20 @@
   function validate(): TransferBody | null {
     const e: Record<string, string> = {};
     let amount = 0;
-    if (!from) e['from'] = 'Choose an account to pay from.';
-    if (!toId) e['to'] = 'Enter or choose the account to pay.';
-    else if (toId === fromId) e['to'] = 'Choose a different account from the one you pay from.';
+    if (!from) e['from'] = t('pay.chooseFrom');
+    if (!toId) e['to'] = t('pay.enterTo');
+    else if (toId === fromId) e['to'] = t('pay.differentTo');
     if (from) {
       try {
         amount = parseToMinor(amountText, from.currency);
-        if (amount <= 0) e['amount'] = 'Enter an amount greater than zero.';
+        if (amount <= 0) e['amount'] = t('pay.amountPositive');
       } catch (err) {
         e['amount'] = err instanceof RangeError && /decimal/.test(err.message)
-          ? `${from.currency} amounts have at most 2 decimal places.`
-          : 'Enter an amount like 12.50.';
+          ? t('pay.amountDecimals', { currency: from.currency, n: minorExponent(from.currency) })
+          : t('pay.amountFormat');
       }
     }
-    if (description.length > 140) e['description'] = 'Keep the description to 140 characters.';
+    if (description.length > 140) e['description'] = t('pay.descriptionLong');
     errors = e;
     if (Object.keys(e).length || !from) return null;
     return { from_account_id: from.id, to_account_id: toId, amount, currency: from.currency, description: description.trim() };
@@ -118,22 +119,22 @@
     if (flow.busy) return;
     const body = validate();
     if (!body) {
-      status.announce('Please fix the highlighted fields.');
+      status.announce(t('pay.fixFields'));
       return;
     }
     const name = toName;
     await flow.submit(
       body,
       (result, sent) => {
-        sentSummary = `${formatMinor(sent.amount, sent.currency)} to ${name}`;
-        status.announce(
-          result.kind === 'sent'
-            ? `Sent ${sentSummary}.`
-            : `Awaiting approval: ${result.requiredApprovals} approver${result.requiredApprovals === 1 ? '' : 's'} required.`,
-        );
+        sentSummary = t('pay.summary', { amount: formatMinor(sent.amount, sent.currency), name });
+        status.announce(result.kind === 'sent' ? t('pay.sentMessage', { summary: sentSummary }) : awaitingText(result.requiredApprovals));
       },
-      () => status.announce('Payment not sent.'),
+      () => status.announce(t('pay.notSent')),
     );
+  }
+
+  function awaitingText(n: number): string {
+    return n === 1 ? t('pay.awaitingOne') : t('pay.awaitingMany', { n });
   }
 
   function reset() {
@@ -145,68 +146,67 @@
   const busy = $derived(phase !== 'idle');
 </script>
 
-<h1>Pay</h1>
+<h1>{t('title.pay')}</h1>
 
 {#if loadError}
   <Problem error={loadError} onretry={load} />
 {:else if accounts === null}
-  <p aria-busy="true">Loading accounts…</p>
+  <p aria-busy="true">{t('home.loadingAccounts')}</p>
 {:else if outcome}
   <div data-testid="pay-outcome">
-  <Card title={outcome.kind === 'sent' ? 'Sent' : 'Awaiting approval'} id="outcome">
+  <Card title={outcome.kind === 'sent' ? t('pay.sent') : t('pay.awaiting')} id="outcome">
     {#if outcome.kind === 'sent'}
-      <p class="ok big">Sent {sentSummary}.</p>
-      <p class="muted">Transaction <span class="mono">{outcome.transactionId}</span> · {outcome.status}</p>
+      <p class="ok big">{t('pay.sentMessage', { summary: sentSummary })}</p>
+      <p class="muted">{t('pay.transaction')} <bdi class="mono">{outcome.transactionId}</bdi> · {tValue('status', outcome.status)}</p>
     {:else}
-      <p class="warn big">
-        Awaiting approval ({outcome.requiredApprovals} approver{outcome.requiredApprovals === 1 ? '' : 's'} required).
-      </p>
-      <p>{sentSummary} will be sent once approved. Track it in <a href={href('/approvals')}>Approvals</a>.</p>
-      <p class="muted">Approval <span class="mono">{outcome.approvalId}</span></p>
+      <p class="warn big">{awaitingText(outcome.requiredApprovals)}</p>
+      <p>{t('pay.willBeSent', { summary: sentSummary })} <a href={href('/approvals')}>{t('title.approvals')}</a>.</p>
+      <p class="muted">{t('pay.approval')} <bdi class="mono">{outcome.approvalId}</bdi></p>
     {/if}
     <div class="row">
-      <button type="button" onclick={reset}>Make another payment</button>
-      <a class="button secondary" href={href('/')}>Back to Home</a>
+      <button type="button" onclick={reset}>{t('pay.another')}</button>
+      <a class="button secondary" href={href('/')}>{t('pay.backHome')}</a>
     </div>
   </Card>
   </div>
 {:else if accounts.length === 0}
-  <p>You need an account before you can pay.</p>
+  <p>{t('pay.needAccount')}</p>
 {:else}
   <form onsubmit={onSubmit} novalidate aria-describedby="pay-note">
-    <p id="pay-note" class="muted">Every payment is confirmed with your passkey. The confirmation is bound to exactly these details.</p>
+    <p id="pay-note" class="muted">{t('pay.note')}</p>
 
     <div class="field">
-      <label for="from">From</label>
+      <label for="from">{t('pay.from')}</label>
       <select id="from" bind:value={fromId} disabled={busy} aria-invalid={errors['from'] ? 'true' : undefined}>
         {#each accounts as a (a.id)}
-          <option value={a.id}>{a.name} ({a.code}) · {formatMinor(a.available, a.currency)} available</option>
+          <option value={a.id}>{t('pay.optionAvailable', { name: a.name, code: a.code, amount: formatMinor(a.available, a.currency) })}</option>
         {/each}
       </select>
-      {#if from}<p class="hint">Available: <Amount amount={from.available} currency={from.currency} /></p>{/if}
+      {#if from}<p class="hint">{t('pay.availableHint')} <Amount amount={from.available} currency={from.currency} /></p>{/if}
     </div>
 
     <fieldset class="field" disabled={busy}>
-      <legend>To</legend>
+      <legend>{t('pay.to')}</legend>
       <div class="row choice">
-        <label class="inline"><input type="radio" bind:group={toMode} value="own" disabled={others.length === 0} /> One of my accounts</label>
-        <label class="inline"><input type="radio" bind:group={toMode} value="id" /> Another account id</label>
+        <label class="inline"><input type="radio" bind:group={toMode} value="own" disabled={others.length === 0} /> {t('pay.toOwn')}</label>
+        <label class="inline"><input type="radio" bind:group={toMode} value="id" /> {t('pay.toOther')}</label>
       </div>
       {#if toMode === 'own'}
-        <label for="to-own" class="visually-hidden">Destination account</label>
+        <label for="to-own" class="visually-hidden">{t('pay.destinationOwn')}</label>
         <select id="to-own" bind:value={toOwnId} aria-invalid={errors['to'] ? 'true' : undefined} aria-describedby={errors['to'] ? 'to-error' : undefined}>
           {#each others as a (a.id)}
             <option value={a.id}>{a.name} ({a.code})</option>
           {/each}
         </select>
       {:else}
-        <label for="to-id">Destination account id</label>
+        <label for="to-id">{t('pay.destinationId')}</label>
         <input
           id="to-id"
           bind:value={toIdText}
           autocomplete="off"
           autocapitalize="none"
           spellcheck="false"
+          dir="ltr"
           aria-invalid={errors['to'] ? 'true' : undefined}
           aria-describedby={errors['to'] ? 'to-error' : undefined}
         />
@@ -215,12 +215,13 @@
     </fieldset>
 
     <div class="field">
-      <label for="amount">Amount{from ? ` (${from.currency})` : ''}</label>
+      <label for="amount">{t('pay.amount')}{from ? ` (${from.currency})` : ''}</label>
       <input
         id="amount"
         inputmode="decimal"
         autocomplete="off"
         placeholder="0.00"
+        dir="ltr"
         bind:value={amountText}
         disabled={busy}
         aria-invalid={errors['amount'] ? 'true' : undefined}
@@ -230,7 +231,7 @@
     </div>
 
     <div class="field">
-      <label for="description">Description <span class="muted">(optional)</span></label>
+      <label for="description">{t('pay.description')} <span class="muted">{t('pay.optional')}</span></label>
       <input
         id="description"
         bind:value={description}
@@ -243,18 +244,18 @@
     </div>
 
     {#if previewMinor !== null && from && toId}
-      <p class="summary">You are paying <strong><Amount amount={previewMinor} currency={from.currency} /></strong> to <strong>{toName}</strong>.</p>
+      <p class="summary">{t('pay.payingLead')} <strong><Amount amount={previewMinor} currency={from.currency} /></strong> {t('pay.payingTo')} <strong><bdi>{toName}</bdi></strong>.</p>
     {/if}
 
     {#if submitError}<Problem error={submitError} />{/if}
 
     <div class="row">
       <button type="submit" disabled={busy || !connectivity.online} aria-busy={busy}>
-        {#if phase === 'stepup'}Confirm with your passkey…{:else if phase === 'sending'}Sending…{:else if canRetry}Retry payment{:else}Confirm and pay{/if}
+        {#if phase === 'stepup'}{t('pay.confirming')}{:else if phase === 'sending'}{t('pay.sending')}{:else if canRetry}{t('pay.retry')}{:else}{t('pay.confirm')}{/if}
       </button>
-      {#if !connectivity.online}<span class="muted">Payments need a connection.</span>{/if}
+      {#if !connectivity.online}<span class="muted">{t('pay.needsConnection')}</span>{/if}
     </div>
-    <p class="hint">Signed in as {me.display_name}.</p>
+    <p class="hint">{t('pay.signedInAs', { name: me.display_name })}</p>
   </form>
 {/if}
 
@@ -282,7 +283,8 @@
     gap: var(--space-2);
     font-weight: 400;
     min-height: 44px;
-    margin: 0 var(--space-3) 0 0;
+    margin: 0;
+    margin-inline-end: var(--space-3);
   }
   label.inline input {
     width: 20px;

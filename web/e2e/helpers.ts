@@ -4,6 +4,7 @@
 import { createHash, randomBytes } from 'node:crypto';
 import { expect, request as playwrightRequest, type APIRequestContext, type Page } from '@playwright/test';
 import type { Account, Approval } from '../src/lib/types';
+import { startsWith } from './i18n';
 
 /**
  * Attach a CTAP2 platform authenticator to the page that creates resident
@@ -43,7 +44,7 @@ export async function devLogin(page: Page, handle: string): Promise<void> {
   // A hash-only change would keep the old in-memory session; leave the document first.
   await page.goto('about:blank');
   await page.goto('/#/');
-  await expect(page.getByRole('heading', { level: 1, name: /^Hello, / })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: startsWith('home.hello') })).toBeVisible();
 }
 
 /** A separate cookie jar signed in as `handle`, for API-only setup and checks. */

@@ -59,7 +59,7 @@ svg {
 
 .skip-link {
   position: absolute;
-  left: var(--gutter);
+  inset-inline-start: var(--gutter);
   top: -100px;
   z-index: 100;
   padding: var(--space-2) var(--space-4);

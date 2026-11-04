@@ -2,11 +2,13 @@
 // (cents, agorot, pence); decimals exist only at the edges: formatting for
 // display and parsing what the user typed. No floating point arithmetic.
 
+import { currentLocale } from './i18n.svelte';
+
 const FIXED_EXPONENTS: Record<string, number> = { ILS: 2, EUR: 2, GBP: 2, USD: 2 };
 
+/** The app language decides the locale: he-IL (₪ after the number) or en. */
 function defaultLocale(): string {
-  if (typeof navigator !== 'undefined' && navigator.language) return navigator.language;
-  return 'en-GB';
+  return currentLocale();
 }
 
 /** Number of minor-unit digits for an ISO 4217 currency (2 for ILS/EUR/GBP/USD). */
@@ -32,14 +34,20 @@ export function minorToDecimalString(amount: bigint | number, currency: string):
   return `${neg ? '-' : ''}${int}${frac}`;
 }
 
+export interface FormatOptions {
+  /** Always show the sign ("+" for credits), placed by the locale. */
+  signed?: boolean;
+}
+
 /** Format integer minor units as a localized currency string. */
-export function formatMinor(amount: bigint | number, currency: string, locale?: string): string {
+export function formatMinor(amount: bigint | number, currency: string, locale?: string, opts: FormatOptions = {}): string {
   const exp = minorExponent(currency);
   const fmt = new Intl.NumberFormat(locale ?? defaultLocale(), {
     style: 'currency',
     currency: currency.toUpperCase(),
     minimumFractionDigits: exp,
     maximumFractionDigits: exp,
+    signDisplay: opts.signed ? 'exceptZero' : 'auto',
   });
   // Intl accepts exact decimal strings, so precision survives beyond 2^53.
   return fmt.format(minorToDecimalString(amount, currency) as Intl.StringNumericLiteral);
@@ -49,7 +57,9 @@ const DECIMAL = /^(-)?(\d*)(?:\.(\d+))?$/;
 const GROUPED = /^-?\d{1,3}(,\d{3})+(\.\d+)?$/;
 
 /**
- * Parse a user-typed decimal ("12.5", "1,234.56") into integer minor units.
+ * Parse a user-typed decimal ("12.5", "1000.50", "1,234.56") into integer
+ * minor units. Separators are always "," for thousands and "." for
+ * decimals, whatever the UI language (Israeli usage matches).
  * Throws on anything ambiguous: exponents, misplaced separators, or more
  * decimals than the currency has.
  */

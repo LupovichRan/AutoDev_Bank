@@ -2,6 +2,7 @@
 // (PublicKeyCredential.parse*OptionsFromJSON / credential.toJSON) and falls
 // back to manual base64url conversion on older browsers.
 import { apiPost } from './api';
+import { t } from './i18n.svelte';
 
 export function b64urlEncode(buf: ArrayBuffer | ArrayBufferView): string {
   const bytes = buf instanceof ArrayBuffer ? new Uint8Array(buf) : new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength);
@@ -111,7 +112,7 @@ async function create(options: Json): Promise<Json> {
     ? s.parseCreationOptionsFromJSON(unwrapOptions(options))
     : creationOptionsFromJSON(options);
   const cred = (await navigator.credentials.create({ publicKey })) as PublicKeyCredential | null;
-  if (!cred) throw new Error('No passkey was created.');
+  if (!cred) throw new Error(t('webauthn.noneCreated'));
   return credentialToJSON(cred);
 }
 
@@ -121,7 +122,7 @@ async function get(options: Json): Promise<Json> {
     ? s.parseRequestOptionsFromJSON(unwrapOptions(options))
     : requestOptionsFromJSON(options);
   const cred = (await navigator.credentials.get({ publicKey })) as PublicKeyCredential | null;
-  if (!cred) throw new Error('No passkey was selected.');
+  if (!cred) throw new Error(t('webauthn.noneSelected'));
   return credentialToJSON(cred);
 }
 
@@ -147,9 +148,9 @@ export async function stepUp(payloadHash: string): Promise<{ stepped_up: boolean
 /** Turn a DOMException from navigator.credentials into a sentence for people. */
 export function describeWebAuthnError(e: unknown): string {
   if (e instanceof DOMException) {
-    if (e.name === 'NotAllowedError') return 'The passkey request was cancelled or timed out.';
-    if (e.name === 'InvalidStateError') return 'This device already has a passkey for this account.';
-    if (e.name === 'SecurityError') return 'Passkeys need a secure (https or localhost) origin.';
+    if (e.name === 'NotAllowedError') return t('webauthn.cancelled');
+    if (e.name === 'InvalidStateError') return t('webauthn.exists');
+    if (e.name === 'SecurityError') return t('webauthn.insecure');
   }
   return e instanceof Error ? e.message : String(e);
 }

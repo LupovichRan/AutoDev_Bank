@@ -2,6 +2,7 @@
   import Card from '../../components/Card.svelte';
   import { apiGet } from '../../lib/api';
   import { relativeTime } from '../../lib/format';
+  import { t } from '../../lib/i18n.svelte';
   import type { ProviderStatus } from '../../lib/types';
 
   let providers = $state<ProviderStatus[] | null>(null);
@@ -12,19 +13,19 @@
     .catch(() => (failed = true));
 </script>
 
-<Card title="Data provider health" id="provider-status">
+<Card title={t('health.title')} id="provider-status">
   {#if failed}
-    <p class="muted">Provider status is unavailable right now.</p>
+    <p class="muted">{t('health.unavailable')}</p>
   {:else if providers === null}
-    <p aria-busy="true">Loading…</p>
+    <p aria-busy="true">{t('app.loading')}</p>
   {:else}
     <ul class="list-plain">
       {#each providers as p (p.provider + p.kind)}
         <li class="row">
-          <span class="pill" class:ok={p.ok} class:bad={!p.ok}>{p.ok ? 'OK' : 'Failing'}</span>
-          <span><strong>{p.provider}</strong> <span class="muted">({p.kind})</span></span>
-          <span class="muted">last fetch {relativeTime(p.fetched_at)}{p.duration_ms ? `, ${p.duration_ms} ms` : ''}</span>
-          {#if !p.ok && p.error}<span class="bad">{p.error}</span>{/if}
+          <span class="pill" class:ok={p.ok} class:bad={!p.ok}>{p.ok ? t('health.ok') : t('health.failing')}</span>
+          <span><strong><bdi>{p.provider}</bdi></strong> <span class="muted">(<bdi>{p.kind}</bdi>)</span></span>
+          <span class="muted">{t('health.last', { time: relativeTime(p.fetched_at) })}{p.duration_ms ? `, ${p.duration_ms} ms` : ''}</span>
+          {#if !p.ok && p.error}<span class="bad" lang="en" dir="ltr">{p.error}</span>{/if}
         </li>
       {/each}
     </ul>

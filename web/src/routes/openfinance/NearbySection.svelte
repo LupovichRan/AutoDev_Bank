@@ -2,7 +2,8 @@
   import Card from '../../components/Card.svelte';
   import Problem from '../../components/Problem.svelte';
   import { apiGet } from '../../lib/api';
-  import { parseLatLon } from '../../lib/format';
+  import { formatNumber, parseLatLon } from '../../lib/format';
+  import { t } from '../../lib/i18n.svelte';
   import type { OpenDataList, OpenDataRecord, PlaceData } from '../../lib/types';
   import Badges from './Badges.svelte';
 
@@ -18,7 +19,7 @@
 
   async function search(k: 'atms' | 'branches' = kind) {
     const p = parseLatLon(point);
-    pointError = p ? '' : 'Enter latitude,longitude, e.g. 51.5074,-0.1278';
+    pointError = p ? '' : t('nearby.pointError');
     if (!p) return;
     error = null;
     loading = true;
@@ -34,7 +35,7 @@
 
   function useMyLocation() {
     if (!('geolocation' in navigator)) {
-      pointError = 'Location is not available in this browser. Enter coordinates instead.';
+      pointError = t('nearby.noGeo');
       return;
     }
     locating = true;
@@ -46,7 +47,7 @@
       },
       () => {
         locating = false;
-        pointError = 'Could not get your location. Enter coordinates instead.';
+        pointError = t('nearby.geoFail');
       },
       { enableHighAccuracy: false, timeout: 10_000, maximumAge: 300_000 },
     );
@@ -59,35 +60,36 @@
 
   search();
 
-  const km = (d: number) => `${new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 }).format(d)} km`;
+  const km = (d: number) => t('nearby.km', { n: formatNumber(d, 1) });
   const mapUrl = (p: PlaceData) => `https://www.openstreetmap.org/?mlat=${p.lat}&mlon=${p.lon}#map=17/${p.lat}/${p.lon}`;
 </script>
 
-<Card title="Nearby ATMs and branches" id="nearby">
+<Card title={t('nearby.title')} id="nearby">
   <form onsubmit={onSubmit} novalidate>
     <fieldset class="kind">
-      <legend>Show</legend>
-      <label class="inline"><input type="radio" bind:group={kind} value="atms" onchange={() => search('atms')} /> ATMs</label>
-      <label class="inline"><input type="radio" bind:group={kind} value="branches" onchange={() => search('branches')} /> Branches</label>
+      <legend>{t('nearby.show')}</legend>
+      <label class="inline"><input type="radio" bind:group={kind} value="atms" onchange={() => search('atms')} /> {t('nearby.atms')}</label>
+      <label class="inline"><input type="radio" bind:group={kind} value="branches" onchange={() => search('branches')} /> {t('nearby.branches')}</label>
     </fieldset>
     <div class="field">
-      <label for="near">Near (latitude,longitude)</label>
+      <label for="near">{t('nearby.near')}</label>
       <div class="near-row">
         <input
           id="near"
           bind:value={point}
           inputmode="decimal"
+          dir="ltr"
           autocomplete="off"
           aria-invalid={pointError ? 'true' : undefined}
           aria-describedby="near-hint{pointError ? ' near-error' : ''}"
         />
-        <button type="submit" disabled={loading}>Search</button>
+        <button type="submit" disabled={loading}>{t('nearby.search')}</button>
       </div>
-      <p class="hint" id="near-hint">Defaults to central London. Your location is only sent to this bank's server to sort results.</p>
+      <p class="hint" id="near-hint">{t('nearby.hint')}</p>
       {#if pointError}<p class="field-error" id="near-error">{pointError}</p>{/if}
     </div>
     <button type="button" class="secondary" onclick={useMyLocation} disabled={locating} aria-busy={locating}>
-      {locating ? 'Locating…' : 'Use my location'}
+      {locating ? t('nearby.locating') : t('nearby.useMine')}
     </button>
   </form>
 
@@ -95,9 +97,9 @@
     {#if error}
       <Problem {error} onretry={() => search()} />
     {:else if records === null}
-      <p aria-busy="true">Loading…</p>
+      <p aria-busy="true">{t('app.loading')}</p>
     {:else if records.length === 0}
-      <p class="muted">Nothing found near this point.</p>
+      <p class="muted">{t('nearby.nothing')}</p>
     {:else}
       <Badges {records} />
       <ol class="list-plain places">
@@ -109,8 +111,8 @@
             </div>
             <p class="muted">{r.data.bank} · {[r.data.address, r.data.postcode].filter(Boolean).join(', ')}</p>
             <p class="row">
-              {#if r.data.access24h}<span class="pill ok">24 hours</span>{/if}
-              <a href={mapUrl(r.data)} rel="noopener noreferrer" target="_blank">Map<span class="visually-hidden"> for {r.data.name} (opens in a new tab)</span></a>
+              {#if r.data.access24h}<span class="pill ok">{t('nearby.open24h')}</span>{/if}
+              <a href={mapUrl(r.data)} rel="noopener noreferrer" target="_blank">{t('nearby.map')}<span class="visually-hidden">{t('nearby.mapFor', { name: r.data.name })}</span></a>
             </p>
           </li>
         {/each}
@@ -135,7 +137,7 @@
     gap: var(--space-2);
     font-weight: 400;
     min-height: 44px;
-    margin-right: var(--space-4);
+    margin-inline-end: var(--space-4);
   }
   label.inline input {
     width: 20px;

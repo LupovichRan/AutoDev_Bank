@@ -3,6 +3,7 @@
   import Problem from '../../components/Problem.svelte';
   import { apiGet } from '../../lib/api';
   import { formatDate } from '../../lib/format';
+  import { i18n, t } from '../../lib/i18n.svelte';
   import { convertViaEur } from '../../lib/opendata';
   import type { FxData, OpenDataList, OpenDataRecord } from '../../lib/types';
   import Badges from './Badges.svelte';
@@ -33,41 +34,41 @@
     if (!amountText.trim() || !Number.isFinite(n)) return null;
     return convertViaEur(n, fromCcy, toCcy, eur.map((r) => r.data));
   });
-  const fmtRate = (n: number) => new Intl.NumberFormat(undefined, { maximumFractionDigits: 6 }).format(n);
+  const fmtRate = (n: number) => new Intl.NumberFormat(i18n.locale, { maximumFractionDigits: 6 }).format(n);
   const fmtMoney = (n: number, c: string) => {
     try {
-      return new Intl.NumberFormat(undefined, { style: 'currency', currency: c }).format(n);
+      return new Intl.NumberFormat(i18n.locale, { style: 'currency', currency: c }).format(n);
     } catch {
       return `${n.toFixed(2)} ${c}`;
     }
   };
 </script>
 
-<Card title="Exchange rates" id="fx">
+<Card title={t('fx.title')} id="fx">
   {#if error}
     <Problem {error} onretry={load} />
   {:else if records === null}
-    <p aria-busy="true">Loading rates…</p>
+    <p aria-busy="true">{t('fx.loading')}</p>
   {:else if records.length === 0}
-    <p class="muted">No rates cached yet.</p>
+    <p class="muted">{t('fx.none')}</p>
   {:else}
     <Badges {records} />
 
     <form class="converter" onsubmit={(e) => e.preventDefault()} aria-labelledby="conv-title">
-      <h3 id="conv-title">Converter</h3>
+      <h3 id="conv-title">{t('fx.converter')}</h3>
       <div class="conv-grid">
         <div>
-          <label for="fx-amount">Amount</label>
-          <input id="fx-amount" inputmode="decimal" bind:value={amountText} />
+          <label for="fx-amount">{t('fx.amount')}</label>
+          <input id="fx-amount" inputmode="decimal" dir="ltr" bind:value={amountText} />
         </div>
         <div>
-          <label for="fx-from">From</label>
+          <label for="fx-from">{t('fx.from')}</label>
           <select id="fx-from" bind:value={fromCcy}>
             {#each currencies as c (c)}<option>{c}</option>{/each}
           </select>
         </div>
         <div>
-          <label for="fx-to">To</label>
+          <label for="fx-to">{t('fx.to')}</label>
           <select id="fx-to" bind:value={toCcy}>
             {#each currencies as c (c)}<option>{c}</option>{/each}
           </select>
@@ -75,18 +76,18 @@
       </div>
       <p class="result" aria-live="polite">
         {#if converted !== null}
-          ≈ <strong>{fmtMoney(converted, toCcy)}</strong>
-          <span class="muted">at reference rates. AutoDev Bank adds no FX markup.</span>
+          ≈ <strong><bdi>{fmtMoney(converted, toCcy)}</bdi></strong>
+          <span class="muted">{t('fx.note')}</span>
         {:else}
-          <span class="muted">Enter an amount to convert.</span>
+          <span class="muted">{t('fx.enter')}</span>
         {/if}
       </p>
     </form>
 
     <div class="table-wrap">
       <table>
-        <caption>Euro reference rates (1 EUR =)</caption>
-        <thead><tr><th scope="col">Currency</th><th scope="col" class="num">Rate</th><th scope="col">Date</th><th scope="col">Source</th></tr></thead>
+        <caption>{t('fx.eurCaption')}</caption>
+        <thead><tr><th scope="col">{t('fx.colCurrency')}</th><th scope="col" class="num">{t('fx.colRate')}</th><th scope="col">{t('fx.colDate')}</th><th scope="col">{t('fx.colSource')}</th></tr></thead>
         <tbody>
           {#each eur as r (r.key)}
             <tr><th scope="row">{r.data.quote}</th><td class="num">{fmtRate(r.data.rate)}</td><td>{formatDate(r.data.date)}</td><td>{r.data.source || r.provider}</td></tr>
@@ -98,11 +99,11 @@
     {#if others.length}
       <div class="table-wrap">
         <table>
-          <caption>Other reference rates (e.g. Bank of Israel, ILS)</caption>
-          <thead><tr><th scope="col">Pair</th><th scope="col" class="num">Rate</th><th scope="col">Date</th><th scope="col">Source</th></tr></thead>
+          <caption>{t('fx.otherCaption')}</caption>
+          <thead><tr><th scope="col">{t('fx.colPair')}</th><th scope="col" class="num">{t('fx.colRate')}</th><th scope="col">{t('fx.colDate')}</th><th scope="col">{t('fx.colSource')}</th></tr></thead>
           <tbody>
             {#each others as r (r.key)}
-              <tr><th scope="row">1 {r.data.base} = {r.data.quote}</th><td class="num">{fmtRate(r.data.rate)}</td><td>{formatDate(r.data.date)}</td><td>{r.data.source || r.provider}</td></tr>
+              <tr><th scope="row"><bdi>1 {r.data.base} = {r.data.quote}</bdi></th><td class="num">{fmtRate(r.data.rate)}</td><td>{formatDate(r.data.date)}</td><td>{r.data.source || r.provider}</td></tr>
             {/each}
           </tbody>
         </table>

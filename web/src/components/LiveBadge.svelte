@@ -1,6 +1,7 @@
 <script lang="ts">
   import { safeUrl } from '../lib/safeUrl';
   import { formatDateTime, relativeTime } from '../lib/format';
+  import { i18n, t } from '../lib/i18n.svelte';
 
   interface Props {
     provider: string;
@@ -23,21 +24,21 @@
 </script>
 
 <p class="badge">
-  <span class="pill ok">Live data</span>
-  <span>{provider}</span>
+  <span class="pill ok">{t('live.data')}</span>
+  <bdi>{provider}</bdi>
   <span aria-hidden="true">·</span>
-  <time datetime={fetchedAt} title={formatDateTime(fetchedAt)}>fetched {relativeTime(fetchedAt, now)}</time>
+  <time datetime={fetchedAt} title={formatDateTime(fetchedAt, i18n.locale)}>{t('live.fetched', { time: relativeTime(fetchedAt, now, i18n.locale) })}</time>
   {#if source}
     <span aria-hidden="true">·</span>
-    <a href={source} rel="noopener noreferrer" target="_blank">Source<span class="visually-hidden"> for {provider} (opens in a new tab)</span></a>
+    <a href={source} rel="noopener noreferrer" target="_blank">{t('live.source')}<span class="visually-hidden">{t('live.sourceFor', { provider })}</span></a>
   {/if}
   {#if license}
     <span aria-hidden="true">·</span>
-    <span>Licence: {license}</span>
+    <span>{t('live.licence', { license })}</span>
   {/if}
   {#if terms}
     <span aria-hidden="true">·</span>
-    <a href={terms} rel="noopener noreferrer" target="_blank">Terms<span class="visually-hidden"> of {provider} (opens in a new tab)</span></a>
+    <a href={terms} rel="noopener noreferrer" target="_blank">{t('live.terms')}<span class="visually-hidden">{t('live.termsOf', { provider })}</span></a>
   {/if}
 </p>
 

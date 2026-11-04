@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { i18n } from '../lib/i18n.svelte';
   import { formatMinor } from '../lib/money';
 
   interface Props {
@@ -12,15 +13,18 @@
 
   const positive = $derived(amount > 0);
   const negative = $derived(amount < 0);
-  const text = $derived((signed && positive ? '+' : '') + formatMinor(amount, currency));
+  // The locale places the sign and the currency symbol (he-IL: "‏1,234.56 ‏₪").
+  const text = $derived(formatMinor(amount, currency, i18n.locale, { signed }));
 </script>
 
-<span class="amount" class:large class:ok={signed && positive} class:bad={signed && negative}>{text}</span>
+<!-- Isolated so the number and symbol keep the order Intl gives them for the locale. -->
+<span class="amount" dir={i18n.dir} class:large class:ok={signed && positive} class:bad={signed && negative}>{text}</span>
 
 <style>
   .amount {
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
+    unicode-bidi: isolate;
   }
   .large {
     font-size: var(--text-3xl);

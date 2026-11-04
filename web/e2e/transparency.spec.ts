@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { apiAs } from './helpers';
+import { L } from './i18n';
 
 test('audit chain verifies, fees and recent events render', async ({ page, baseURL }) => {
   // Make sure the chain has at least one event of this run (auth.dev_login).
@@ -13,25 +14,25 @@ test('audit chain verifies, fees and recent events render', async ({ page, baseU
   expect(v.length).toBeGreaterThan(0);
 
   await page.goto('/#/transparency');
-  await expect(page.getByRole('heading', { level: 1, name: 'Transparency' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: L('title.transparency') })).toBeVisible();
 
-  const audit = page.getByRole('region', { name: 'Audit chain' });
-  await expect(audit.getByText(/^OK — every audit event links/)).toBeVisible();
+  const audit = page.getByRole('region', { name: L('tr.audit') });
+  await expect(audit.getByText(L('tr.ok'), { exact: true })).toBeVisible();
   const length = audit.getByRole('definition').first();
   await expect(length).toHaveText(/^[1-9][\d,.\s]*$/);
 
-  const fees = page.getByRole('region', { name: 'Published fee logic' });
-  const rules = fees.getByRole('table', { name: 'Rules as enforced by the code' });
+  const fees = page.getByRole('region', { name: L('tr.fees') });
+  const rules = fees.getByRole('table', { name: L('tr.rulesCaption') });
   await expect(rules.locator('tbody tr').first()).toBeVisible();
-  await expect(fees.getByText('None (0 bp)')).toBeVisible();
+  await expect(fees.getByText(L('tr.noneBp'))).toBeVisible();
 
   // The public feed shows only the event class, the hour and a hash prefix;
   // nobody's id or activity is published.
-  const events = page.getByRole('region', { name: 'Recent audit events' });
-  const table = events.getByRole('table', { name: 'Most recent audit events' });
+  const events = page.getByRole('region', { name: L('tr.recent') });
+  const table = events.getByRole('table', { name: L('tr.caption') });
   await expect(table.locator('tbody tr').first()).toBeVisible();
   await expect(table.getByRole('cell', { name: 'auth', exact: true }).first()).toBeVisible();
-  await expect(table.getByRole('columnheader')).toHaveText(['#', 'Hour', 'Kind', 'Hash']);
+  await expect(table.getByRole('columnheader')).toHaveText(['#', L('tr.colHour'), L('tr.colKind'), L('tr.colHash')]);
   const recent = (await (await page.request.get('/api/transparency/audit/recent')).json()) as { events: Record<string, unknown>[] };
   for (const ev of recent.events) expect(Object.keys(ev).sort()).toEqual(['action', 'at', 'hash_prefix', 'seq']);
 

@@ -4,6 +4,7 @@
   import Problem from '../components/Problem.svelte';
   import { apiGet } from '../lib/api';
   import { formatDate } from '../lib/format';
+  import { t, tValue } from '../lib/i18n.svelte';
   import { href } from '../lib/router';
   import type { Account, Entry, Me } from '../lib/types';
 
@@ -48,17 +49,17 @@
   });
 </script>
 
-<h1>Hello, {me.display_name}</h1>
+<h1>{t('home.hello', { name: me.display_name })}</h1>
 
 {#if error}
   <Problem {error} onretry={load} />
 {:else if accounts === null}
-  <p aria-busy="true">Loading accounts…</p>
+  <p aria-busy="true">{t('home.loadingAccounts')}</p>
 {:else if accounts.length === 0}
-  <p>You have no accounts yet.</p>
+  <p>{t('home.noAccounts')}</p>
 {:else}
   <section aria-labelledby="accounts-title">
-    <h2 id="accounts-title" class="visually-hidden">Your accounts</h2>
+    <h2 id="accounts-title" class="visually-hidden">{t('home.yourAccounts')}</h2>
     <ul class="list-plain accounts">
       {#each accounts as a (a.id)}
         <li>
@@ -69,9 +70,9 @@
             onclick={() => (selectedId = a.id)}
           >
             <span class="acc-name">{a.name}</span>
-            <span class="acc-meta">{a.code} · {a.kind}{a.holders.length > 1 ? ' · joint' : ''}</span>
+            <span class="acc-meta"><bdi class="code">{a.code}</bdi> · {tValue('kind', a.kind)}{a.holders.length > 1 ? ` · ${t('home.joint')}` : ''}</span>
             <Amount amount={a.balance} currency={a.currency} large />
-            <span class="acc-meta">Available <Amount amount={a.available} currency={a.currency} /></span>
+            <span class="acc-meta">{t('home.available')} <Amount amount={a.available} currency={a.currency} /></span>
           </button>
         </li>
       {/each}
@@ -82,40 +83,40 @@
     <div class="stack detail">
       <Card title={selected.name} id="account-detail">
         {#snippet actions()}
-          <a class="button small-link" href={href('/pay', { from: selected.id })}>Pay from this account</a>
+          <a class="button small-link" href={href('/pay', { from: selected.id })}>{t('home.payFrom')}</a>
         {/snippet}
         <dl class="facts">
-          <div><dt>Balance</dt><dd><Amount amount={selected.balance} currency={selected.currency} /></dd></div>
-          <div><dt>Available</dt><dd><Amount amount={selected.available} currency={selected.currency} /></dd></div>
-          <div><dt>Pending out</dt><dd><Amount amount={selected.pending_debits} currency={selected.currency} /></dd></div>
-          <div><dt>Pending in</dt><dd><Amount amount={selected.pending_credits} currency={selected.currency} /></dd></div>
+          <div><dt>{t('home.balance')}</dt><dd><Amount amount={selected.balance} currency={selected.currency} /></dd></div>
+          <div><dt>{t('home.available')}</dt><dd><Amount amount={selected.available} currency={selected.currency} /></dd></div>
+          <div><dt>{t('home.pendingOut')}</dt><dd><Amount amount={selected.pending_debits} currency={selected.currency} /></dd></div>
+          <div><dt>{t('home.pendingIn')}</dt><dd><Amount amount={selected.pending_credits} currency={selected.currency} /></dd></div>
           <div>
-            <dt>Holders</dt>
+            <dt>{t('home.holders')}</dt>
             <dd>{selected.holders.map((h) => h.display_name).join(', ')}</dd>
           </div>
-          <div><dt>Account id</dt><dd class="mono">{selected.id}</dd></div>
+          <div><dt>{t('home.accountId')}</dt><dd class="mono"><bdi>{selected.id}</bdi></dd></div>
         </dl>
       </Card>
 
-      <Card title="Recent activity" id="entries">
+      <Card title={t('home.recent')} id="entries">
         {#if entriesError}
           <Problem error={entriesError} onretry={() => selectedId && loadEntries(selectedId)} />
         {:else if entries === null}
-          <p aria-busy="true">Loading activity…</p>
+          <p aria-busy="true">{t('home.loadingActivity')}</p>
         {:else if entries.length === 0}
-          <p class="muted">No activity yet.</p>
+          <p class="muted">{t('home.noActivity')}</p>
         {:else}
           <ul class="list-plain entries">
             {#each entries as e (e.id)}
               <li>
                 <div class="entry-main">
-                  <span>{e.description || 'Transfer'}</span>
+                  <span>{e.description || t('home.transfer')}</span>
                   <Amount amount={e.amount} currency={e.currency} signed />
                 </div>
                 <div class="entry-meta muted">
                   <time datetime={e.effective_date}>{formatDate(e.effective_date)}</time>
-                  {#if e.status !== 'posted'}<span class="pill warn">{e.status}</span>{/if}
-                  <span>Balance <Amount amount={e.balance_after} currency={e.currency} /></span>
+                  {#if e.status !== 'posted'}<span class="pill warn">{tValue('status', e.status)}</span>{/if}
+                  <span>{t('home.balance')} <Amount amount={e.balance_after} currency={e.currency} /></span>
                 </div>
               </li>
             {/each}
@@ -154,6 +155,8 @@
   .acc-meta {
     font-size: var(--text-sm);
     color: var(--color-text-muted);
+    max-width: 100%;
+    overflow-wrap: anywhere;
   }
   .detail {
     margin-top: var(--space-5);

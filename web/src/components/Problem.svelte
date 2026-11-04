@@ -1,5 +1,7 @@
 <script lang="ts">
   import { NetworkError, ProblemError } from '../lib/api';
+  import { t } from '../lib/i18n.svelte';
+  import { isKey } from '../lib/messages';
 
   interface Props {
     error: unknown;
@@ -8,18 +10,23 @@
   }
   let { error, onretry }: Props = $props();
 
-  const FRIENDLY: Record<string, string> = {
-    step_up_required: 'Please confirm with your passkey to continue.',
-    insufficient_funds: 'There is not enough available balance for this payment.',
-  };
-
+  // Server titles and details are English; known statuses and detail codes
+  // are shown in the UI language, anything else as the server sent it.
   const title = $derived.by(() => {
-    if (error instanceof ProblemError) return error.title || `Error ${error.status}`;
-    if (error instanceof NetworkError) return 'You are offline';
-    return 'Something went wrong';
+    if (error instanceof ProblemError) {
+      const k = `problem.status.${error.status}`;
+      if (isKey(k)) return t(k);
+      return error.title || t('problem.errorStatus', { status: error.status });
+    }
+    if (error instanceof NetworkError) return t('problem.offline');
+    return t('problem.generic');
   });
   const detail = $derived.by(() => {
-    if (error instanceof ProblemError) return FRIENDLY[error.detail] ?? error.detail;
+    if (error instanceof ProblemError) {
+      const k = `problem.detail.${error.detail}`;
+      return isKey(k) ? t(k) : error.detail;
+    }
+    if (error instanceof NetworkError) return t('problem.offlineDetail');
     return error instanceof Error ? error.message : String(error);
   });
 </script>
@@ -27,7 +34,7 @@
 <div class="problem" role="alert">
   <p class="title">{title}</p>
   {#if detail && detail !== title}<p class="detail">{detail}</p>{/if}
-  {#if onretry}<button type="button" class="secondary small" onclick={onretry}>Try again</button>{/if}
+  {#if onretry}<button type="button" class="secondary small" onclick={onretry}>{t('problem.retry')}</button>{/if}
 </div>
 
 <style>

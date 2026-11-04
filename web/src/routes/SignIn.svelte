@@ -2,6 +2,7 @@
   import Card from '../components/Card.svelte';
   import Problem from '../components/Problem.svelte';
   import { apiGet, apiPost, ProblemError } from '../lib/api';
+  import { t, type Key } from '../lib/i18n.svelte';
   import { navigate, ROUTES } from '../lib/router';
   import { session } from '../lib/session.svelte';
   import { status } from '../lib/status.svelte';
@@ -18,11 +19,11 @@
 
   // Demo sign-in exists only when the server runs with BANK_DEV_TEST_LOGIN=1
   // (./dev demo, e2e). It skips passkeys, so it is never offered otherwise.
-  const DEMO_USERS = [
-    { handle: 'alice', label: 'Alice (customer)' },
-    { handle: 'bob', label: 'Bob (customer)' },
-    { handle: 'carol', label: 'Carol (staff approver)' },
-    { handle: 'dave', label: 'Dave (staff initiator)' },
+  const DEMO_USERS: { handle: string; label: Key }[] = [
+    { handle: 'alice', label: 'signin.demo.alice' },
+    { handle: 'bob', label: 'signin.demo.bob' },
+    { handle: 'carol', label: 'signin.demo.carol' },
+    { handle: 'dave', label: 'signin.demo.dave' },
   ];
   let devLogin = $state(false);
   apiGet<AppConfig>('/api/config')
@@ -34,7 +35,7 @@
     busy = 'demo';
     try {
       await apiPost('/api/auth/dev-login', { handle: h });
-      await done(`Signed in as ${h} (demo).`);
+      await done(t('signin.signedInDemo', { handle: h }));
     } catch (e) {
       error = toError(e);
     } finally {
@@ -67,7 +68,7 @@
     busy = 'login';
     try {
       await login();
-      await done('Signed in.');
+      await done(t('signin.signedIn'));
     } catch (e) {
       error = toError(e);
     } finally {
@@ -78,12 +79,12 @@
   async function onRegister(e: SubmitEvent) {
     e.preventDefault();
     error = null;
-    handleError = HANDLE.test(handle.trim()) ? '' : '3–32 characters: lowercase letters, digits, dot, dash or underscore.';
+    handleError = HANDLE.test(handle.trim()) ? '' : t('signin.handleError');
     if (handleError || !displayName.trim()) return;
     busy = 'register';
     try {
       await register(handle.trim(), displayName.trim());
-      await done('Account created and signed in.');
+      await done(t('signin.created'));
     } catch (err) {
       error = toError(err);
     } finally {
@@ -92,60 +93,61 @@
   }
 </script>
 
-<h1>Sign in</h1>
-<p class="muted">AutoDev Bank uses passkeys only. No passwords, nothing to phish.</p>
+<h1>{t('title.signIn')}</h1>
+<p class="muted">{t('signin.lead')}</p>
 
 {#if !supported}
-  <Problem error={new Error('This browser does not support passkeys (WebAuthn). Try a current browser over https or localhost.')} />
+  <Problem error={new Error(t('signin.unsupported'))} />
 {/if}
 
 <div class="stack">
   {#if error}<Problem {error} />{/if}
 
-  <Card title="Use your passkey" id="login">
-    <p>Sign in with the passkey saved on this device or your phone.</p>
+  <Card title={t('signin.useTitle')} id="login">
+    <p>{t('signin.useBody')}</p>
     <button type="button" onclick={onLogin} disabled={!supported || busy !== null} aria-busy={busy === 'login'}>
-      {busy === 'login' ? 'Waiting for passkey…' : 'Sign in with passkey'}
+      {busy === 'login' ? t('signin.waiting') : t('signin.withPasskey')}
     </button>
   </Card>
 
   {#if devLogin}
-    <Card title="Demo sign-in (dev only)" id="demo">
-      <p class="muted">This server runs with BANK_DEV_TEST_LOGIN=1, so you can sign in as a seeded demo user without a passkey. Never enable it in production.</p>
+    <Card title={t('signin.demoTitle')} id="demo">
+      <p class="muted">{t('signin.demoBody')}</p>
       <div class="row">
         {#each DEMO_USERS as u (u.handle)}
           <button type="button" class="secondary" onclick={() => onDemo(u.handle)} disabled={busy !== null}>
-            Demo sign-in as {u.label}
+            {t('signin.demoAs', { who: t(u.label) })}
           </button>
         {/each}
       </div>
     </Card>
   {/if}
 
-  <Card title="New here? Create a passkey" id="register">
+  <Card title={t('signin.registerTitle')} id="register">
     <form onsubmit={onRegister} novalidate>
       <div class="field">
-        <label for="handle">Handle</label>
+        <label for="handle">{t('signin.handle')}</label>
         <input
           id="handle"
           name="handle"
           autocomplete="username webauthn"
           autocapitalize="none"
           spellcheck="false"
+          dir="ltr"
           required
           bind:value={handle}
           aria-invalid={handleError ? 'true' : undefined}
           aria-describedby="handle-hint{handleError ? ' handle-error' : ''}"
         />
-        <p class="hint" id="handle-hint">A unique name, e.g. alice.</p>
+        <p class="hint" id="handle-hint">{t('signin.handleHint')}</p>
         {#if handleError}<p class="field-error" id="handle-error">{handleError}</p>{/if}
       </div>
       <div class="field">
-        <label for="display-name">Display name</label>
+        <label for="display-name">{t('signin.displayName')}</label>
         <input id="display-name" name="display_name" autocomplete="name" required bind:value={displayName} />
       </div>
       <button type="submit" class="secondary" disabled={!supported || busy !== null} aria-busy={busy === 'register'}>
-        {busy === 'register' ? 'Creating passkey…' : 'Create account'}
+        {busy === 'register' ? t('signin.creating') : t('signin.create')}
       </button>
     </form>
   </Card>

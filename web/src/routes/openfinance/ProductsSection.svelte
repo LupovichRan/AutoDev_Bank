@@ -3,6 +3,7 @@
   import Problem from '../../components/Problem.svelte';
   import { apiGet } from '../../lib/api';
   import { formatPercent } from '../../lib/format';
+  import { t } from '../../lib/i18n.svelte';
   import { safeUrl } from '../../lib/safeUrl';
   import type { OpenDataList, OpenDataRecord, ProductData } from '../../lib/types';
   import Badges from './Badges.svelte';
@@ -25,34 +26,35 @@
   const shown = $derived((records ?? []).filter((r) => !bank || r.data.bank === bank));
   const gbp = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' });
   const fee = (v: number | null) => (v === null || v === undefined ? '—' : gbp.format(v));
+  // GBP fees keep the en-GB form (£1.50) in both languages: they are quoted UK prices.
 </script>
 
-<Card title="UK current accounts compared" id="products">
+<Card title={t('products.title')} id="products">
   {#if error}
     <Problem {error} onretry={load} />
   {:else if records === null}
-    <p aria-busy="true">Loading products…</p>
+    <p aria-busy="true">{t('products.loading')}</p>
   {:else if records.length === 0}
-    <p class="muted">No products cached yet.</p>
+    <p class="muted">{t('products.none')}</p>
   {:else}
     <Badges {records} />
     <div class="field filter">
-      <label for="bank-filter">Filter by bank</label>
+      <label for="bank-filter">{t('products.filter')}</label>
       <select id="bank-filter" bind:value={bank}>
-        <option value="">All banks ({records.length})</option>
+        <option value="">{t('products.all', { n: records.length })}</option>
         {#each banks as b (b)}<option value={b}>{b}</option>{/each}
       </select>
     </div>
     <div class="table-wrap">
       <table>
-        <caption>Personal current accounts from Open Banking UK open data ({shown.length} shown)</caption>
+        <caption>{t('products.caption', { n: shown.length })}</caption>
         <thead>
           <tr>
-            <th scope="col">Bank</th>
-            <th scope="col">Product</th>
-            <th scope="col">Type</th>
-            <th scope="col" class="num">Overdraft EAR</th>
-            <th scope="col" class="num">Monthly fee</th>
+            <th scope="col">{t('products.colBank')}</th>
+            <th scope="col">{t('products.colProduct')}</th>
+            <th scope="col">{t('products.colType')}</th>
+            <th scope="col" class="num">{t('products.colEar')}</th>
+            <th scope="col" class="num">{t('products.colFee')}</th>
           </tr>
         </thead>
         <tbody>

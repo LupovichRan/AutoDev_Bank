@@ -2,7 +2,8 @@
   import Card from '../components/Card.svelte';
   import Problem from '../components/Problem.svelte';
   import { apiGet } from '../lib/api';
-  import { formatDateTime, truncateMiddle } from '../lib/format';
+  import { formatDateTime, formatNumber, formatPercent, truncateMiddle } from '../lib/format';
+  import { t } from '../lib/i18n.svelte';
   import { formatMinor } from '../lib/money';
   import { status } from '../lib/status.svelte';
   import type { AuditEvent, AuditVerify, FeeSchedule } from '../lib/types';
@@ -51,66 +52,66 @@
     try {
       await navigator.clipboard.writeText(verify.head_hash);
       copied = true;
-      status.announce('Head hash copied.');
+      status.announce(t('tr.copied'));
       setTimeout(() => (copied = false), 2000);
     } catch {
-      status.announce('Copy failed. Select the hash text instead.');
+      status.announce(t('tr.copyFailed'));
     }
   }
 </script>
 
-<h1>Transparency</h1>
+<h1>{t('title.transparency')}</h1>
 <p>
-  This bank's code, fee logic and controls are open source. Read and verify them at
-  <a href={REPO} rel="noopener noreferrer" target="_blank">{REPO.replace('https://', '')}</a>.
+  {t('tr.lead')}
+  <a href={REPO} rel="noopener noreferrer" target="_blank"><bdi>{REPO.replace('https://', '')}</bdi></a>.
 </p>
 
 <div class="stack">
-  <Card title="Audit chain" id="audit">
+  <Card title={t('tr.audit')} id="audit">
     {#if verifyError}
       <Problem error={verifyError} onretry={loadVerify} />
     {:else if verify === null}
-      <p aria-busy="true">Verifying the audit chain…</p>
+      <p aria-busy="true">{t('tr.verifying')}</p>
     {:else}
       <p class="verdict" class:ok={verify.ok} class:bad={!verify.ok}>
-        {verify.ok ? 'OK — every audit event links to the one before it.' : `FAIL — the chain breaks at event #${verify.first_bad_seq ?? '?'}.`}
+        {verify.ok ? t('tr.ok') : t('tr.fail', { seq: verify.first_bad_seq ?? '?' })}
       </p>
       <dl class="facts">
-        <div><dt>Events in chain</dt><dd>{verify.length.toLocaleString()}</dd></div>
+        <div><dt>{t('tr.events')}</dt><dd>{formatNumber(verify.length)}</dd></div>
         <div>
-          <dt>Head hash</dt>
+          <dt>{t('tr.headHash')}</dt>
           <dd class="hash">
-            <code class="mono" title={verify.head_hash}>{truncateMiddle(verify.head_hash, 10)}</code>
+            <code class="mono" title={verify.head_hash}><bdi>{truncateMiddle(verify.head_hash, 10)}</bdi></code>
             <button type="button" class="secondary small" onclick={copyHash}>
-              {copied ? 'Copied' : 'Copy'}<span class="visually-hidden"> full head hash</span>
+              {copied ? t('tr.copiedButton') : t('tr.copy')}<span class="visually-hidden">{t('tr.fullHash')}</span>
             </button>
           </dd>
         </div>
       </dl>
-      <button type="button" class="secondary" onclick={loadVerify}>Verify again</button>
+      <button type="button" class="secondary" onclick={loadVerify}>{t('tr.verifyAgain')}</button>
     {/if}
   </Card>
 
-  <Card title="Recent audit events" id="events">
-    <p class="muted">Who did what is private: only the event number, the hour, the kind of event and the start of its hash are published.</p>
+  <Card title={t('tr.recent')} id="events">
+    <p class="muted">{t('tr.privacy')}</p>
     {#if eventsError}
       <Problem error={eventsError} onretry={loadEvents} />
     {:else if events === null}
-      <p aria-busy="true">Loading events…</p>
+      <p aria-busy="true">{t('tr.loadingEvents')}</p>
     {:else if events.length === 0}
-      <p class="muted">No events yet.</p>
+      <p class="muted">{t('tr.noEvents')}</p>
     {:else}
       <div class="table-wrap">
         <table>
-          <caption class="visually-hidden">Most recent audit events</caption>
-          <thead><tr><th scope="col" class="num">#</th><th scope="col">Hour</th><th scope="col">Kind</th><th scope="col">Hash</th></tr></thead>
+          <caption class="visually-hidden">{t('tr.caption')}</caption>
+          <thead><tr><th scope="col" class="num">#</th><th scope="col">{t('tr.colHour')}</th><th scope="col">{t('tr.colKind')}</th><th scope="col">{t('tr.colHash')}</th></tr></thead>
           <tbody>
             {#each events as ev (ev.seq)}
               <tr>
                 <td class="num">{ev.seq}</td>
                 <td><time datetime={ev.at}>{formatDateTime(ev.at)}</time></td>
                 <td>{ev.action}</td>
-                <td class="mono">{ev.hash_prefix}…</td>
+                <td class="mono"><bdi>{ev.hash_prefix}…</bdi></td>
               </tr>
             {/each}
           </tbody>
@@ -119,25 +120,25 @@
     {/if}
   </Card>
 
-  <Card title="Published fee logic" id="fees">
+  <Card title={t('tr.fees')} id="fees">
     {#if feesError}
       <Problem error={feesError} onretry={loadFees} />
     {:else if fees === null}
-      <p aria-busy="true">Loading fees…</p>
+      <p aria-busy="true">{t('tr.loadingFees')}</p>
     {:else}
       <dl class="facts">
-        <div><dt>Monthly fee</dt><dd>{fees.monthly_fee === 0 ? 'None' : formatMinor(fees.monthly_fee, fees.currency ?? 'ILS')}</dd></div>
-        <div><dt>FX markup</dt><dd>{fees.currency_fx_markup_bp === 0 ? 'None (0 bp)' : `${fees.currency_fx_markup_bp} bp`}</dd></div>
-        <div><dt>Income shared with customers</dt><dd>{fees.income_share_percent}%</dd></div>
+        <div><dt>{t('tr.monthlyFee')}</dt><dd>{fees.monthly_fee === 0 ? t('tr.none') : formatMinor(fees.monthly_fee, fees.currency ?? 'ILS')}</dd></div>
+        <div><dt>{t('tr.fxMarkup')}</dt><dd>{fees.currency_fx_markup_bp === 0 ? t('tr.noneBp') : t('tr.bp', { bp: fees.currency_fx_markup_bp })}</dd></div>
+        <div><dt>{t('tr.incomeShare')}</dt><dd>{formatPercent(fees.income_share_percent)}</dd></div>
       </dl>
       {#if fees.rules.length}
         <div class="table-wrap">
           <table>
-            <caption>Rules as enforced by the code</caption>
-            <thead><tr><th scope="col">Rule</th><th scope="col">What it does</th></tr></thead>
+            <caption>{t('tr.rulesCaption')}</caption>
+            <thead><tr><th scope="col">{t('tr.rule')}</th><th scope="col">{t('tr.whatItDoes')}</th></tr></thead>
             <tbody>
               {#each fees.rules as r (r.name)}
-                <tr><th scope="row" class="mono">{r.name}</th><td>{r.description}</td></tr>
+                <tr><th scope="row" class="mono"><bdi>{r.name}</bdi></th><td lang="en">{r.description}</td></tr>
               {/each}
             </tbody>
           </table>
