@@ -196,7 +196,9 @@ func isDevOrigin(origin string) bool {
 		return true
 	}
 	ip := net.ParseIP(host)
-	return ip != nil && ip.IsLoopback()
+	// Loopback and RFC 1918 / link-local addresses count as development: they
+	// are how a phone on the same Wi-Fi reaches `./dev demo` on a laptop.
+	return ip != nil && (ip.IsLoopback() || ip.IsPrivate() || ip.IsLinkLocalUnicast())
 }
 
 // sweep is one periodic expiry job: run returns how many items it expired.

@@ -15,7 +15,8 @@ func TestAuditSignerFor(t *testing.T) {
 	want := ed25519.NewKeyFromSeed(seedBytes)
 
 	for _, origin := range []string{"http://localhost:8080", "http://LOCALHOST", "https://bank.localhost",
-		"http://127.0.0.1:8080", "http://127.5.6.7", "http://[::1]:8080"} {
+		"http://127.0.0.1:8080", "http://127.5.6.7", "http://[::1]:8080",
+		"http://10.0.0.5:8080", "http://192.168.1.10:8080", "http://172.20.3.4", "http://169.254.1.2"} {
 		key, err := auditSignerFor(Config{Origin: origin})
 		testutil.NoError(t, err, origin)
 		testutil.Len(t, key, ed25519.PrivateKeySize, origin)
@@ -25,7 +26,7 @@ func TestAuditSignerFor(t *testing.T) {
 	b, _ := auditSignerFor(Config{Origin: "http://localhost"})
 	testutil.False(t, a.Equal(b), "ephemeral keys are random")
 
-	for _, origin := range []string{"https://bank.example", "http://10.0.0.5", "http://localhost.example.com",
+	for _, origin := range []string{"https://bank.example", "http://8.8.8.8", "http://localhost.example.com",
 		"http://notlocalhost", "", "not a url"} {
 		_, err := auditSignerFor(Config{Origin: origin})
 		testutil.ErrorContains(t, err, "BANK_AUDIT_SIGNING_KEY", origin)
