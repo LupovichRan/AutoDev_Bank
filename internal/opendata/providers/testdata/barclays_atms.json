@@ -1,0 +1,261 @@
+{
+  "meta": {
+    "LastUpdated": "2026-11-03T13:34:42+0000",
+    "TotalResults": 318,
+    "Agreement": "Use of the APIs and any related data will be subject to the terms of the Open Licence and subject to terms and conditions",
+    "License": "https://www.openbanking.org.uk/open-licence",
+    "TermsOfUse": "https://www.openbanking.org.uk/terms"
+  },
+  "data": [
+    {
+      "Brand": [
+        {
+          "BrandName": "Barclays UK",
+          "ATM": [
+            {
+              "Identification": "UK-B-20057400",
+              "SupportedLanguages": [
+                "en"
+              ],
+              "ATMServices": [
+                "MiniStatement",
+                "MobilePaymentRegistration",
+                "MobilePhoneTopUp",
+                "PINChange",
+                "Balance",
+                "CashWithdrawal"
+              ],
+              "Accessibility": [
+                "WheelchairAccess",
+                "LevelAccess",
+                "AudioCashMachine",
+                "AutomaticDoors",
+                "LowerLevelCounter",
+                "InductionLoop"
+              ],
+              "SupportedCurrencies": [
+                "GBP"
+              ],
+              "Branch": {
+                "Identification": "true"
+              },
+              "Location": {
+                "PostalAddress": {
+                  "AddressLine": [
+                    "5 Silver Street"
+                  ],
+                  "StreetName": "Branch - Bedford",
+                  "TownName": "Bedford",
+                  "CountrySubDivision": [
+                    "Bedfordshire"
+                  ],
+                  "Country": "UK",
+                  "PostCode": "MK40 1SY",
+                  "GeoLocation": {
+                    "GeographicCoordinates": {
+                      "Latitude": "52.13704825",
+                      "Longitude": "-0.46759853"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "Identification": "UK-B-20539700",
+              "SupportedLanguages": [
+                "en"
+              ],
+              "ATMServices": [
+                "MiniStatement",
+                "MobilePaymentRegistration",
+                "MobilePhoneTopUp",
+                "PINChange",
+                "Balance",
+                "CashWithdrawal"
+              ],
+              "Accessibility": [
+                "WheelchairAccess",
+                "LevelAccess",
+                "AudioCashMachine",
+                "AutomaticDoors",
+                "InductionLoop"
+              ],
+              "SupportedCurrencies": [
+                "GBP"
+              ],
+              "Branch": {
+                "Identification": "true"
+              },
+              "Location": {
+                "PostalAddress": {
+                  "AddressLine": [
+                    "28 George Street"
+                  ],
+                  "StreetName": "Branch - Luton",
+                  "TownName": "Luton",
+                  "CountrySubDivision": [
+                    "Bedfordshire"
+                  ],
+                  "Country": "UK",
+                  "PostCode": "LU1 2AX",
+                  "GeoLocation": {
+                    "GeographicCoordinates": {
+                      "Latitude": "51.87850000",
+                      "Longitude": "-0.41474500"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "Identification": "UK-B-20591400",
+              "SupportedLanguages": [
+                "en"
+              ],
+              "ATMServices": [
+                "MiniStatement",
+                "MobilePaymentRegistration",
+                "MobilePhoneTopUp",
+                "CashDeposits",
+                "PINChange",
+                "Balance",
+                "PINActivation",
+                "CashWithdrawal"
+              ],
+              "Accessibility": [
+                "WheelchairAccess",
+                "LevelAccess",
+                "AudioCashMachine",
+                "AutomaticDoors",
+                "LowerLevelCounter",
+                "InductionLoop"
+              ],
+              "SupportedCurrencies": [
+                "GBP"
+              ],
+              "Branch": {
+                "Identification": "true"
+              },
+              "Location": {
+                "PostalAddress": {
+                  "AddressLine": [
+                    "23 - 26 Parkway Centre"
+                  ],
+                  "StreetName": "Branch - Newbury",
+                  "TownName": "Newbury",
+                  "CountrySubDivision": [
+                    "Berkshire"
+                  ],
+                  "Country": "UK",
+                  "PostCode": "RG14 1AY",
+                  "GeoLocation": {
+                    "GeographicCoordinates": {
+                      "Latitude": "51.40330000",
+                      "Longitude": "-1.32409000"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "Identification": "UK-B-20710300",
+              "SupportedLanguages": [
+                "en"
+              ],
+              "ATMServices": [
+                "MiniStatement",
+                "MobilePaymentRegistration",
+                "MobilePhoneTopUp",
+                "PINChange",
+                "Balance",
+                "CashWithdrawal"
+              ],
+              "Accessibility": [
+                "WheelchairAccess",
+                "LevelAccess",
+                "AudioCashMachine",
+                "AutomaticDoors",
+                "InductionLoop",
+                "Accessible interview room"
+              ],
+              "SupportedCurrencies": [
+                "GBP"
+              ],
+              "Branch": {
+                "Identification": "true"
+              },
+              "Location": {
+                "PostalAddress": {
+                  "AddressLine": [
+                    "90-93 Broad Street"
+                  ],
+                  "StreetName": "Branch - Reading",
+                  "TownName": "Reading",
+                  "CountrySubDivision": [
+                    "Berkshire"
+                  ],
+                  "Country": "UK",
+                  "PostCode": "RG1 2AP",
+                  "GeoLocation": {
+                    "GeographicCoordinates": {
+                      "Latitude": "51.45557400",
+                      "Longitude": "-0.97415520"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "Identification": "UK-B-20785800",
+              "SupportedLanguages": [
+                "en"
+              ],
+              "ATMServices": [
+                "MiniStatement",
+                "MobilePaymentRegistration",
+                "MobilePhoneTopUp",
+                "PINChange",
+                "Balance",
+                "CashWithdrawal"
+              ],
+              "Accessibility": [
+                "WheelchairAccess",
+                "LevelAccess",
+                "AudioCashMachine",
+                "AutomaticDoors",
+                "InductionLoop",
+                "Accessible interview room"
+              ],
+              "SupportedCurrencies": [
+                "GBP"
+              ],
+              "Branch": {
+                "Identification": "true"
+              },
+              "Location": {
+                "PostalAddress": {
+                  "AddressLine": [
+                    "192 High Street"
+                  ],
+                  "StreetName": "Branch - Slough",
+                  "TownName": "Slough",
+                  "CountrySubDivision": [
+                    "Berkshire"
+                  ],
+                  "Country": "UK",
+                  "PostCode": "SL1 1JS",
+                  "GeoLocation": {
+                    "GeographicCoordinates": {
+                      "Latitude": "51.50810602",
+                      "Longitude": "-0.59051870"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

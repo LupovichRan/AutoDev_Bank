@@ -1,0 +1,1258 @@
+{
+  "meta": {
+    "LastUpdated": "2026-10-09T09:49:30.539Z",
+    "TotalResults": 10,
+    "Agreement": "Use of the APIs and any related data will be subject to the terms of the Open Licence and subject to terms and conditions",
+    "License": "https://www.openbanking.org.uk/open-licence",
+    "TermsOfUse": "https://www.openbanking.org.uk/terms"
+  },
+  "data": [
+    {
+      "Brand": [
+        {
+          "BrandName": "first direct",
+          "PCA": [
+            {
+              "Name": "1st Account",
+              "Identification": "fdFirAcc",
+              "Segment": [
+                "General"
+              ],
+              "PCAMarketingState": [
+                {
+                  "Identification": "Regular - No Offer",
+                  "PredecessorID": "N/A",
+                  "MarketingState": "Regular",
+                  "FirstMarketedDate": "2017-01-01",
+                  "LastMarketedDate": "2099-12-31",
+                  "Overdraft": {
+                    "Notes": [
+                      "The first £250 of any arranged overdraft amount is charged at 0% EAR variable, above this the overdraft interest rate is 39.9% EAR variable. Overdrafts are subject to status. "
+                    ],
+                    "TcsAndCsURL": "https://www1.firstdirect.com/content/dam/fsdt/en/documents/pdf/fdAccTandC.pdf",
+                    "OverdraftTierBandSet": [
+                      {
+                        "TierBandMethod": "Tiered",
+                        "OverdraftType": "OnDemand",
+                        "Identification": "Authorised Overdraft",
+                        "AuthorisedIndicator": true,
+                        "OverdraftTierBand": [
+                          {
+                            "Identification": "Authorised Overdraft Tier 1",
+                            "TierValueMin": "0.00",
+                            "TierValueMax": "250.00",
+                            "OverdraftInterestChargingCoverage": "Tiered",
+                            "BankGuaranteedIndicator": false,
+                            "EAR": "0.00"
+                          },
+                          {
+                            "Identification": "Authorised Overdraft Tier 2",
+                            "TierValueMin": "250.00",
+                            "OverdraftInterestChargingCoverage": "Tiered",
+                            "BankGuaranteedIndicator": false,
+                            "EAR": "39.9"
+                          }
+                        ]
+                      },
+                      {
+                        "TierBandMethod": "Whole",
+                        "OverdraftType": "OnDemand",
+                        "Identification": "Unauthorised Overdraft",
+                        "AuthorisedIndicator": false,
+                        "OverdraftTierBand": [
+                          {
+                            "Identification": "Unauthorised Overdraft",
+                            "TierValueMin": "0",
+                            "OverdraftInterestChargingCoverage": "Whole",
+                            "BankGuaranteedIndicator": false,
+                            "EAR": "0"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "Eligibility": {
+                    "AgeEligibility": {
+                      "MinimumAge": 18.0,
+                      "Notes": [
+                        "You just need to be over 18, a UK resident and haven't been declared bankrupt or registered for an Individual Voluntary Agreement in the last six years (or be in the process of doing so). You also need to have a phone number and email address so we can get in touch with you."
+                      ]
+                    },
+                    "ResidencyEligibility": {
+                      "ResidencyIncluded": [
+                        "ELEN",
+                        "ELNI",
+                        "ELSC",
+                        "ELUK",
+                        "ELWA"
+                      ]
+                    },
+                    "CreditCheck": {
+                      "ScoringType": "Hard"
+                    },
+                    "IDVerificationCheck": {
+                      "URL": "https://www.firstdirect.com/banking/current-account/"
+                    }
+                  },
+                  "FeaturesAndBenefits": {
+                    "Card": [
+                      {
+                        "Type": "DebitCard",
+                        "Scheme": "MasterCard",
+                        "ContactlessIndicator": true
+                      }
+                    ],
+                    "MobileWallet": [
+                      {
+                        "Type": "ApplePay"
+                      },
+                      {
+                        "Type": "GooglePay"
+                      },
+                      {
+                        "Type": "SamsungPay"
+                      },
+                      {
+                        "Type": "MobileBankingApp"
+                      }
+                    ]
+                  },
+                  "OtherFeesCharges": {
+                    "FeeChargeDetail": [
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayForeignPaymentInUKAcc",
+                        "FeeAmount": "5.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerOccurrence",
+                        "Notes": [
+                          "Sending money within the UK in foreign currency - To non-HSBC/fd accounts in any currency excluding EUR by:\n* Online\n* Phone\n* Post"
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayForeignPaymentInUKAcc",
+                        "FeeAmount": "5.00",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Sending money outside the UK in other currencies to non HSB/fd accounts or EUR to non-HSBC/fd accounts outside the EEA by:\n* Online\n* Phone\n* Post\n\nNote: If we send money outside the UK, we may use an intermediary bank. This intermediary and the receiving bank may also impose charges."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayFXPaymentIn",
+                        "FeeAmount": "5.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Receiving money from outside the UK - In all currencies from within and outside the EEA (excluding EUR from within the EEA)"
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Card",
+                        "FeeType": "ATMNonSterlingWithdrawal",
+                        "FeeRate": "0.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransactionAmount",
+                        "Notes": [
+                          "No first direct fees for withdrawing cash from a cash machine outside the UK\n\nNote: You may still be charged for fees that are outside of our control. For example, some cash machine operators may apply a direct charge for withdrawals from their cash machines (this should be advised on screen at the time of withdrawal)"
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Card",
+                        "FeeType": "ATMNonSterlingWithdrawal",
+                        "FeeAmount": "0.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransactionAmount",
+                        "Notes": [
+                          "No first direct cash fees for withdrawing cash from a cash machine outside the UK\n\nNote: You may still be charged for fees that are outside of our control. For example, some cash machine operators may apply a direct charge for withdrawals from their cash machines (this should be advised on screen at the time of withdrawal)"
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Card",
+                        "FeeType": "IntlPayPurchaseNonSterling",
+                        "FeeRate": "0.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransactionAmount",
+                        "Notes": [
+                          "Debit Card payments in a foreign currency.\n\nWe calculate the percentage fee on the converted amount \nof the debit card payment."
+                        ]
+                      }
+                    ]
+                  },
+                  "CoreProduct": {
+                    "ProductURL": "https://www.firstdirect.com/banking/current-account/",
+                    "ProductDescription": "A current account that helps you save, borrow and manage your money, whenever is right for you",
+                    "TcsAndCsURL": "https://www.firstdirect.com/content/dam/wpb/fsdt/en/documents/pdf/fdAccTandC.pdf",
+                    "SalesAccessChannels": [
+                      "CallCentre",
+                      "Online"
+                    ],
+                    "ServicingAccessChannels": [
+                      "ATM",
+                      "CallCentre",
+                      "Online",
+                      "PostOffice",
+                      "MobileBankingApp"
+                    ],
+                    "MonthlyMaximumCharge": "0.00"
+                  },
+                  "Ucodes": [
+                    {
+                      "CurrentUcode": "UAJAA"
+                    },
+                    {
+                      "CurrentUcode": "UAJAG"
+                    },
+                    {
+                      "CurrentUcode": "UAJAJ"
+                    },
+                    {
+                      "CurrentUcode": "UAJAK"
+                    }
+                  ]
+                }
+              ],
+              "OnSaleIndicator": true
+            },
+            {
+              "Name": "1st Account",
+              "Identification": "fdFirAcc",
+              "Segment": [
+                "General"
+              ],
+              "PCAMarketingState": [
+                {
+                  "Identification": "Switch Incentive September 2026",
+                  "PredecessorID": "Regular – No Offer",
+                  "MarketingState": "Promotional",
+                  "FirstMarketedDate": "2026-09-14",
+                  "LastMarketedDate": "2026-12-02",
+                  "Notes": [
+                    "To get the £175 cash offer and £35 booster, you need to switch your everyday banking to us using the Current Account Switching Service, including at least 2 Direct Debits or standing orders. Then pay in £1,000, make 5+ debit card payments, and log on to digital banking, within 45 days of your account opening. Your card transactions can be made in-store or online, and could be from your digital wallet or using your actual card."
+                  ],
+                  "Overdraft": {
+                    "Notes": [
+                      "The first £250 of any arranged overdraft amount is charged at 0% EAR variable, above this the overdraft interest rate is 39.9% EAR variable. Overdrafts are subject to status. "
+                    ],
+                    "TcsAndCsURL": "https://www1.firstdirect.com/content/dam/fsdt/en/documents/pdf/fdAccTandC.pdf",
+                    "OverdraftTierBandSet": [
+                      {
+                        "TierBandMethod": "Tiered",
+                        "OverdraftType": "OnDemand",
+                        "Identification": "Authorised Overdraft",
+                        "AuthorisedIndicator": true,
+                        "OverdraftTierBand": [
+                          {
+                            "Identification": "Authorised Overdraft Tier 1",
+                            "TierValueMin": "0.00",
+                            "TierValueMax": "250.00",
+                            "OverdraftInterestChargingCoverage": "Tiered",
+                            "BankGuaranteedIndicator": false,
+                            "EAR": "0.00"
+                          },
+                          {
+                            "Identification": "Authorised Overdraft Tier 2",
+                            "TierValueMin": "250.00",
+                            "OverdraftInterestChargingCoverage": "Tiered",
+                            "BankGuaranteedIndicator": false,
+                            "EAR": "39.9"
+                          }
+                        ]
+                      },
+                      {
+                        "TierBandMethod": "Whole",
+                        "OverdraftType": "OnDemand",
+                        "Identification": "Unauthorised Overdraft",
+                        "AuthorisedIndicator": false,
+                        "OverdraftTierBand": [
+                          {
+                            "Identification": "Unauthorised Overdraft",
+                            "TierValueMin": "0",
+                            "OverdraftInterestChargingCoverage": "Whole",
+                            "BankGuaranteedIndicator": false,
+                            "EAR": "0"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "Eligibility": {
+                    "AgeEligibility": {
+                      "MinimumAge": 18.0,
+                      "Notes": [
+                        "You just need to be over 18, a UK resident and haven't been declared bankrupt or registered for an Individual Voluntary Agreement in the last six years (or be in the process of doing so). You also need to have a phone number and email address so we can get in touch with you."
+                      ]
+                    },
+                    "ResidencyEligibility": {
+                      "ResidencyIncluded": [
+                        "ELEN",
+                        "ELNI",
+                        "ELSC",
+                        "ELUK",
+                        "ELWA"
+                      ]
+                    },
+                    "CreditCheck": {
+                      "ScoringType": "Hard"
+                    },
+                    "IDVerificationCheck": {
+                      "URL": "https://www.firstdirect.com/banking/current-account/"
+                    }
+                  },
+                  "FeaturesAndBenefits": {
+                    "Card": [
+                      {
+                        "Type": "DebitCard",
+                        "Scheme": "MasterCard",
+                        "ContactlessIndicator": true
+                      }
+                    ],
+                    "MobileWallet": [
+                      {
+                        "Type": "ApplePay"
+                      },
+                      {
+                        "Type": "GooglePay"
+                      },
+                      {
+                        "Type": "SamsungPay"
+                      },
+                      {
+                        "Type": "MobileBankingApp"
+                      }
+                    ]
+                  },
+                  "OtherFeesCharges": {
+                    "FeeChargeDetail": [
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayForeignPaymentInUKAcc",
+                        "FeeAmount": "5.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerOccurrence",
+                        "Notes": [
+                          "Sending money within the UK in foreign currency - To non-HSBC/fd accounts in any currency excluding EUR by:\n* Online\n* Phone\n* Post"
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayForeignPaymentInUKAcc",
+                        "FeeAmount": "5.00",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Sending money outside the UK in other currencies to non HSB/fd accounts or EUR to non-HSBC/fd accounts outside the EEA by:\n* Online\n* Phone\n* Post\n\nNote: If we send money outside the UK, we may use an intermediary bank. This intermediary and the receiving bank may also impose charges."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayFXPaymentIn",
+                        "FeeAmount": "5.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Receiving money from outside the UK in all currencies from within and outside the EEA (excluding EUR from within the EEA)"
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Card",
+                        "FeeType": "ATMNonSterlingWithdrawal",
+                        "FeeRate": "0.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransactionAmount",
+                        "Notes": [
+                          "No first direct fees for withdrawing cash from a cash machine outside the UK\n\nNote: You may still be charged for fees that are outside of our control. For example, some cash machine operators may apply a direct charge for withdrawals from their cash machines (this should be advised on screen at the time of withdrawal)"
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Card",
+                        "FeeType": "ATMNonSterlingWithdrawal",
+                        "FeeAmount": "0.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransactionAmount",
+                        "Notes": [
+                          "No first direct cash fees for withdrawing cash from a cash machine outside the UK\n\nNote: You may still be charged for fees that are outside of our control. For example, some cash machine operators may apply a direct charge for withdrawals from their cash machines (this should be advised on screen at the time of withdrawal)"
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Card",
+                        "FeeType": "IntlPayPurchaseNonSterling",
+                        "FeeRate": "0.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransactionAmount",
+                        "Notes": [
+                          "Debit Card payments in a foreign currency.\n\nWe calculate the percentage fee on the converted amount \nof the debit card payment."
+                        ]
+                      }
+                    ]
+                  },
+                  "CoreProduct": {
+                    "ProductURL": "https://www.firstdirect.com/banking/current-account/",
+                    "ProductDescription": "A current account that helps you save, borrow and manage your money, whenever is right for you",
+                    "TcsAndCsURL": "https://www.firstdirect.com/content/dam/wpb/fsdt/en/documents/pdf/fdAccTandC.pdf",
+                    "SalesAccessChannels": [
+                      "CallCentre",
+                      "Online"
+                    ],
+                    "ServicingAccessChannels": [
+                      "ATM",
+                      "CallCentre",
+                      "Online",
+                      "PostOffice",
+                      "MobileBankingApp"
+                    ],
+                    "MonthlyMaximumCharge": "0.00"
+                  },
+                  "Ucodes": [
+                    {
+                      "CurrentUcode": "UAJAA"
+                    },
+                    {
+                      "CurrentUcode": "UAJAG"
+                    },
+                    {
+                      "CurrentUcode": "UAJAJ"
+                    },
+                    {
+                      "CurrentUcode": "UAJAK"
+                    }
+                  ]
+                }
+              ],
+              "OnSaleIndicator": true
+            }
+          ],
+          "OnSaleIndicator": true
+        },
+        {
+          "BrandName": "HSBC UK",
+          "PCA": [
+            {
+              "Name": "Basic Bank Account",
+              "Identification": "BasAcc",
+              "Segment": [
+                "Basic"
+              ],
+              "PCAMarketingState": [
+                {
+                  "Identification": "Regular - No Offer",
+                  "PredecessorID": "N/A",
+                  "MarketingState": "Regular",
+                  "FirstMarketedDate": "2017-01-01",
+                  "LastMarketedDate": "2099-12-31",
+                  "Eligibility": {
+                    "AgeEligibility": {
+                      "MinimumAge": 16.0
+                    },
+                    "ResidencyEligibility": {
+                      "ResidencyIncluded": [
+                        "ELEN",
+                        "ELNI",
+                        "ELSC",
+                        "ELUK",
+                        "ELWA"
+                      ]
+                    },
+                    "CreditCheck": {
+                      "ScoringType": "Hard",
+                      "Notes": [
+                        "If you apply for an HSBC current account via the HSBC mobile banking app and are offered a basic bank account, a soft credit check will be completed.  If you apply for a standard HSBC Bank Account via the public website, but don’t qualify and are offered a Basic Bank Account instead, a hard credit check will be completed."
+                      ]
+                    },
+                    "IDVerificationCheck": {
+                      "URL": "https://www.hsbc.co.uk/help/banking-made-easy/help-us-identify-you/"
+                    }
+                  },
+                  "FeaturesAndBenefits": {
+                    "FeatureBenefitItem": [
+                      {
+                        "Identification": "1",
+                        "Type": "Rewards",
+                        "Name": "Home&Away Offers",
+                        "Indicator": true,
+                        "Textual": "Home&Away gives all HSBC cardholders offers on shopping, dining, travel, experiences and much more.",
+                        "Notes": [
+                          "Some Home&Away deals are only available to holders of specific cards, so please check the terms and conditions of each offer to see if you're eligible."
+                        ]
+                      }
+                    ],
+                    "Card": [
+                      {
+                        "Type": "DebitCard",
+                        "Scheme": "Visa",
+                        "ContactlessIndicator": true
+                      }
+                    ],
+                    "MobileWallet": [
+                      {
+                        "Type": "GooglePay"
+                      },
+                      {
+                        "Type": "ApplePay"
+                      },
+                      {
+                        "Type": "SamsungPay"
+                      },
+                      {
+                        "Type": "MobileBankingApp"
+                      }
+                    ]
+                  },
+                  "OtherFeesCharges": {
+                    "FeeChargeDetail": [
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayForeignPaymentInUKAcc",
+                        "FeeAmount": "17.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Sending money within the UK in foreign currency to HSBC accounts by Post."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayForeignPaymentInUKAcc",
+                        "FeeAmount": "17.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Sending money within the UK in foreign currency to all other accounts in EUR by Post."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayForeignPaymentInUKAcc",
+                        "FeeAmount": "5.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Sending money within the UK in foreign currency to all other accounts in foreign currencies excluding EUR by:\n* Branch\n* Telephone\n* Online\n* Mobile"
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayForeignPaymentInUKAcc",
+                        "FeeAmount": "17.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Sending money within the UK in foreign currency to all other accounts in foreign currencies excluding EUR by Post."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "FeeAmount": "17.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Sending money outside the UK to HSBC accounts by Post.\n\nNote: If we send money outside the UK we may use an intermediary bank. This intermediary and the receiving bank may also impose charges."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "FeeAmount": "17.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Sending money outside the UK to non-HSBC accounts in the EEA in EUR by Post.\n\nNote: If we send money outside the UK we may use an intermediary bank. This intermediary and the receiving bank may also impose charges."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "FeeAmount": "5.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Sending money outside the UK to non-HSBC accounts in the EEA in foreign currencies excluding EUR by:\n* Branch\n* Telephone\n* Online\n* Mobile\n\nNote: If we send money outside the UK we may use an intermediary bank. This intermediary and the receiving bank may also impose charges."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "FeeAmount": "17.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Sending money outside the UK to non-HSBC accounts in the EEA in foreign currencies excluding EUR by Post.\n\nNote: If we send money outside the UK we may use an intermediary bank. This intermediary and the receiving bank may also impose charges."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "FeeAmount": "5.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Sending money outside the UK to non-HSBC accounts outside the EEA in any foreign currency by:\n* Branch\n* Telephone\n* Online\n* Mobile\n\nNote: If we send money outside the UK we may use an intermediary bank. This intermediary and the receiving bank may also impose charges."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "FeeAmount": "17.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Sending money outside the UK to non-HSBC accounts outside the EEA in any foreign currency by Post.\n\nNote: If we send money outside the UK we may use an intermediary bank. This intermediary and the receiving bank may also impose charges."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayFXPaymentIn",
+                        "FeeAmount": "5.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Receiving money from outside the UK - In all currencies from within and outside the EEA (excluding EUR from within the EEA)"
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Card",
+                        "FeeType": "IntlPayPurchaseNonSterling",
+                        "FeeRate": "2.75",
+                        "FeeRateType": "Gross",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransactionAmount",
+                        "Notes": [
+                          "Debit Card payments in a foreign currency.\n\nWe calculate the percentage fee on the converted amount of the debit card payment."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Card",
+                        "FeeType": "ATMNonSterlingWithdrawal",
+                        "FeeRate": "2.75",
+                        "FeeRateType": "Gross",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransactionAmount",
+                        "Notes": [
+                          "Cash withdrawal in foreign currency outside the UK.\n\nOther ATM providers may charge you to use their cash machines.\n\nWe calculate the percentage fee on the converted amount of the cash withdrawal."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Card",
+                        "FeeType": "ATMNonSterlingWithdrawal",
+                        "FeeRate": "2.00",
+                        "FeeRateType": "Gross",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransactionAmount",
+                        "Notes": [
+                          "Cash withdrawal in foreign currency outside the UK cash fee.\n\nMinimum £1.75, Maximum £5."
+                        ],
+                        "FeeApplicableRange": {
+                          "MinimumAmount": "1.75",
+                          "MaximumAmount": "5.00"
+                        }
+                      }
+                    ]
+                  },
+                  "CoreProduct": {
+                    "ProductURL": "https://www.hsbc.co.uk/current-accounts/products/basic-bank-account/",
+                    "ProductDescription": "Our Basic Bank Account is only for people who don’t qualify for one of our other accounts and for those who don’t already hold a payment account in the UK - perhaps because they’ve had financial trouble or have a poor credit record.",
+                    "TcsAndCsURL": "https://www.hsbc.co.uk/content/dam/hsbc/gb/pdf/personal-banking-terms-conditions.pdf",
+                    "SalesAccessChannels": [
+                      "Online",
+                      "Branch",
+                      "CallCentre"
+                    ],
+                    "ServicingAccessChannels": [
+                      "ATM",
+                      "Branch",
+                      "CallCentre",
+                      "MobileBankingApp",
+                      "Online",
+                      "PostOffice"
+                    ],
+                    "MonthlyMaximumCharge": "0.00"
+                  },
+                  "Ucodes": [
+                    {
+                      "CurrentUcode": "UACBB"
+                    },
+                    {
+                      "CurrentUcode": "UCDAO"
+                    }
+                  ]
+                }
+              ],
+              "OnSaleIndicator": true
+            },
+            {
+              "Name": "MyAccount",
+              "Identification": "MyAcc",
+              "Segment": [
+                "Youth"
+              ],
+              "PCAMarketingState": [
+                {
+                  "Identification": "Regular - No Offer",
+                  "PredecessorID": "N/A",
+                  "MarketingState": "Regular",
+                  "FirstMarketedDate": "2017-01-01",
+                  "LastMarketedDate": "2099-12-31",
+                  "Eligibility": {
+                    "AgeEligibility": {
+                      "MinimumAge": 11.0,
+                      "MaximumAge": 17.0
+                    },
+                    "ResidencyEligibility": {
+                      "ResidencyIncluded": [
+                        "ELEN",
+                        "ELNI",
+                        "ELSC",
+                        "ELUK",
+                        "ELWA"
+                      ]
+                    },
+                    "CreditCheck": {
+                      "ScoringType": "Soft"
+                    },
+                    "IDVerificationCheck": {
+                      "URL": "https://www.hsbc.co.uk/help/banking-made-easy/help-us-identify-you/",
+                      "Notes": [
+                        "If your parent or guardian banks with HSBC, we just need your identification. If your parent or guardian doesn't bank with HSBC, you'll need to make an appointment at one of our branches and take your identification and their identification and proof of address. Your parent or legal guardian also needs to be present at the time of application."
+                      ]
+                    }
+                  },
+                  "FeaturesAndBenefits": {
+                    "FeatureBenefitItem": [
+                      {
+                        "Identification": "1",
+                        "Type": "Rewards",
+                        "Name": "Home&Away Offers",
+                        "Indicator": true,
+                        "Textual": "Home&Away gives all HSBC cardholders offers on shopping, dining, travel, experiences and much more.",
+                        "Notes": [
+                          "Some Home&Away deals are only available to holders of specific cards, so please check the terms and conditions of each offer to see if you're eligible."
+                        ]
+                      }
+                    ],
+                    "Card": [
+                      {
+                        "Type": "DebitCard",
+                        "Scheme": "Visa",
+                        "ContactlessIndicator": true,
+                        "Notes": [
+                          "If for any reason you do not want a Visa debit card, then please get in touch with us and we can stop one from being sent out to you."
+                        ]
+                      }
+                    ],
+                    "MobileWallet": [
+                      {
+                        "Type": "GooglePay"
+                      },
+                      {
+                        "Type": "ApplePay"
+                      },
+                      {
+                        "Type": "SamsungPay"
+                      },
+                      {
+                        "Type": "MobileBankingApp"
+                      }
+                    ]
+                  },
+                  "OtherFeesCharges": {
+                    "FeeChargeDetail": [
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayForeignPaymentInUKAcc",
+                        "FeeAmount": "17.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Sending money within the UK in foreign currency to HSBC accounts by Post."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayForeignPaymentInUKAcc",
+                        "FeeAmount": "17.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Sending money within the UK in foreign currency to all other accounts in EUR by Post."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayForeignPaymentInUKAcc",
+                        "FeeAmount": "5.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Sending money within the UK in foreign currency to all other accounts in foreign currencies excluding EUR by:\n* Branch\n* Telephone\n* Online\n* Mobile\n\nNote: This fee does not apply to Premier MyAccount."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayForeignPaymentInUKAcc",
+                        "FeeAmount": "17.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Sending money within the UK in foreign currency to all other accounts in foreign currencies excluding EUR by Post."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "FeeAmount": "17.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Sending money outside the UK to HSBC accounts by Post.\n\nNote: If we send money outside the UK we may use an intermediary bank. This intermediary and the receiving bank may also impose charges."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "FeeAmount": "17.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Sending money outside the UK to non-HSBC accounts in the EEA in EUR by Post.\n\nNote: If we send money outside the UK we may use an intermediary bank. This intermediary and the receiving bank may also impose charges."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "FeeAmount": "5.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Sending money outside the UK to non-HSBC accounts in the EEA in foreign currencies excluding EUR by:\n* Branch\n* Telephone\n* Online\n* Mobile\n\nNote: This fee does not apply to Premier MyAccount.\n\nNote: If we send money outside the UK we may use an intermediary bank. This intermediary and the receiving bank may also impose charges."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "FeeAmount": "17.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Sending money outside the UK to non-HSBC accounts in the EEA in foreign currencies excluding EUR by Post.\n\nNote: If we send money outside the UK we may use an intermediary bank. This intermediary and the receiving bank may also impose charges."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "FeeAmount": "5.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Sending money outside the UK to non-HSBC accounts outside the EEA in any foreign currency by:\n* Branch\n* Telephone\n* Online\n* Mobile\n\nNote: This fee does not apply to Premier MyAccount. \n\nNote: If we send money outside the UK we may use an intermediary bank. This intermediary and the receiving bank may also impose charges."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "FeeAmount": "17.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Sending money outside the UK to non-HSBC accounts outside the EEA in any foreign currency by Post.\n\nNote: If we send money outside the UK we may use an intermediary bank. This intermediary and the receiving bank may also impose charges."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayFXPaymentIn",
+                        "FeeAmount": "0.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Receiving money from outside the UK - In all currencies from within and outside the EEA (excluding EUR from within the EEA)"
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Card",
+                        "FeeType": "IntlPayPurchaseNonSterling",
+                        "FeeRate": "2.75",
+                        "FeeRateType": "Gross",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransactionAmount",
+                        "Notes": [
+                          "Debit Card payments in a foreign currency.\n\nWe calculate the percentage fee on the converted amount of the debit card payment."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Card",
+                        "FeeType": "ATMNonSterlingWithdrawal",
+                        "FeeRate": "2.75",
+                        "FeeRateType": "Gross",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransactionAmount",
+                        "Notes": [
+                          "Cash withdrawal in foreign currency outside the UK.\n\nOther ATM providers may charge you to use their cash machines.\n\nWe calculate the percentage fee on the converted amount of the cash withdrawal."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Card",
+                        "FeeType": "ATMNonSterlingWithdrawal",
+                        "FeeRate": "2.00",
+                        "FeeRateType": "Gross",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransactionAmount",
+                        "Notes": [
+                          "MyAccount:\nCash withdrawal in foreign currency outside the UK cash fee.\n\nMinimum £1.75, Maximum £5.\n\nPremier MyAccount: \nNo Fee"
+                        ],
+                        "FeeApplicableRange": {
+                          "MinimumAmount": "1.75",
+                          "MaximumAmount": "5.00"
+                        }
+                      }
+                    ]
+                  },
+                  "CoreProduct": {
+                    "ProductURL": "https://www.hsbc.co.uk/current-accounts/products/children/",
+                    "ProductDescription": "Looking for your first bank account? With HSBC MyMoney, you'll get a fantastic current account for easy day-to-day banking, plus a savings account to help you put something away for the future.",
+                    "TcsAndCsURL": "https://www.hsbc.co.uk/content/dam/hsbc/gb/pdf/personal-banking-terms-conditions.pdf",
+                    "SalesAccessChannels": [
+                      "Branch",
+                      "Online"
+                    ],
+                    "ServicingAccessChannels": [
+                      "Branch",
+                      "CallCentre",
+                      "MobileBankingApp",
+                      "Online",
+                      "PostOffice",
+                      "ATM"
+                    ],
+                    "MonthlyMaximumCharge": "0.00"
+                  },
+                  "Ucodes": [
+                    {
+                      "CurrentUcode": "UCHLJ"
+                    },
+                    {
+                      "CurrentUcode": "USAAO"
+                    }
+                  ]
+                }
+              ],
+              "OnSaleIndicator": true
+            },
+            {
+              "Name": "Bank Account",
+              "Identification": "BankAcc",
+              "Segment": [
+                "General"
+              ],
+              "PCAMarketingState": [
+                {
+                  "Identification": "Regular - No Offer",
+                  "PredecessorID": "N/A",
+                  "MarketingState": "Regular",
+                  "FirstMarketedDate": "2017-01-01",
+                  "LastMarketedDate": "2099-12-31",
+                  "Overdraft": {
+                    "Notes": [
+                      "The first £25 of any arranged overdraft amount is charged at 0% EAR variable, above this the overdraft interest rate is 39.9% EAR variable. Overdrafts are subject to status. "
+                    ],
+                    "TcsAndCsURL": "https://www.hsbc.co.uk/content/dam/hsbc/gb/pdf/personal-banking-terms-conditions.pdf",
+                    "OverdraftTierBandSet": [
+                      {
+                        "TierBandMethod": "Tiered",
+                        "OverdraftType": "OnDemand",
+                        "Identification": "Authorised Overdraft",
+                        "AuthorisedIndicator": true,
+                        "OverdraftTierBand": [
+                          {
+                            "Identification": "Authorised Overdraft Tier 1",
+                            "TierValueMin": "0.00",
+                            "TierValueMax": "25",
+                            "OverdraftInterestChargingCoverage": "Tiered",
+                            "BankGuaranteedIndicator": false,
+                            "EAR": "0.00"
+                          },
+                          {
+                            "Identification": "Authorised Overdraft Tier 2",
+                            "TierValueMin": "25",
+                            "OverdraftInterestChargingCoverage": "Tiered",
+                            "BankGuaranteedIndicator": false,
+                            "EAR": "39.9"
+                          }
+                        ]
+                      },
+                      {
+                        "TierBandMethod": "Whole",
+                        "OverdraftType": "OnDemand",
+                        "Identification": "Unauthorised Overdraft",
+                        "AuthorisedIndicator": false,
+                        "OverdraftTierBand": [
+                          {
+                            "Identification": "Unauthorised Overdraft",
+                            "TierValueMin": "0",
+                            "OverdraftInterestChargingCoverage": "Whole",
+                            "BankGuaranteedIndicator": false,
+                            "EAR": "0.00"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "Eligibility": {
+                    "AgeEligibility": {
+                      "MinimumAge": 18.0
+                    },
+                    "ResidencyEligibility": {
+                      "ResidencyIncluded": [
+                        "ELEE",
+                        "ELEN",
+                        "ELEU",
+                        "ELIR",
+                        "ELNI",
+                        "ELSC",
+                        "ELUK",
+                        "ELWA"
+                      ]
+                    },
+                    "CreditCheck": {
+                      "ScoringType": "Hard",
+                      "Notes": [
+                        "You are happy for us to do a credit check against your name (if you're applying for a joint account and live in the UK)"
+                      ]
+                    },
+                    "IDVerificationCheck": {
+                      "URL": "https://www.hsbc.co.uk/help/banking-made-easy/help-us-identify-you/"
+                    }
+                  },
+                  "FeaturesAndBenefits": {
+                    "FeatureBenefitItem": [
+                      {
+                        "Identification": "1",
+                        "Type": "Rewards",
+                        "Name": "Home&Away Offers",
+                        "Indicator": true,
+                        "Textual": "Home&Away gives all HSBC cardholders offers on shopping, dining, travel, experiences and much more.",
+                        "Notes": [
+                          "Some Home&Away deals are only available to holders of specific cards, so please check the terms and conditions of each offer to see if you're eligible."
+                        ]
+                      }
+                    ],
+                    "Card": [
+                      {
+                        "Type": "DebitCard",
+                        "Scheme": "Visa",
+                        "ContactlessIndicator": true
+                      }
+                    ],
+                    "MobileWallet": [
+                      {
+                        "Type": "GooglePay"
+                      },
+                      {
+                        "Type": "ApplePay"
+                      },
+                      {
+                        "Type": "SamsungPay"
+                      },
+                      {
+                        "Type": "MobileBankingApp"
+                      }
+                    ]
+                  },
+                  "OtherFeesCharges": {
+                    "FeeChargeDetail": [
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayForeignPaymentInUKAcc",
+                        "FeeAmount": "17.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Sending money within the UK in foreign currency to HSBC accounts by Post."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayForeignPaymentInUKAcc",
+                        "FeeAmount": "17.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Sending money within the UK in foreign currency to all other accounts in EUR by Post."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayForeignPaymentInUKAcc",
+                        "FeeAmount": "5.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Sending money within the UK in foreign currency to all other accounts in foreign currencies excluding EUR by:\n* Branch\n* Telephone\n* Online\n* Mobile"
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayForeignPaymentInUKAcc",
+                        "FeeAmount": "17.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Sending money within the UK in foreign currency to all other accounts in foreign currencies excluding EUR by Post."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "FeeAmount": "17.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Sending money outside the UK to HSBC accounts by Post.\n\nNote: If we send money outside the UK we may use an intermediary bank. This intermediary and the receiving bank may also impose charges."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "FeeAmount": "17.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Sending money outside the UK to non-HSBC accounts in the EEA in EUR by Post.\n\nNote: If we send money outside the UK we may use an intermediary bank. This intermediary and the receiving bank may also impose charges."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "FeeAmount": "5.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Sending money outside the UK to non-HSBC accounts in the EEA in foreign currencies excluding EUR by:\n* Branch\n* Telephone\n* Online\n* Mobile\n\nNote: If we send money outside the UK we may use an intermediary bank. This intermediary and the receiving bank may also impose charges."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "FeeAmount": "17.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Sending money outside the UK to non-HSBC accounts in the EEA in foreign currencies excluding EUR by Post.\n\nNote: If we send money outside the UK we may use an intermediary bank. This intermediary and the receiving bank may also impose charges."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "FeeAmount": "5.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Sending money outside the UK to non-HSBC accounts outside the EEA in any foreign currency by:\n* Branch\n*Telephone\n* Online\n* Mobile\n\nNote: If we send money outside the UK we may use an intermediary bank. This intermediary and the receiving bank may also impose charges."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "FeeAmount": "17.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Sending money outside the UK to non-HSBC accounts outside the EEA in any foreign currency by Post.\n\nNote: If we send money outside the UK we may use an intermediary bank. This intermediary and the receiving bank may also impose charges."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "IntlPayFXPaymentIn",
+                        "FeeAmount": "5.00",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Receiving money from outside the UK - In all currencies from within and outside the EEA (excluding EUR from within the EEA)"
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Card",
+                        "FeeType": "IntlPayPurchaseNonSterling",
+                        "FeeRate": "2.75",
+                        "FeeRateType": "Gross",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransactionAmount",
+                        "Notes": [
+                          "Debit Card payments in a foreign currency.\n\nWe calculate the percentage fee on the converted amount of the debit card payment."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Card",
+                        "FeeType": "ATMNonSterlingWithdrawal",
+                        "FeeRate": "2.75",
+                        "FeeRateType": "Gross",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransactionAmount",
+                        "Notes": [
+                          "Cash withdrawal in foreign currency outside the UK.\n\nOther ATM providers may charge you to use their cash machines.\n\nWe calculate the percentage fee on the converted amount of the cash withdrawal."
+                        ],
+                        "FeeApplicableRange": {
+                          "MinimumAmount": "1.75",
+                          "MaximumAmount": "5.00"
+                        }
+                      },
+                      {
+                        "FeeCategory": "Card",
+                        "FeeType": "ATMNonSterlingWithdrawal",
+                        "FeeRate": "2.00",
+                        "FeeRateType": "Gross",
+                        "ApplicationFrequency": "PerOccurrence",
+                        "CalculationFrequency": "PerTransactionAmount",
+                        "Notes": [
+                          "Cash withdrawal in foreign currency outside the UK cash fee.\n\nMinimum £1.75, Maximum £5."
+                        ]
+                      }
+                    ]
+                  },
+                  "CoreProduct": {
+                    "ProductURL": "https://www.hsbc.co.uk/current-accounts/products/bank-account/",
+                    "ProductDescription": "Show your money who's boss with our Bank Account. Get everything you need for everyday banking and to keep your finances in check.",
+                    "TcsAndCsURL": "https://www.hsbc.co.uk/content/dam/hsbc/gb/pdf/personal-banking-terms-conditions.pdf",
+                    "SalesAccessChannels": [
+                      "Branch",
+                      "Online",
+                      "CallCentre"
+                    ],
+                    "ServicingAccessChannels": [
+                      "ATM",
+                      "Branch",
+                      "CallCentre",
+                      "MobileBankingApp",
+                      "Online",
+                      "PostOffice"
+                    ],
+                    "MonthlyMaximumCharge": "0.00"
+                  },
+                  "Ucodes": [
+                    {
+                      "CurrentUcode": "UCHIC"
+                    },
+                    {
+                      "CurrentUcode": "UCHIH"
+                    },
+                    {
+                      "CurrentUcode": "UCHIG"
+                    },
+                    {
+                      "CurrentUcode": "UCNII"
+                    },
+                    {
+                      "CurrentUcode": "UCNYO"
+                    }
+                  ]
+                }
+              ],
+              "OnSaleIndicator": true
+            }
+          ],
+          "OnSaleIndicator": true
+        }
+      ]
+    }
+  ]
+}

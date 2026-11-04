@@ -1,0 +1,1209 @@
+{
+  "meta": {
+    "Agreement": "Use of the APIs and any related data will be subject to the terms of the Open Licence and subject to terms and conditions",
+    "License": "https://openbanking.org.uk/open-licence",
+    "TermsOfUse": "https://openbanking.org.uk/terms",
+    "TotalResults": 6,
+    "LastUpdated": "2026-11-04T10:35:31.974Z"
+  },
+  "data": [
+    {
+      "Brand": {
+        "BrandName": "Nationwide Building Society",
+        "PCA": [
+          {
+            "Identification": "FlexAccount",
+            "PCAMarketingState": [
+              {
+                "Overdraft": {
+                  "OverdraftTierBandSet": [
+                    {
+                      "TierBandMethod": "Whole",
+                      "Identification": "Arranged Overdraft",
+                      "OverdraftTierBand": [
+                        {
+                          "TierValueMin": "0",
+                          "TierValueMax": "50",
+                          "Notes": [],
+                          "OverdraftFeesCharges": [
+                            {
+                              "OverdraftFeeChargeDetail": [
+                                {
+                                  "FeeType": "ArrangedOverdraft",
+                                  "FeeAmount": "0",
+                                  "ApplicationFrequency": "Monthly",
+                                  "CalculationFrequency": "Daily",
+                                  "Notes": []
+                                }
+                              ],
+                              "OverdraftFeeChargeCap": []
+                            }
+                          ],
+                          "Identification": "Arranged Overdraft Tier 1",
+                          "OverdraftInterestChargingCoverage": "Tiered"
+                        },
+                        {
+                          "Identification": "Arranged Overdraft Tier 2",
+                          "TierValueMin": "50.01",
+                          "OverdraftInterestChargingCoverage": "Tiered",
+                          "Notes": [],
+                          "OverdraftFeesCharges": [
+                            {
+                              "OverdraftFeeChargeDetail": [
+                                {
+                                  "FeeType": "ArrangedOverdraft",
+                                  "FeeRate": "39.9",
+                                  "FeeRateType": "Gross",
+                                  "ApplicationFrequency": "Monthly",
+                                  "CalculationFrequency": "Daily",
+                                  "Notes": []
+                                }
+                              ],
+                              "OverdraftFeeChargeCap": []
+                            }
+                          ]
+                        }
+                      ],
+                      "OverdraftFeesCharges": [],
+                      "Notes": []
+                    },
+                    {
+                      "TierBandMethod": "Whole",
+                      "Identification": "Unnarranged Overdraft",
+                      "OverdraftTierBand": [
+                        {
+                          "TierValueMin": "0",
+                          "Notes": [],
+                          "OverdraftFeesCharges": []
+                        }
+                      ],
+                      "OverdraftFeesCharges": [
+                        {
+                          "OverdraftFeeChargeDetail": [
+                            {
+                              "ApplicationFrequency": "Monthly",
+                              "FeeType": "UnauthorisedBorrowing",
+                              "CalculationFrequency": "Daily",
+                              "FeeAmount": "0",
+                              "Notes": [
+                                " "
+                              ]
+                            }
+                          ],
+                          "OverdraftFeeChargeCap": []
+                        }
+                      ],
+                      "Notes": [
+                        "Nationwide no longer offers unarranged overdrafts. If you do accidentally exceed your arranged overdraft limit (meaning you won’t be able to use your account until you credit it again), we’ll only charge you for borrowing up to your arranged overdraft limit. So, our Monthly Maximum Charge for unarranged overdraft fees is £0."
+                      ]
+                    }
+                  ],
+                  "Notes": []
+                },
+                "FeaturesAndBenefits": {
+                  "FeatureBenefitItem": [
+                    {
+                      "Type": "Other",
+                      "Identification": "No monthly account fee",
+                      "Notes": [
+                        "No monthly fee just for keeping your account with us."
+                      ],
+                      "Name": "No monthly account fee",
+                      "FeatureBenefitEligibility": []
+                    },
+                    {
+                      "Identification": "Push Alerts",
+                      "Type": "AccountManagement",
+                      "Name": "Push Alerts",
+                      "Textual": "We can send alerts to your mobile to help you manage your account. These will either be sent by Text via your mobile phone network provider or via Push via the internet. ",
+                      "Notes": [],
+                      "FeatureBenefitEligibility": []
+                    }
+                  ],
+                  "Card": [
+                    {
+                      "Type": "DebitCard",
+                      "Scheme": [
+                        "Visa"
+                      ],
+                      "ContactlessIndicator": true,
+                      "Notes": [
+                        "Contactless opt-out available on request"
+                      ]
+                    }
+                  ],
+                  "FeatureBenefitGroup": [],
+                  "MobileWallet": []
+                },
+                "Eligibility": {
+                  "AgeEligibility": {
+                    "MinimumAge": 18
+                  },
+                  "CreditCheck": {
+                    "ScoringType": "Hard"
+                  },
+                  "IDVerificationCheck": {
+                    "URL": "http://www.nationwide.co.uk/support/support-articles/manage-your-account/proving-your-identity"
+                  },
+                  "ResidencyEligibility": [
+                    {
+                      "ResidencyIncluded": [
+                        "UK"
+                      ],
+                      "Notes": [
+                        "You must be UK resident to apply for a Nationwide Current Account"
+                      ]
+                    }
+                  ]
+                },
+                "MarketingState": "Regular",
+                "OtherFeesCharges": {
+                  "FeeChargeDetail": [
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "CHAPSIn",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeCategory": "PaymentScheme",
+                      "FeeAmount": "0",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "CHAPSOut",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeCategory": "PaymentScheme",
+                      "FeeAmount": "15.00",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "TransSWIFTOutNonEEASterling",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeCategory": "International",
+                      "FeeAmount": "15.00",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "TransSWIFTOutUKForeign",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeCategory": "International",
+                      "FeeAmount": "15.00",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "SEPAIn",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeCategory": "PaymentScheme",
+                      "FeeAmount": "0",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "SEPAOut",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeCategory": "PaymentScheme",
+                      "FeeAmount": "0",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerItem",
+                      "FeeType": "ChqStopped",
+                      "CalculationFrequency": "PerItem",
+                      "FeeCategory": "Cheque",
+                      "FeeAmount": "0",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerItem",
+                      "FeeType": "ChqCopy",
+                      "CalculationFrequency": "PerItem",
+                      "FeeCategory": "Cheque",
+                      "FeeAmount": "0",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerItem",
+                      "FeeType": "ReportStatementCopy1",
+                      "CalculationFrequency": "PerItem",
+                      "FeeCategory": "Report",
+                      "FeeAmount": "0",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "DraftsCounter",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeCategory": "BankersDrafts",
+                      "FeeAmount": "0",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "ATMNonSterlingWithdrawal",
+                      "FeeRate": "2.99",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeRateType": "Gross",
+                      "FeeCategory": "Foreign",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "TransPOSSaleForeign",
+                      "FeeRate": "2.99",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeRateType": "Gross",
+                      "FeeCategory": "Foreign",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "ATMAbroad",
+                      "FeeRate": "2.99",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeRateType": "Gross",
+                      "FeeCategory": "Foreign",
+                      "Notes": []
+                    }
+                  ],
+                  "FeeChargeCap": []
+                },
+                "CoreProduct": {
+                  "ServicingAccessChannels": [
+                    "ATM",
+                    "Branch",
+                    "CallCentre",
+                    "MobileBankingApp",
+                    "Online",
+                    "Post",
+                    "PostOffice",
+                    "Text"
+                  ],
+                  "ProductURL": "https://www.nationwide.co.uk/current-accounts/flexaccount/",
+                  "SalesAccessChannels": [
+                    "Branch",
+                    "CallCentre",
+                    "Online"
+                  ],
+                  "MonthlyMaximumCharge": "0",
+                  "TcsAndCsURL": "https://www.nationwide.co.uk/current-accounts/help/terms/"
+                },
+                "Identification": "FlexAccount",
+                "Notes": []
+              }
+            ],
+            "Segment": [
+              "General"
+            ],
+            "Name": "FlexAccount",
+            "undefined": []
+          },
+          {
+            "Identification": "FlexBasic",
+            "PCAMarketingState": [
+              {
+                "FeaturesAndBenefits": {
+                  "FeatureBenefitItem": [
+                    {
+                      "Type": "Other",
+                      "Identification": "No Monthly Fee",
+                      "Notes": [
+                        "With FlexBasic, we don't charge you a monthly fee."
+                      ],
+                      "FeatureBenefitEligibility": []
+                    },
+                    {
+                      "Type": "OverdraftControl",
+                      "Identification": "No arranged overdraft",
+                      "Notes": [
+                        "There is no arranged overdraft on FlexBasic"
+                      ],
+                      "FeatureBenefitEligibility": []
+                    },
+                    {
+                      "Identification": "Push Alerts",
+                      "Type": "AccountManagement",
+                      "Textual": "We can send alerts to your mobile to help you manage your account.  These will either be sent by Text via your mobile phone network provider or via Push via the internet.",
+                      "Notes": [],
+                      "FeatureBenefitEligibility": [],
+                      "Name": "Push Alerts"
+                    }
+                  ],
+                  "Card": [
+                    {
+                      "Type": "DebitCard",
+                      "Scheme": [
+                        "Visa"
+                      ],
+                      "ContactlessIndicator": true,
+                      "Notes": [
+                        "Contactless opt-out available on request"
+                      ]
+                    }
+                  ],
+                  "FeatureBenefitGroup": [],
+                  "MobileWallet": []
+                },
+                "Eligibility": {
+                  "AgeEligibility": {
+                    "MinimumAge": 18,
+                    "Notes": [
+                      "FlexBasic is our basic bank account. It could be for you if you don’t already have a UK bank account, or you aren't eligible for our other accounts. This may be because you have financial difficulties or a limited credit history."
+                    ]
+                  },
+                  "CreditCheck": {
+                    "ScoringType": "Hard",
+                    "Notes": []
+                  },
+                  "IDVerificationCheck": {
+                    "URL": "http://www.nationwide.co.uk/support/support-articles/manage-your-account/proving-your-identity",
+                    "Notes": []
+                  },
+                  "ResidencyEligibility": [
+                    {
+                      "ResidencyIncluded": [
+                        "UK"
+                      ],
+                      "Notes": [
+                        "You must be UK resident to apply for a Nationwide Current Account"
+                      ]
+                    }
+                  ]
+                },
+                "MarketingState": "Regular",
+                "OtherFeesCharges": {
+                  "FeeChargeDetail": [
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "CHAPSIn",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeCategory": "PaymentScheme",
+                      "FeeAmount": "0",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "CHAPSOut",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeCategory": "PaymentScheme",
+                      "FeeAmount": "0",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "TransSWIFTOutNonEEASterling",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeCategory": "International",
+                      "FeeAmount": "15.00",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "TransSWIFTOutUKForeign",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeCategory": "International",
+                      "Notes": [
+                        "UK Pounds to countries within the EEA is 0"
+                      ],
+                      "FeeAmount": "15.00"
+                    },
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "SEPAIn",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeCategory": "PaymentScheme",
+                      "FeeAmount": "0",
+                      "Notes": [
+                        "UK Pounds to countries within the EEA is 0"
+                      ]
+                    },
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "SEPAOut",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeCategory": "PaymentScheme",
+                      "FeeAmount": "0",
+                      "Notes": [
+                        "UK Pounds to countries within the EEA is 0"
+                      ]
+                    },
+                    {
+                      "ApplicationFrequency": "PerItem",
+                      "FeeType": "ChqStopped",
+                      "CalculationFrequency": "PerItem",
+                      "FeeCategory": "Cheque",
+                      "FeeAmount": "0",
+                      "Notes": [
+                        "UK Pounds to countries within the EEA is 0"
+                      ]
+                    },
+                    {
+                      "ApplicationFrequency": "PerItem",
+                      "FeeType": "ChqCopy",
+                      "CalculationFrequency": "PerItem",
+                      "FeeCategory": "Cheque",
+                      "FeeAmount": "0",
+                      "Notes": [
+                        "UK Pounds to countries within the EEA is 0"
+                      ]
+                    },
+                    {
+                      "ApplicationFrequency": "PerItem",
+                      "FeeType": "ReportStatementCopy1",
+                      "CalculationFrequency": "PerItem",
+                      "FeeCategory": "Report",
+                      "FeeAmount": "0",
+                      "Notes": [
+                        "UK Pounds to countries within the EEA is 0"
+                      ]
+                    },
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "DraftsCounter",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeCategory": "BankersDrafts",
+                      "FeeAmount": "0",
+                      "Notes": [
+                        "UK Pounds to countries within the EEA is 0"
+                      ]
+                    },
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "ATMNonSterlingWithdrawal",
+                      "FeeRate": "2.99",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeRateType": "Gross",
+                      "FeeCategory": "Foreign",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "TransPOSSaleForeign",
+                      "FeeRate": "2.99",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeRateType": "Gross",
+                      "FeeCategory": "Foreign",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "ATMAbroad",
+                      "FeeRate": "2.99",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeRateType": "Gross",
+                      "FeeCategory": "Foreign",
+                      "Notes": []
+                    }
+                  ],
+                  "FeeChargeCap": []
+                },
+                "CoreProduct": {
+                  "ServicingAccessChannels": [
+                    "ATM",
+                    "Branch",
+                    "CallCentre",
+                    "MobileBankingApp",
+                    "Online",
+                    "Post",
+                    "PostOffice",
+                    "Text"
+                  ],
+                  "ProductURL": "https://www.nationwide.co.uk/current-accounts/flexbasic/",
+                  "SalesAccessChannels": [
+                    "Branch",
+                    "CallCentre",
+                    "Online"
+                  ],
+                  "MonthlyMaximumCharge": "0.00",
+                  "TcsAndCsURL": "https://www.nationwide.co.uk/current-accounts/help/terms/"
+                },
+                "Identification": "FlexBasic",
+                "Notes": []
+              }
+            ],
+            "Segment": [
+              "General"
+            ],
+            "Name": "FlexBasic",
+            "undefined": []
+          },
+          {
+            "Identification": "FlexDirect",
+            "PCAMarketingState": [
+              {
+                "Overdraft": {
+                  "OverdraftTierBandSet": [
+                    {
+                      "TierBandMethod": "Whole",
+                      "Identification": "Arranged Overdraft",
+                      "OverdraftTierBand": [
+                        {
+                          "TierValueMin": "0",
+                          "Notes": [],
+                          "OverdraftFeesCharges": [
+                            {
+                              "OverdraftFeeChargeDetail": [
+                                {
+                                  "FeeType": "ArrangedOverdraft",
+                                  "FeeAmount": "0",
+                                  "ApplicationFrequency": "Monthly",
+                                  "CalculationFrequency": "Daily",
+                                  "Notes": []
+                                }
+                              ],
+                              "OverdraftFeeChargeCap": []
+                            }
+                          ],
+                          "Identification": "Arranged Overdraft Tier 1",
+                          "TierValueMax": "50",
+                          "OverdraftInterestChargingCoverage": "Tiered"
+                        },
+                        {
+                          "Identification": "Arranged Overdraft Tier 2",
+                          "TierValueMin": "50.01",
+                          "OverdraftInterestChargingCoverage": "Tiered",
+                          "Notes": [],
+                          "OverdraftFeesCharges": [
+                            {
+                              "OverdraftFeeChargeDetail": [
+                                {
+                                  "FeeType": "ArrangedOverdraft",
+                                  "FeeRate": "39.9",
+                                  "FeeRateType": "Gross",
+                                  "ApplicationFrequency": "Monthly",
+                                  "CalculationFrequency": "Daily",
+                                  "Notes": []
+                                }
+                              ],
+                              "OverdraftFeeChargeCap": []
+                            }
+                          ]
+                        }
+                      ],
+                      "OverdraftFeesCharges": [],
+                      "Notes": []
+                    },
+                    {
+                      "TierBandMethod": "Whole",
+                      "Identification": "Unnarranged Overdraft",
+                      "OverdraftTierBand": [
+                        {
+                          "TierValueMin": "0",
+                          "Notes": [],
+                          "OverdraftFeesCharges": []
+                        }
+                      ],
+                      "OverdraftFeesCharges": [
+                        {
+                          "OverdraftFeeChargeDetail": [
+                            {
+                              "ApplicationFrequency": "Monthly",
+                              "FeeType": "UnauthorisedBorrowing",
+                              "CalculationFrequency": "Daily",
+                              "FeeAmount": "0",
+                              "Notes": [
+                                " "
+                              ]
+                            }
+                          ],
+                          "OverdraftFeeChargeCap": []
+                        }
+                      ],
+                      "Notes": [
+                        "Nationwide no longer offers unarranged overdrafts. If you do accidentally exceed your arranged overdraft limit (meaning you won’t be able to use your account until you credit it again), we’ll only charge you for borrowing up to your arranged overdraft limit. So, our Monthly Maximum Charge for unarranged overdraft fees is £0."
+                      ]
+                    }
+                  ],
+                  "Notes": []
+                },
+                "FeaturesAndBenefits": {
+                  "Card": [
+                    {
+                      "Type": "DebitCard",
+                      "Scheme": [
+                        "Visa"
+                      ],
+                      "ContactlessIndicator": true,
+                      "Notes": [
+                        "Contactless opt-out available on request"
+                      ]
+                    }
+                  ],
+                  "FeatureBenefitGroup": [],
+                  "FeatureBenefitItem": [
+                    {
+                      "Identification": "Push Alerts",
+                      "Type": "AccountManagement",
+                      "Textual": "We can send alerts to your mobile to help you manage your account.  These will either be sent by Text via your mobile phone network provider or via Push via the internet.",
+                      "Notes": [],
+                      "FeatureBenefitEligibility": [],
+                      "Name": "Push Alerts"
+                    }
+                  ],
+                  "MobileWallet": []
+                },
+                "PredecessorID": "FlexDirect 1st 12 months",
+                "Eligibility": {
+                  "AgeEligibility": {
+                    "MinimumAge": 18,
+                    "Notes": []
+                  },
+                  "CreditCheck": {
+                    "ScoringType": "Hard",
+                    "Notes": []
+                  },
+                  "IDVerificationCheck": {
+                    "URL": "http://www.nationwide.co.uk/support/support-articles/manage-your-account/proving-your-identity",
+                    "Notes": []
+                  },
+                  "ResidencyEligibility": [
+                    {
+                      "ResidencyIncluded": [
+                        "UK"
+                      ],
+                      "Notes": [
+                        "You must be UK resident to apply for a Nationwide Current Account"
+                      ]
+                    }
+                  ]
+                },
+                "LastMarketedDate": "2099-12-31",
+                "MarketingState": "Regular",
+                "OtherFeesCharges": {
+                  "FeeChargeDetail": [
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "CHAPSIn",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeCategory": "PaymentScheme",
+                      "FeeAmount": "0",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "CHAPSOut",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeCategory": "PaymentScheme",
+                      "FeeAmount": "15.00",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "TransSWIFTOutNonEEASterling",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeCategory": "International",
+                      "FeeAmount": "15.00",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "TransSWIFTOutUKForeign",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeCategory": "International",
+                      "FeeAmount": "15.00",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "SEPAIn",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeCategory": "PaymentScheme",
+                      "FeeAmount": "0",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "SEPAOut",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeCategory": "PaymentScheme",
+                      "FeeAmount": "0",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerItem",
+                      "FeeType": "ChqStopped",
+                      "CalculationFrequency": "PerItem",
+                      "FeeCategory": "Cheque",
+                      "FeeAmount": "0",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerItem",
+                      "FeeType": "ChqCopy",
+                      "CalculationFrequency": "PerItem",
+                      "FeeCategory": "Cheque",
+                      "FeeAmount": "0",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerItem",
+                      "FeeType": "ReportStatementCopy1",
+                      "CalculationFrequency": "PerItem",
+                      "FeeCategory": "Report",
+                      "FeeAmount": "0",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "DraftsCounter",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeCategory": "BankersDrafts",
+                      "FeeAmount": "0",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "ATMNonSterlingWithdrawal",
+                      "FeeRate": "2.99",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeRateType": "Gross",
+                      "FeeCategory": "Foreign",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "TransPOSSaleForeign",
+                      "FeeRate": "2.99",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeRateType": "Gross",
+                      "FeeCategory": "Foreign",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "ATMAbroad",
+                      "FeeRate": "2.99",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeRateType": "Gross",
+                      "FeeCategory": "Foreign",
+                      "Notes": []
+                    }
+                  ],
+                  "FeeChargeCap": []
+                },
+                "CoreProduct": {
+                  "ServicingAccessChannels": [
+                    "ATM",
+                    "Branch",
+                    "CallCentre",
+                    "Post",
+                    "MobileBankingApp",
+                    "Online",
+                    "PostOffice",
+                    "Text"
+                  ],
+                  "ProductURL": "https://www.nationwide.co.uk/current-accounts/flexdirect/",
+                  "SalesAccessChannels": [
+                    "Branch",
+                    "CallCentre",
+                    "Online"
+                  ],
+                  "MonthlyMaximumCharge": "0.00",
+                  "TcsAndCsURL": "https://www.nationwide.co.uk/current-accounts/help/terms/"
+                },
+                "Identification": "FlexDirect",
+                "FirstMarketedDate": "2023-07-01",
+                "CreditInterest": {
+                  "TierBandSet": [
+                    {
+                      "TierBandMethod": "Tiered",
+                      "CalculationMethod": "Compound",
+                      "CreditInterestEligibility": [
+                        {
+                          "Type": "MinimumDeposit",
+                          "Description": "The standard interest rate is paid when you pay in at least £1,000 per month. Money you transfer from another Nationwide account doesn’t count towards the minimum monthly payment. Visa credit payments, including any refunds you may get, also don’t count.\n",
+                          "Amount": "1000.00",
+                          "Period": "Month",
+                          "Name": "Minimum Deposit",
+                          "Notes": [
+                            " "
+                          ]
+                        }
+                      ],
+                      "TierBand": [
+                        {
+                          "FixedVariableInterestRateType": "Variable",
+                          "TierValueMinimum": "0.01",
+                          "ApplicationFrequency": "Monthly",
+                          "TierValueMaximum": "1500.00",
+                          "CalculationFrequency": "Daily",
+                          "Identification": "Variable Rate",
+                          "AER": "1.00",
+                          "Notes": [
+                            "The rate of 1.00% AER applies after the end of the 12 month introductory period"
+                          ]
+                        },
+                        {
+                          "FixedVariableInterestRateType": "Variable",
+                          "TierValueMinimum": "1500.01",
+                          "ApplicationFrequency": "Monthly",
+                          "CalculationFrequency": "Daily",
+                          "Identification": "Variable Rate",
+                          "AER": "0",
+                          "Notes": []
+                        }
+                      ],
+                      "Notes": []
+                    }
+                  ]
+                },
+                "Notes": []
+              },
+              {
+                "StateTenurePeriod": "Month",
+                "FeaturesAndBenefits": {
+                  "Card": [
+                    {
+                      "Type": "DebitCard",
+                      "Scheme": [
+                        "Visa"
+                      ],
+                      "ContactlessIndicator": true,
+                      "Notes": [
+                        "Contactless opt-out available on request"
+                      ]
+                    }
+                  ],
+                  "FeatureBenefitGroup": [],
+                  "FeatureBenefitItem": [
+                    {
+                      "Type": "Cashback",
+                      "Textual": "Earn £5.00 cashback each month on debit card spend",
+                      "Notes": [
+                        "Earn £5.00 cashback each month, when you hit at least £500 of qualifying spend made using your FlexDirect debit card. "
+                      ],
+                      "FeatureBenefitEligibility": [
+                        {
+                          "Name": "Minimum Monthly Deposit",
+                          "Type": "MinimumDeposit",
+                          "Textual": "You’ll need to pay in at least £1,000 each month to get the 12-month interest and cashback offers",
+                          "Notes": []
+                        }
+                      ],
+                      "Name": "Debit Card Cashback"
+                    },
+                    {
+                      "Type": "AccountManagement",
+                      "Name": "Push Alerts",
+                      "Textual": "We can send alerts to your mobile to help you manage your account.  These will either be sent by Text via your mobile phone network provider or via Push via the internet.",
+                      "Notes": [],
+                      "FeatureBenefitEligibility": [],
+                      "Identification": "Push Alerts"
+                    },
+                    {
+                      "Type": "Cashback",
+                      "Name": "Direct Debit Cashback",
+                      "Textual": "Earn £5.00 cashback each month on direct debit spend",
+                      "Notes": [
+                        "Earn £5.00 cashback each month, when you hit at least £300 of qualifying Direct Debit spend made from your FlexDirect account."
+                      ],
+                      "FeatureBenefitEligibility": []
+                    }
+                  ],
+                  "MobileWallet": []
+                },
+                "Eligibility": {
+                  "AgeEligibility": {
+                    "MinimumAge": 18,
+                    "Notes": []
+                  },
+                  "CreditCheck": {
+                    "ScoringType": "Hard",
+                    "Notes": []
+                  },
+                  "IDVerificationCheck": {
+                    "URL": "http://www.nationwide.co.uk/support/support-articles/manage-your-account/proving-your-identity",
+                    "Notes": []
+                  },
+                  "ResidencyEligibility": [
+                    {
+                      "ResidencyIncluded": [
+                        "UK"
+                      ],
+                      "Notes": [
+                        "You must be UK resident to apply for a Nationwide Current Account"
+                      ]
+                    }
+                  ]
+                },
+                "LastMarketedDate": "2099-12-31",
+                "OtherFeesCharges": {
+                  "FeeChargeDetail": [
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "CHAPSIn",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeCategory": "PaymentScheme",
+                      "FeeAmount": "0",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "CHAPSOut",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeCategory": "PaymentScheme",
+                      "FeeAmount": "15.00",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "TransSWIFTOutNonEEASterling",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeCategory": "International",
+                      "FeeAmount": "15.00",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "TransSWIFTOutUKForeign",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeCategory": "International",
+                      "FeeAmount": "15.00",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "SEPAIn",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeCategory": "PaymentScheme",
+                      "FeeAmount": "0",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "SEPAOut",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeCategory": "PaymentScheme",
+                      "FeeAmount": "0",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerItem",
+                      "FeeType": "ChqStopped",
+                      "CalculationFrequency": "PerItem",
+                      "FeeCategory": "Cheque",
+                      "FeeAmount": "0",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerItem",
+                      "FeeType": "ChqCopy",
+                      "CalculationFrequency": "PerItem",
+                      "FeeCategory": "Cheque",
+                      "FeeAmount": "0",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerItem",
+                      "FeeType": "ReportStatementCopy1",
+                      "CalculationFrequency": "PerItem",
+                      "FeeCategory": "Report",
+                      "FeeAmount": "0",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "DraftsCounter",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeCategory": "BankersDrafts",
+                      "FeeAmount": "0",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "ATMNonSterlingWithdrawal",
+                      "FeeRate": "2.99",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeRateType": "Gross",
+                      "FeeCategory": "Foreign",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "TransPOSSaleForeign",
+                      "FeeRate": "2.99",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeRateType": "Gross",
+                      "FeeCategory": "Foreign",
+                      "Notes": []
+                    },
+                    {
+                      "ApplicationFrequency": "PerTransaction",
+                      "FeeType": "ATMAbroad",
+                      "FeeRate": "2.99",
+                      "CalculationFrequency": "PerTransaction",
+                      "FeeRateType": "Gross",
+                      "FeeCategory": "Foreign",
+                      "Notes": []
+                    }
+                  ],
+                  "FeeChargeCap": []
+                },
+                "Identification": "FlexDirect 1st 12 months",
+                "StateTenureLength": 12,
+                "CreditInterest": {
+                  "TierBandSet": [
+                    {
+                      "TierBandMethod": "Tiered",
+                      "CalculationMethod": "Compound",
+                      "CreditInterestEligibility": [
+                        {
+                          "Type": "MinimumDeposit",
+                          "Description": "You need to pay at least £1,500 each month into your FlexDirect account. Money you transfer from other Nationwide accounts or Visa credits from payments made with your card, including refunds, don’t count.",
+                          "Amount": "1500.00",
+                          "Period": "Month",
+                          "Name": "Minimum Deposit",
+                          "Notes": [
+                            " "
+                          ]
+                        }
+                      ],
+                      "TierBand": [
+                        {
+                          "FixedVariableInterestRateType": "Fixed",
+                          "TierValueMinimum": "0.01",
+                          "ApplicationFrequency": "Monthly",
+                          "TierValueMaximum": "1500.00",
+                          "CalculationFrequency": "Daily",
+                          "Identification": "Fixed Rate",
+                          "AER": "5.00",
+                          "Notes": [
+                            "New business will qualify for a promo rate of 5.00% AER capped up to £1,500, reverting after 12 months to 1.00%. Existing customers will also be on a rate of 1.00% AER."
+                          ]
+                        },
+                        {
+                          "FixedVariableInterestRateType": "Variable",
+                          "TierValueMinimum": "1500.01",
+                          "ApplicationFrequency": "Monthly",
+                          "CalculationFrequency": "Daily",
+                          "Identification": "Variable Rate",
+                          "AER": "0",
+                          "Notes": []
+                        }
+                      ],
+                      "Notes": []
+                    }
+                  ]
+                },
+                "Overdraft": {
+                  "OverdraftTierBandSet": [
+                    {
+                      "TierBandMethod": "Whole",
+                      "Identification": "Arranged Overdraft",
+                      "OverdraftTierBand": [
+                        {
+                          "TierValueMin": "0",
+                          "Notes": [],
+                          "OverdraftFeesCharges": [
+                            {
+                              "OverdraftFeeChargeDetail": [
+                                {
+                                  "FeeType": "ArrangedOverdraft",
+                                  "FeeAmount": "0",
+                                  "ApplicationFrequency": "Monthly",
+                                  "CalculationFrequency": "Daily",
+                                  "Notes": []
+                                }
+                              ],
+                              "OverdraftFeeChargeCap": []
+                            }
+                          ],
+                          "Identification": "Arranged Overdraft Tier 1",
+                          "TierValueMax": "50",
+                          "OverdraftInterestChargingCoverage": "Tiered"
+                        },
+                        {
+                          "Identification": "Arranged Overdraft Tier 2",
+                          "TierValueMin": "50.01",
+                          "OverdraftInterestChargingCoverage": "Tiered",
+                          "Notes": [],
+                          "OverdraftFeesCharges": [
+                            {
+                              "OverdraftFeeChargeDetail": [
+                                {
+                                  "FeeType": "ArrangedOverdraft",
+                                  "FeeRate": "39.9",
+                                  "FeeRateType": "Gross",
+                                  "ApplicationFrequency": "Monthly",
+                                  "CalculationFrequency": "Daily",
+                                  "Notes": []
+                                }
+                              ],
+                              "OverdraftFeeChargeCap": []
+                            }
+                          ]
+                        }
+                      ],
+                      "OverdraftFeesCharges": [],
+                      "Notes": []
+                    },
+                    {
+                      "TierBandMethod": "Whole",
+                      "Identification": "Unarranged Overdraft",
+                      "OverdraftTierBand": [
+                        {
+                          "TierValueMin": "0",
+                          "Notes": [],
+                          "OverdraftFeesCharges": []
+                        }
+                      ],
+                      "OverdraftFeesCharges": [
+                        {
+                          "OverdraftFeeChargeDetail": [
+                            {
+                              "FeeType": "UnauthorisedBorrowing",
+                              "FeeRate": "0",
+                              "ApplicationFrequency": "Monthly",
+                              "CalculationFrequency": "Daily",
+                              "Notes": []
+                            }
+                          ],
+                          "OverdraftFeeChargeCap": []
+                        }
+                      ],
+                      "Notes": [
+                        "Nationwide no longer offers unarranged overdrafts. If you do accidentally exceed your arranged overdraft limit (meaning you won’t be able to use your account until you credit it again), we’ll only charge you for borrowing up to your arranged overdraft limit. So, our Monthly Maximum Charge for unarranged overdraft fees is £0"
+                      ]
+                    }
+                  ],
+                  "Notes": []
+                },
+                "MarketingState": "Promotional",
+                "CoreProduct": {
+                  "ServicingAccessChannels": [
+                    "ATM",
+                    "Branch",
+                    "CallCentre",
+                    "Post",
+                    "MobileBankingApp",
+                    "Online",
+                    "PostOffice",
+                    "Text"
+                  ],
+                  "ProductURL": "https://www.nationwide.co.uk/current-accounts/flexdirect/",
+                  "SalesAccessChannels": [
+                    "Branch",
+                    "CallCentre",
+                    "Online"
+                  ],
+                  "MonthlyMaximumCharge": "0.00",
+                  "TcsAndCsURL": "https://www.nationwide.co.uk/current-accounts/help/terms/"
+                },
+                "Notes": [
+                  "You won’t get this offer if you’ve had a FlexDirect account in the last 3 years, unless: You’re opening a sole account and previously only had a joint account; or You’re opening a joint account and the person you’re opening the account with is different to anyone you’ve had a FlexDirect joint account with before."
+                ],
+                "FirstMarketedDate": "2024-09-25"
+              }
+            ],
+            "Segment": [
+              "General"
+            ],
+            "Name": "FlexDirect",
+            "undefined": []
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,365 @@
+{
+  "meta": {
+    "LastUpdated": "2026-11-04T13:24:13+0000",
+    "TotalResults": 665,
+    "Agreement": "Use of the APIs and any related data will be subject to the terms of the Open Licence and subject to terms and conditions",
+    "License": "https://www.openbanking.org.uk/open-licence",
+    "TermsOfUse": "https://www.openbanking.org.uk/terms"
+  },
+  "data": [
+    {
+      "Brand": [
+        {
+          "BrandName": "Barclays UK",
+          "Branch": [
+            {
+              "Identification": "20031851",
+              "SequenceNumber": "0",
+              "Name": "Barclays Bank",
+              "Type": "Physical",
+              "Photo": "http://www.barclays.co.uk/branchImages/content/dam/branchfinder/flex-images/Local Generic Image.jpg",
+              "CustomerSegment": [
+                "Private",
+                "SME",
+                "Premier",
+                "Select",
+                "Wealth",
+                "Corporate",
+                "Business",
+                "Personal"
+              ],
+              "Accessibility": [
+                "WheelchairAccess",
+                "InductionLoop"
+              ],
+              "Availability": {
+                "StandardAvailability": {
+                  "Day": [
+                    {
+                      "Name": "Monday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "00:00",
+                          "ClosingTime": "00:00"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Tuesday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "16:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Wednesday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "00:00",
+                          "ClosingTime": "00:00"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Thursday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "16:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Friday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "16:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Saturday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "00:00",
+                          "ClosingTime": "00:00"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Sunday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "00:00",
+                          "ClosingTime": "00:00"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "ContactInfo": [
+                {
+                  "ContactContent": "+44-3457345345",
+                  "ContactDescription": "Phone"
+                }
+              ],
+              "PostalAddress": {
+                "AddressLine": [
+                  "Leighton Buzzard Library Theatre"
+                ],
+                "BuildingNumber": "Barclays Bank",
+                "StreetName": "Local - Leighton Buzzard",
+                "TownName": "Lake Street, Leighton Buzzard",
+                "CountrySubDivision": [
+                  "Bedfordshire"
+                ],
+                "Country": "UK",
+                "PostCode": "LU7 1RX",
+                "GeoLocation": {
+                  "GeographicCoordinates": {
+                    "Latitude": "51.91501320",
+                    "Longitude": "-0.65907430"
+                  }
+                }
+              }
+            },
+            {
+              "Identification": "20057452",
+              "SequenceNumber": "0",
+              "Name": "Barclays Bank",
+              "Type": "Physical",
+              "Photo": "http://www.barclays.co.uk/branchImages/content/dam/branchfinder/flex-images/local-a-h/Biggleswade.jpg",
+              "CustomerSegment": [
+                "Private",
+                "SME",
+                "Premier",
+                "Select",
+                "Wealth",
+                "Corporate",
+                "Business",
+                "Personal"
+              ],
+              "Accessibility": [
+                "WheelchairAccess",
+                "InductionLoop"
+              ],
+              "Availability": {
+                "StandardAvailability": {
+                  "Day": [
+                    {
+                      "Name": "Monday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "00:00",
+                          "ClosingTime": "00:00"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Tuesday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "16:00"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Wednesday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "16:00"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Thursday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "16:00"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Friday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "00:00",
+                          "ClosingTime": "00:00"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Saturday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "00:00",
+                          "ClosingTime": "00:00"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Sunday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "00:00",
+                          "ClosingTime": "00:00"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "ContactInfo": [
+                {
+                  "ContactContent": "+44-3457345345",
+                  "ContactDescription": "Phone"
+                }
+              ],
+              "PostalAddress": {
+                "AddressLine": [
+                  "The Library, Chestnut Avenue"
+                ],
+                "BuildingNumber": "Barclays Bank",
+                "StreetName": "Local - Biggleswade",
+                "TownName": "Biggleswade",
+                "CountrySubDivision": [
+                  "Bedfordshire"
+                ],
+                "Country": "UK",
+                "PostCode": "SG18 0LL",
+                "GeoLocation": {
+                  "GeographicCoordinates": {
+                    "Latitude": "52.08779860",
+                    "Longitude": "-0.25938720"
+                  }
+                }
+              }
+            },
+            {
+              "Identification": "20057453",
+              "SequenceNumber": "0",
+              "Name": "Barclays Bank",
+              "Type": "Physical",
+              "Photo": "http://www.barclays.co.uk/branchImages/content/dam/branchfinder/flex-images/Local Generic Image.jpg",
+              "CustomerSegment": [
+                "Private",
+                "SME",
+                "Premier",
+                "Select",
+                "Wealth",
+                "Corporate",
+                "Business",
+                "Personal"
+              ],
+              "Accessibility": [
+                "WheelchairAccess",
+                "InductionLoop"
+              ],
+              "Availability": {
+                "StandardAvailability": {
+                  "Day": [
+                    {
+                      "Name": "Monday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "14:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Tuesday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "00:00",
+                          "ClosingTime": "00:00"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Wednesday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "00:00",
+                          "ClosingTime": "00:00"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Thursday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "14:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Friday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "14:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Saturday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "00:00",
+                          "ClosingTime": "00:00"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Sunday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "00:00",
+                          "ClosingTime": "00:00"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "ContactInfo": [
+                {
+                  "ContactContent": "+44-3457345345",
+                  "ContactDescription": "Phone"
+                }
+              ],
+              "PostalAddress": {
+                "AddressLine": [
+                  "The Rufus Centre, Steppingley Road"
+                ],
+                "BuildingNumber": "Barclays Bank",
+                "StreetName": "Local - Flitwick",
+                "TownName": "Flitwick",
+                "CountrySubDivision": [
+                  "Bedfordshire"
+                ],
+                "Country": "UK",
+                "PostCode": "MK45 1AH",
+                "GeoLocation": {
+                  "GeographicCoordinates": {
+                    "Latitude": "52.01003720",
+                    "Longitude": "-0.51042970"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

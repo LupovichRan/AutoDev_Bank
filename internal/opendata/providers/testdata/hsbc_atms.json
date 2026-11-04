@@ -1,0 +1,222 @@
+{
+  "meta": {
+    "LastUpdated": "2026-10-14T11:57:27.380Z",
+    "TotalResults": 1231,
+    "Agreement": "Use of the APIs and any related data will be subject to the terms of the Open Licence and subject to terms and conditions",
+    "License": "https://www.openbanking.org.uk/open-licence",
+    "TermsOfUse": "https://www.openbanking.org.uk/terms"
+  },
+  "data": [
+    {
+      "Brand": [
+        {
+          "BrandName": "HSBC UK",
+          "ATM": [
+            {
+              "Identification": "A23A1664",
+              "SupportedLanguages": [
+                "en",
+                "fr",
+                "es",
+                "de"
+              ],
+              "ATMServices": [
+                "CashWithdrawal",
+                "PINChange",
+                "PINActivation",
+                "PINUnblock",
+                "Balance",
+                "MiniStatement"
+              ],
+              "SupportedCurrencies": [
+                "GBP"
+              ],
+              "Branch": {
+                "Identification": "402411"
+              },
+              "Location": {
+                "Site": {
+                  "Name": "HEREFORD"
+                },
+                "PostalAddress": {
+                  "StreetName": "35 High Town",
+                  "TownName": "HEREFORD",
+                  "Country": "GB",
+                  "PostCode": "HR1 2AQ",
+                  "GeoLocation": {
+                    "GeographicCoordinates": {
+                      "Latitude": "52.056561",
+                      "Longitude": "-2.716771"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "Identification": "A24A0156",
+              "SupportedLanguages": [
+                "en",
+                "fr",
+                "es",
+                "de",
+                "cy"
+              ],
+              "ATMServices": [
+                "CashWithdrawal",
+                "PINChange",
+                "PINActivation",
+                "PINUnblock",
+                "Balance",
+                "MiniStatement"
+              ],
+              "SupportedCurrencies": [
+                "GBP"
+              ],
+              "Branch": {
+                "Identification": "401623"
+              },
+              "Location": {
+                "Site": {
+                  "Name": "CARMARTHEN"
+                },
+                "PostalAddress": {
+                  "StreetName": "15 Lammas Street",
+                  "TownName": "Carmarthen",
+                  "Country": "GB",
+                  "PostCode": "SA31 3AQ",
+                  "GeoLocation": {
+                    "GeographicCoordinates": {
+                      "Latitude": "51.856697",
+                      "Longitude": "-4.310111"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "Identification": "A24A0166",
+              "SupportedLanguages": [
+                "en",
+                "fr",
+                "es",
+                "de"
+              ],
+              "ATMServices": [
+                "CashWithdrawal",
+                "PINChange",
+                "PINActivation",
+                "PINUnblock",
+                "Balance",
+                "MiniStatement"
+              ],
+              "SupportedCurrencies": [
+                "GBP"
+              ],
+              "Branch": {
+                "Identification": "400437"
+              },
+              "Location": {
+                "Site": {
+                  "Name": "MUSWELL HILL"
+                },
+                "PostalAddress": {
+                  "StreetName": "88 The Broadway",
+                  "TownName": "Muswell Hill",
+                  "Country": "GB",
+                  "PostCode": "N10 3RX",
+                  "GeoLocation": {
+                    "GeographicCoordinates": {
+                      "Latitude": "51.590001",
+                      "Longitude": "-0.143975"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "Identification": "A24A0203",
+              "SupportedLanguages": [
+                "en",
+                "fr",
+                "es",
+                "de"
+              ],
+              "ATMServices": [
+                "CashWithdrawal",
+                "PINChange",
+                "PINActivation",
+                "PINUnblock",
+                "Balance",
+                "MiniStatement"
+              ],
+              "SupportedCurrencies": [
+                "GBP"
+              ],
+              "Branch": {
+                "Identification": "400526"
+              },
+              "Location": {
+                "Site": {
+                  "Name": " 79 PICCADILLY"
+                },
+                "PostalAddress": {
+                  "StreetName": "79 Piccadilly",
+                  "TownName": "London",
+                  "Country": "GB",
+                  "PostCode": "W1J 8EU",
+                  "GeoLocation": {
+                    "GeographicCoordinates": {
+                      "Latitude": "51.506771",
+                      "Longitude": "-0.143198"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "Identification": "A24A0254",
+              "SupportedLanguages": [
+                "en",
+                "fr",
+                "es",
+                "de",
+                "cy"
+              ],
+              "ATMServices": [
+                "CashWithdrawal",
+                "PINChange",
+                "PINActivation",
+                "PINUnblock",
+                "Balance",
+                "MiniStatement"
+              ],
+              "SupportedCurrencies": [
+                "GBP"
+              ],
+              "Branch": {
+                "Identification": "401602"
+              },
+              "Location": {
+                "Site": {
+                  "Name": "CAERNARFON"
+                },
+                "PostalAddress": {
+                  "StreetName": "24 Castle Square",
+                  "TownName": "Caernarfon",
+                  "Country": "GB",
+                  "PostCode": "LL55 2NB",
+                  "GeoLocation": {
+                    "GeographicCoordinates": {
+                      "Latitude": "53.139359",
+                      "Longitude": "-4.273848"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

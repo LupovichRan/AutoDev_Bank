@@ -1,0 +1,365 @@
+{
+  "meta": {
+    "LastUpdated": "2026-11-04T12:44:31.209Z",
+    "TotalResults": 327,
+    "Agreement": "Use of the APIs and any related data will be subject to the terms of the Open Licence and subject to terms and conditions",
+    "License": "https://www.openbanking.org.uk/open-licence",
+    "TermsOfUse": "https://www.openbanking.org.uk/terms"
+  },
+  "data": [
+    {
+      "Brand": [
+        {
+          "BrandName": "HSBC UK",
+          "Branch": [
+            {
+              "Identification": "400125",
+              "SequenceNumber": "0",
+              "Name": "Aberdeen - Counter Service Available (Monday-Friday)",
+              "Type": "Physical",
+              "SortCode": [
+                "40-01-25"
+              ],
+              "CustomerSegment": [
+                "Business",
+                "Corporate",
+                "Personal",
+                "Premier",
+                "Private",
+                "Select",
+                "SME",
+                "Wealth"
+              ],
+              "ServiceAndFacility": [
+                "CounterServices",
+                "ExternalATM",
+                "InternalATM",
+                "WiFi",
+                "BureauDeChange",
+                "LodgementDevice",
+                "OnDemandCurrency",
+                "StatementPrinter",
+                "OnlineBankingPoint",
+                "MeetingRooms",
+                "SelfServiceAccountOpening"
+              ],
+              "Accessibility": [
+                "WheelchairAccess",
+                "AudioCashMachine",
+                "AutomaticDoors",
+                "InductionLoop",
+                "LevelAccess"
+              ],
+              "Availability": {
+                "StandardAvailability": {
+                  "Day": [
+                    {
+                      "Name": "Monday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "16:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Tuesday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "16:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Wednesday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "16:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Thursday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "16:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Friday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "16:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Saturday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "13:00"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "ContactInfo": [
+                {
+                  "ContactType": "Phone",
+                  "ContactContent": "03457 404 404"
+                }
+              ],
+              "PostalAddress": {
+                "BuildingNumber": "95-99 ",
+                "StreetName": "Union Street",
+                "TownName": "Aberdeen",
+                "CountrySubDivision": [
+                  "Scotland"
+                ],
+                "Country": "GB",
+                "PostCode": "AB11 6BD",
+                "GeoLocation": {
+                  "GeographicCoordinates": {
+                    "Latitude": "57.146605",
+                    "Longitude": "-2.098131"
+                  }
+                }
+              }
+            },
+            {
+              "Identification": "400809",
+              "SequenceNumber": "0",
+              "Name": "Aberystwyth - Counter Service Available (Monday-Friday)",
+              "Type": "Physical",
+              "SortCode": [
+                "40-08-09"
+              ],
+              "CustomerSegment": [
+                "Business",
+                "Corporate",
+                "Personal",
+                "Premier",
+                "Private",
+                "Select",
+                "SME",
+                "Wealth"
+              ],
+              "ServiceAndFacility": [
+                "CounterServices",
+                "InternalATM",
+                "WiFi",
+                "BureauDeChange",
+                "LodgementDevice",
+                "OnDemandCurrency",
+                "StatementPrinter",
+                "OnlineBankingPoint",
+                "MeetingRooms",
+                "SelfServiceAccountOpening"
+              ],
+              "Accessibility": [
+                "WheelchairAccess",
+                "AudioCashMachine",
+                "AutomaticDoors",
+                "InductionLoop",
+                "LevelAccess"
+              ],
+              "Availability": {
+                "StandardAvailability": {
+                  "Day": [
+                    {
+                      "Name": "Monday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "15:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Tuesday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "15:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Wednesday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "15:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Thursday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "15:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Friday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "15:30"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "ContactInfo": [
+                {
+                  "ContactType": "Phone",
+                  "ContactContent": "03457 404 404"
+                }
+              ],
+              "PostalAddress": {
+                "BuildingNumber": "19 ",
+                "StreetName": "Great Darkgate Street",
+                "TownName": "Aberystwyth",
+                "CountrySubDivision": [
+                  "Ceredigion"
+                ],
+                "Country": "GB",
+                "PostCode": "SY23 1DE",
+                "GeoLocation": {
+                  "GeographicCoordinates": {
+                    "Latitude": "52.414738",
+                    "Longitude": "-4.084735"
+                  }
+                }
+              }
+            },
+            {
+              "Identification": "400810",
+              "SequenceNumber": "0",
+              "Name": "Abingdon - Counter Service Available (Monday-Friday)",
+              "Type": "Physical",
+              "SortCode": [
+                "40-08-10"
+              ],
+              "CustomerSegment": [
+                "Business",
+                "Corporate",
+                "Personal",
+                "Premier",
+                "Private",
+                "Select",
+                "SME",
+                "Wealth"
+              ],
+              "ServiceAndFacility": [
+                "CounterServices",
+                "ExternalATM",
+                "InternalATM",
+                "WiFi",
+                "BureauDeChange",
+                "LodgementDevice",
+                "OnDemandCurrency",
+                "StatementPrinter",
+                "OnlineBankingPoint",
+                "MeetingRooms",
+                "SelfServiceAccountOpening"
+              ],
+              "Accessibility": [
+                "WheelchairAccess",
+                "AudioCashMachine",
+                "AutomaticDoors",
+                "InductionLoop",
+                "InternalRamp",
+                "LevelAccess"
+              ],
+              "Availability": {
+                "StandardAvailability": {
+                  "Day": [
+                    {
+                      "Name": "Monday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "15:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Tuesday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "15:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Wednesday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "15:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Thursday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "15:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Friday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "15:30"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "ContactInfo": [
+                {
+                  "ContactType": "Phone",
+                  "ContactContent": "03457 404 404"
+                }
+              ],
+              "PostalAddress": {
+                "BuildingNumber": "6 ",
+                "StreetName": "High Street",
+                "TownName": "Abingdon",
+                "CountrySubDivision": [
+                  "Oxfordshire"
+                ],
+                "Country": "GB",
+                "PostCode": "OX14 5AZ",
+                "GeoLocation": {
+                  "GeographicCoordinates": {
+                    "Latitude": "51.669979",
+                    "Longitude": "-1.282277"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

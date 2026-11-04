@@ -1,0 +1,273 @@
+{
+  "meta": {
+    "LastUpdated": "2026-10-29T11:46:26.178Z",
+    "TotalResults": 1273,
+    "Agreement": "Use of the APIs and any related data will be subject to the terms of the Open Licence and subject to terms and conditions",
+    "License": "https://openbanking.org.uk/open-licence",
+    "TermsOfUse": "https://openbanking.org.uk/terms"
+  },
+  "data": [
+    {
+      "Brand": [
+        {
+          "BrandName": "Nationwide Building Society",
+          "ATM": [
+            {
+              "SupportedLanguages": [
+                "en",
+                "fr",
+                "de",
+                "es"
+              ],
+              "MinimumPossibleAmount": "10",
+              "SupportedCurrencies": [
+                "GBP"
+              ],
+              "Accessibility": [
+                "WheelchairAccess"
+              ],
+              "Branch": {
+                "Identification": "0508"
+              },
+              "ATMServices": [
+                "CashWithdrawal",
+                "Balance",
+                "PINActivation",
+                "PINChange",
+                "MiniStatement",
+                "EnvelopeDeposit",
+                "PINUnblock",
+                "CashDeposits",
+                "ChequeDeposits"
+              ],
+              "Identification": "W0508Z",
+              "Location": {
+                "Site": {
+                  "Identification": "0508",
+                  "Name": "Pocklington"
+                },
+                "PostalAddress": {
+                  "AddressLine": [
+                    "49 Market Place"
+                  ],
+                  "TownName": "Pocklington",
+                  "Country": "GB",
+                  "GeoLocation": {
+                    "GeographicCoordinates": {
+                      "Latitude": "53.93094512",
+                      "Longitude": "-0.77854403"
+                    }
+                  },
+                  "PostCode": "YO42 2AL"
+                }
+              }
+            },
+            {
+              "SupportedLanguages": [
+                "en",
+                "fr",
+                "de",
+                "es"
+              ],
+              "MinimumPossibleAmount": "10",
+              "SupportedCurrencies": [
+                "GBP"
+              ],
+              "Accessibility": [
+                "WheelchairAccess"
+              ],
+              "Branch": {
+                "Identification": "0747"
+              },
+              "ATMServices": [
+                "CashWithdrawal",
+                "Balance",
+                "PINActivation",
+                "PINChange",
+                "MiniStatement",
+                "BillPayments",
+                "PINUnblock",
+                "CashDeposits",
+                "ChequeDeposits"
+              ],
+              "Identification": "W5901Z",
+              "Location": {
+                "Site": {
+                  "Identification": "0747",
+                  "Name": "Wisbech"
+                },
+                "PostalAddress": {
+                  "AddressLine": [
+                    "25/26 Market Place"
+                  ],
+                  "TownName": "Wisbech",
+                  "Country": "GB",
+                  "GeoLocation": {
+                    "GeographicCoordinates": {
+                      "Latitude": "52.66532532",
+                      "Longitude": "0.15997480"
+                    }
+                  },
+                  "PostCode": "PE13 1DQ"
+                }
+              }
+            },
+            {
+              "SupportedLanguages": [
+                "en",
+                "fr",
+                "de",
+                "es"
+              ],
+              "MinimumPossibleAmount": "10",
+              "SupportedCurrencies": [
+                "GBP"
+              ],
+              "Accessibility": [
+                "WheelchairAccess"
+              ],
+              "Branch": {
+                "Identification": "0623"
+              },
+              "ATMServices": [
+                "CashWithdrawal",
+                "Balance",
+                "PINActivation",
+                "PINChange",
+                "MiniStatement",
+                "BillPayments",
+                "EnvelopeDeposit",
+                "PINUnblock",
+                "CashDeposits",
+                "ChequeDeposits"
+              ],
+              "Identification": "W0623Z",
+              "Location": {
+                "Site": {
+                  "Identification": "0623",
+                  "Name": "Gravesend"
+                },
+                "PostalAddress": {
+                  "AddressLine": [
+                    "167 Windmill Street"
+                  ],
+                  "TownName": "Gravesend",
+                  "Country": "GB",
+                  "GeoLocation": {
+                    "GeographicCoordinates": {
+                      "Latitude": "51.4417458",
+                      "Longitude": "0.3692691"
+                    }
+                  },
+                  "PostCode": "DA12 1AH"
+                }
+              }
+            },
+            {
+              "SupportedLanguages": [
+                "en",
+                "fr",
+                "de",
+                "es"
+              ],
+              "MinimumPossibleAmount": "10",
+              "SupportedCurrencies": [
+                "GBP"
+              ],
+              "Accessibility": [
+                "WheelchairAccess"
+              ],
+              "Branch": {
+                "Identification": "0243"
+              },
+              "ATMServices": [
+                "CashWithdrawal",
+                "Balance",
+                "PINActivation",
+                "PINChange",
+                "MiniStatement",
+                "BillPayments",
+                "EnvelopeDeposit",
+                "PINUnblock",
+                "CashDeposits",
+                "ChequeDeposits"
+              ],
+              "Identification": "W0243Z",
+              "Location": {
+                "Site": {
+                  "Identification": "0243",
+                  "Name": "Barking"
+                },
+                "PostalAddress": {
+                  "AddressLine": [
+                    "4 Station Parade"
+                  ],
+                  "TownName": "Barking",
+                  "Country": "GB",
+                  "GeoLocation": {
+                    "GeographicCoordinates": {
+                      "Latitude": "51.53810764",
+                      "Longitude": "0.08010797"
+                    }
+                  },
+                  "PostCode": "IG11 8DP"
+                }
+              }
+            },
+            {
+              "SupportedLanguages": [
+                "en",
+                "fr",
+                "de",
+                "es"
+              ],
+              "MinimumPossibleAmount": "10",
+              "SupportedCurrencies": [
+                "GBP"
+              ],
+              "Accessibility": [
+                "WheelchairAccess"
+              ],
+              "Branch": {
+                "Identification": "0637"
+              },
+              "ATMServices": [
+                "CashWithdrawal",
+                "Balance",
+                "PINActivation",
+                "PINChange",
+                "MiniStatement",
+                "BillPayments",
+                "EnvelopeDeposit",
+                "PINUnblock",
+                "CashDeposits",
+                "ChequeDeposits"
+              ],
+              "Identification": "W0637Z",
+              "Location": {
+                "Site": {
+                  "Identification": "0637",
+                  "Name": "Canvey Island"
+                },
+                "PostalAddress": {
+                  "AddressLine": [
+                    "3 Furtherwick Road"
+                  ],
+                  "TownName": "Canvey Island",
+                  "Country": "GB",
+                  "GeoLocation": {
+                    "GeographicCoordinates": {
+                      "Latitude": "51.522903",
+                      "Longitude": "0.592757"
+                    }
+                  },
+                  "PostCode": "SS8 7AS"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

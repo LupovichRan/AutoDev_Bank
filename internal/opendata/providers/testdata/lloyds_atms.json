@@ -1,0 +1,120 @@
+{
+  "meta": {
+    "LastUpdated": "2026-10-30T14:55:41.606Z",
+    "TotalResults": 923,
+    "Agreement": "Use of the APIs and any related data will be subject to the terms of the Open Licence and subject to terms and conditions",
+    "License": "https://www.openbanking.org.uk/open-licence",
+    "TermsOfUse": "https://www.openbanking.org.uk/terms-conditions"
+  },
+  "data": [
+    {
+      "Brand": [
+        {
+          "BrandName": "Lloyds Bank",
+          "ATM": [
+            {
+              "Identification": "L001AC11",
+              "SupportedCurrencies": [
+                "GBP"
+              ],
+              "Location": {
+                "PostalAddress": {
+                  "AddressLine": [
+                    "91 Old Street; "
+                  ],
+                  "StreetName": "91 Old Street",
+                  "TownName": "Ashton Under Lyne",
+                  "CountrySubDivision": [
+                    "Lancashire"
+                  ],
+                  "Country": "GB",
+                  "PostCode": "OL6 7RU"
+                }
+              }
+            },
+            {
+              "Identification": "L001DC11",
+              "SupportedCurrencies": [
+                "GBP"
+              ],
+              "Location": {
+                "PostalAddress": {
+                  "AddressLine": [
+                    "18-20 The Strand; Longton"
+                  ],
+                  "StreetName": "18-20 The Strand",
+                  "TownName": "Stoke On Trent",
+                  "CountrySubDivision": [
+                    "Staffordshire"
+                  ],
+                  "Country": "GB",
+                  "PostCode": "ST3 2RP"
+                }
+              }
+            },
+            {
+              "Identification": "L001EC11",
+              "SupportedCurrencies": [
+                "GBP"
+              ],
+              "Location": {
+                "PostalAddress": {
+                  "AddressLine": [
+                    "7 Manchester Road; "
+                  ],
+                  "StreetName": "7 Manchester Road",
+                  "TownName": "Burnley",
+                  "CountrySubDivision": [
+                    "Lancashire"
+                  ],
+                  "Country": "GB",
+                  "PostCode": "BB11 1HT"
+                }
+              }
+            },
+            {
+              "Identification": "L002BC11",
+              "SupportedCurrencies": [
+                "GBP"
+              ],
+              "Location": {
+                "PostalAddress": {
+                  "AddressLine": [
+                    "91 Old Street; "
+                  ],
+                  "StreetName": "91 Old Street",
+                  "TownName": "Ashton Under Lyne",
+                  "CountrySubDivision": [
+                    "Lancashire"
+                  ],
+                  "Country": "GB",
+                  "PostCode": "OL6 7RU"
+                }
+              }
+            },
+            {
+              "Identification": "L002CC11",
+              "SupportedCurrencies": [
+                "GBP"
+              ],
+              "Location": {
+                "PostalAddress": {
+                  "AddressLine": [
+                    "7 Manchester Road; "
+                  ],
+                  "StreetName": "7 Manchester Road",
+                  "TownName": "Burnley",
+                  "CountrySubDivision": [
+                    "Lancashire"
+                  ],
+                  "Country": "GB",
+                  "PostCode": "BB11 1HT"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

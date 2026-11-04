@@ -1,0 +1,281 @@
+{
+  "meta": {
+    "LastUpdated": "2026-11-02T09:33:30.699Z",
+    "TotalResults": 303,
+    "Agreement": "Use of the APIs and any related data will be subject to the terms of the Open Licence and subject to terms and conditions",
+    "License": "https://www.openbanking.org.uk/open-licence",
+    "TermsOfUse": "https://www.openbanking.org.uk/terms-conditions"
+  },
+  "data": [
+    {
+      "Brand": [
+        {
+          "BrandName": "Lloyds Bank",
+          "Branch": [
+            {
+              "Identification": "30125100",
+              "SequenceNumber": "00",
+              "Name": "Cowley",
+              "Type": "Physical",
+              "CustomerSegment": [
+                "Personal",
+                "Business"
+              ],
+              "Availability": {
+                "StandardAvailability": {
+                  "Day": [
+                    {
+                      "Name": "Monday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "16:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Tuesday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "16:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Wednesday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "10:00",
+                          "ClosingTime": "16:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Thursday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "16:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Saturday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "13:00"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "ContactInfo": [
+                {
+                  "ContactType": "Phone",
+                  "ContactContent": "+44-3456021997"
+                }
+              ],
+              "PostalAddress": {
+                "AddressLine": [
+                  "1 Pound Way Cowley"
+                ],
+                "TownName": "Oxford",
+                "CountrySubDivision": [
+                  "Oxfordshire"
+                ],
+                "Country": "GB",
+                "PostCode": "OX4 3XS",
+                "GeoLocation": {
+                  "GeographicCoordinates": {
+                    "Latitude": "51.73203",
+                    "Longitude": "-1.21823"
+                  }
+                }
+              }
+            },
+            {
+              "Identification": "30125700",
+              "SequenceNumber": "00",
+              "Name": "Cramlington",
+              "Type": "Physical",
+              "CustomerSegment": [
+                "Personal",
+                "Business"
+              ],
+              "Availability": {
+                "StandardAvailability": {
+                  "Day": [
+                    {
+                      "Name": "Monday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "15:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Tuesday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "15:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Wednesday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "10:00",
+                          "ClosingTime": "15:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Thursday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "15:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Friday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "15:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Saturday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "13:00"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "ContactInfo": [
+                {
+                  "ContactType": "Phone",
+                  "ContactContent": "+44-3456021997"
+                }
+              ],
+              "PostalAddress": {
+                "AddressLine": [
+                  "Dudley Court East Square"
+                ],
+                "TownName": "Cramlington",
+                "CountrySubDivision": [
+                  "Northumberland"
+                ],
+                "Country": "GB",
+                "PostCode": "NE23 6QR",
+                "GeoLocation": {
+                  "GeographicCoordinates": {
+                    "Latitude": "55.08539",
+                    "Longitude": "-1.58807"
+                  }
+                }
+              }
+            },
+            {
+              "Identification": "30128600",
+              "SequenceNumber": "00",
+              "Name": "Driffield",
+              "Type": "Physical",
+              "CustomerSegment": [
+                "Personal",
+                "Business"
+              ],
+              "Availability": {
+                "StandardAvailability": {
+                  "Day": [
+                    {
+                      "Name": "Monday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "15:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Tuesday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "15:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Wednesday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "10:00",
+                          "ClosingTime": "15:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Thursday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "15:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Friday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "15:30"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "ContactInfo": [
+                {
+                  "ContactType": "Phone",
+                  "ContactContent": "+44-3456021997"
+                }
+              ],
+              "PostalAddress": {
+                "AddressLine": [
+                  "15 Market Place"
+                ],
+                "TownName": "Driffield",
+                "CountrySubDivision": [
+                  "East Yorkshire"
+                ],
+                "Country": "GB",
+                "PostCode": "YO25 6AH",
+                "GeoLocation": {
+                  "GeographicCoordinates": {
+                    "Latitude": "54.00519",
+                    "Longitude": "-0.43969"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,360 @@
+{
+  "meta": {
+    "LastUpdated": "2026-11-04T18:09:06.120Z",
+    "TotalResults": 672,
+    "Agreement": "Use of the APIs and any related data will be subject to the terms of the Open Licence and subject to terms and conditions",
+    "License": "https://www.openbanking.org.uk/open-licence",
+    "TermsOfUse": "https://www.openbanking.org.uk/terms"
+  },
+  "data": [
+    {
+      "Brand": [
+        {
+          "BrandName": "NWB",
+          "Branch": [
+            {
+              "Identification": "4WXRr6",
+              "SequenceNumber": "0",
+              "Name": "NatWest Herne Bay",
+              "Type": "Physical",
+              "SortCode": [
+                "601037"
+              ],
+              "CustomerSegment": [
+                "Business",
+                "Corporate",
+                "Other",
+                "Personal",
+                "Private",
+                "Premier",
+                "Select",
+                "SME",
+                "Wealth"
+              ],
+              "ServiceAndFacility": [
+                "ExternalATM",
+                "InternalATM",
+                "NightSafe",
+                "QuickDeposit"
+              ],
+              "Accessibility": [
+                "InductionLoop",
+                "WheelchairAccess"
+              ],
+              "OtherCustomerSegment": [],
+              "OtherAccessibility": [],
+              "OtherServiceAndFacility": [],
+              "Availability": {
+                "StandardAvailability": {
+                  "Day": [
+                    {
+                      "Name": "Monday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "15:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Tuesday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "15:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Wednesday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "10:00",
+                          "ClosingTime": "15:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Thursday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "15:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Friday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "15:30"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "ContactInfo": [
+                {
+                  "ContactType": "Phone",
+                  "ContactContent": "+44-3457888444(International:+44(0)1634890876)"
+                }
+              ],
+              "PostalAddress": {
+                "AddressLine": [
+                  "140 High Street",
+                  "Herne Bay",
+                  "Kent",
+                  "CT6 5JX"
+                ],
+                "TownName": "Herne Bay",
+                "CountrySubDivision": [
+                  "Kent"
+                ],
+                "Country": "UK",
+                "PostCode": "CT6 5JX",
+                "GeoLocation": {
+                  "GeographicCoordinates": {
+                    "Latitude": "051.37122151",
+                    "Longitude": "001.12831071"
+                  }
+                }
+              }
+            },
+            {
+              "Identification": "Vo6Obo",
+              "SequenceNumber": "0",
+              "Name": "NatWest Margate",
+              "Type": "Physical",
+              "SortCode": [
+                "601405"
+              ],
+              "CustomerSegment": [
+                "Business",
+                "Corporate",
+                "Other",
+                "Personal",
+                "Private",
+                "Premier",
+                "Select",
+                "SME",
+                "Wealth"
+              ],
+              "ServiceAndFacility": [
+                "ExternalATM",
+                "InternalATM",
+                "NightSafe",
+                "QuickDeposit"
+              ],
+              "Accessibility": [
+                "InductionLoop",
+                "WheelchairAccess"
+              ],
+              "OtherCustomerSegment": [],
+              "OtherAccessibility": [],
+              "OtherServiceAndFacility": [],
+              "Availability": {
+                "StandardAvailability": {
+                  "Day": [
+                    {
+                      "Name": "Monday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "16:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Tuesday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "16:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Wednesday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "10:00",
+                          "ClosingTime": "16:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Thursday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "16:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Friday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "16:30"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "ContactInfo": [
+                {
+                  "ContactType": "Phone",
+                  "ContactContent": "+44-3457888444(International:+44(0)1634890876)"
+                }
+              ],
+              "PostalAddress": {
+                "AddressLine": [
+                  "13 Cecil Square",
+                  "Margate",
+                  "Kent",
+                  "CT9 1XY"
+                ],
+                "TownName": "Margate",
+                "CountrySubDivision": [
+                  "Kent"
+                ],
+                "Country": "UK",
+                "PostCode": "CT9 1XY",
+                "GeoLocation": {
+                  "GeographicCoordinates": {
+                    "Latitude": "051.38786842",
+                    "Longitude": "001.38123829"
+                  }
+                }
+              }
+            },
+            {
+              "Identification": "Qv6qR2",
+              "SequenceNumber": "0",
+              "Name": "NatWest Ashford Kent",
+              "Type": "Physical",
+              "SortCode": [
+                "600121"
+              ],
+              "CustomerSegment": [
+                "Business",
+                "Corporate",
+                "Other",
+                "Personal",
+                "Private",
+                "Premier",
+                "Select",
+                "SME",
+                "Wealth"
+              ],
+              "ServiceAndFacility": [
+                "SaturdayCounterService",
+                "ExternalATM",
+                "InternalATM",
+                "NightSafe",
+                "QuickDeposit"
+              ],
+              "Accessibility": [
+                "InductionLoop",
+                "WheelchairAccess"
+              ],
+              "OtherCustomerSegment": [],
+              "OtherAccessibility": [],
+              "OtherServiceAndFacility": [],
+              "Availability": {
+                "StandardAvailability": {
+                  "Day": [
+                    {
+                      "Name": "Monday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "16:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Tuesday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "16:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Wednesday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "10:00",
+                          "ClosingTime": "16:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Thursday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "16:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Friday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "16:30"
+                        }
+                      ]
+                    },
+                    {
+                      "Name": "Saturday",
+                      "OpeningHours": [
+                        {
+                          "OpeningTime": "09:30",
+                          "ClosingTime": "13:00"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "ContactInfo": [
+                {
+                  "ContactType": "Phone",
+                  "ContactContent": "+44-3457888444(International:+44(0)1634890876)"
+                }
+              ],
+              "PostalAddress": {
+                "AddressLine": [
+                  "20 High Street",
+                  "Ashford",
+                  "Kent",
+                  "TN24 8SH"
+                ],
+                "TownName": "Ashford",
+                "CountrySubDivision": [
+                  "Kent"
+                ],
+                "Country": "UK",
+                "PostCode": "TN24 8SH",
+                "GeoLocation": {
+                  "GeographicCoordinates": {
+                    "Latitude": "051.14915272",
+                    "Longitude": "000.87464234"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

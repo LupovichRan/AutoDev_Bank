@@ -1,0 +1,1520 @@
+{
+  "meta": {
+    "LastUpdated": "2026-10-30T00:01:25Z",
+    "TotalResults": 11,
+    "Agreement": "Use of the APIs and any related data will be subject to the terms of the Open Licence and subject to terms and conditions",
+    "License": "https://www.openbanking.org.uk/open-licence",
+    "TermsOfUse": "https://www.openbanking.org.uk/terms-conditions"
+  },
+  "data": [
+    {
+      "Brand": [
+        {
+          "BrandName": "Lloyds Bank",
+          "PCA": [
+            {
+              "Name": "Platinum Account",
+              "Identification": "320",
+              "Segment": [
+                "Packaged"
+              ],
+              "OnSaleIndicator": true,
+              "PCAMarketingState": [
+                {
+                  "Identification": "LPA-R001",
+                  "PredecessorID": "LPA-R002",
+                  "MarketingState": "Regular",
+                  "FirstMarketedDate": "2017-11-02",
+                  "LastMarketedDate": "9999-12-31",
+                  "Overdraft": {
+                    "OverdraftTierBandSet": [
+                      {
+                        "TierBandMethod": "Whole",
+                        "OverdraftType": "OnDemand",
+                        "Identification": "LPA-AR-001",
+                        "AuthorisedIndicator": true,
+                        "BufferAmount": "0.00",
+                        "OverdraftTierBand": [
+                          {
+                            "Identification": "LPA-AT-101",
+                            "TierValueMin": "0.00",
+                            "EAR": "29.90",
+                            "Notes": [
+                              "One Interest Rate You will be charged a single interest rate for everything you borrow using an arranged overdraft over your interest-free amount. The representative interest rate is 29.9% EAR variable.   Daily Charging Instead of paying all daily arranged overdraft interest in one go each month, daily arranged overdraft interest will be charged at the end of each day you use your arranged overdraft – so you’ll pay for what you borrow on the day you borrow it. This will help you keep track of how much your overdraft costs you.   If you go over your limit So all your payments are made, it’s important you manage your account within your arranged overdraft limit. If you don’t have enough money in your account or you reach your limit, you may not be able to make any more payments. If a payment takes you over your limit or we refuse it, you won’t be charged."
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "Eligibility": {
+                    "OtherEligibility": [
+                      {
+                        "Name": "Previous Bankruptcy",
+                        "Type": "PreviousBankruptcyAllowed",
+                        "Indicator": false
+                      }
+                    ],
+                    "AgeEligibility": {
+                      "MinimumAge": 18,
+                      "Notes": [
+                        "You're aged 18 or older"
+                      ]
+                    },
+                    "ResidencyEligibility": {
+                      "ResidencyIncluded": [
+                        "UK"
+                      ]
+                    },
+                    "CreditCheck": {
+                      "ScoringType": "Hard"
+                    },
+                    "IDVerificationCheck": {
+                      "URL": "http://www.lloydsbank.com/legal/proof-of-identity.asp?srnum=1"
+                    }
+                  },
+                  "FeaturesAndBenefits": {
+                    "FeatureBenefitGroup": [
+                      {
+                        "Name": "Lloyds Platinum Benefits",
+                        "Type": "Other",
+                        "Notes": [
+                          "Lloyds Platinum Account Benefits"
+                        ],
+                        "OtherType": {
+                          "Name": "Platinum Account Benefits",
+                          "Description": "Packaged account benefits"
+                        },
+                        "FeatureBenefitItem": [
+                          {
+                            "Identification": "LPA-BG-001",
+                            "Type": "TravelInsurance",
+                            "Name": "Worldwide travel insurance",
+                            "Textual": "Multi-trip Worldwide travel cover for you and your family (includes, if eligible, your spouse, civil partner or partner and children). Up to the age of 80 for adults and 18 or under (24 or under if still in full time education) for children."
+                          },
+                          {
+                            "Identification": "LPA-BG-002",
+                            "Type": "MotorBreakdown",
+                            "Name": "AA Breakdown family Cover",
+                            "Textual": "Includes Roadside Assistance, At Home and National Recovery. The customer and eligible family member is covered, not the vehicle.\nProvides cover within the UK, Channel Islands and Isle of Man."
+                          },
+                          {
+                            "Identification": "LPA-BG-003",
+                            "Type": "TechnologyInsurance",
+                            "Name": "Mobile phone insurance",
+                            "Textual": "Insures one phone on a sole account and two phones for joint accounts\nRepair or replacement phone up to a maximum of £2,000 (including VAT)\nCovers loss, theft, damage or breakdown (including faults)"
+                          },
+                          {
+                            "Identification": "LPA-BG-004",
+                            "Type": "Travel",
+                            "Name": "No debit card charges abroad",
+                            "Textual": "Wherever you are, we won't charge you for using your debit card.\nIf you’re abroad, and choose to pay for something in Pounds Sterling, the provider of the currency conversion may still charge you. "
+                          }
+                        ]
+                      }
+                    ],
+                    "FeatureBenefitItem": [
+                      {
+                        "Identification": "LCL-BI-004",
+                        "Type": "AccountManagement",
+                        "Name": "Mobile Alerts",
+                        "Textual": "Our mobile alerts are a simple and convenient way to help you stay on top of your money - if we have your mobile number, we’ll send alerts to keep you up to date on your account balance."
+                      },
+                      {
+                        "Identification": "LCL-BI-005",
+                        "Type": "AccountManagement",
+                        "Name": "Money Manager",
+                        "Textual": "Keep track of your spending and see at a glance where your money goes with our free Internet Banking service."
+                      },
+                      {
+                        "Identification": "LCL-BI-006",
+                        "Type": "AccountManagement",
+                        "Name": "Joint Accounts"
+                      },
+                      {
+                        "Identification": "LCL-BI-007",
+                        "Type": "AccountManagement",
+                        "Name": "ATM Withdrawals",
+                        "Textual": "Withdraw money from any cash machine that shows the LINK or VISA sign"
+                      },
+                      {
+                        "Identification": "LCL-BI-008",
+                        "Type": "AccountManagement",
+                        "Name": "Internet Banking",
+                        "Textual": "With Internet Banking, make the most of your account 24/7.  It's the quick, easy way to keep track of your money, make payments and transfers and see your statements."
+                      },
+                      {
+                        "Identification": "LCL-BI-009",
+                        "Type": "AccountManagement",
+                        "Name": "Card Controls",
+                        "Textual": "You can freeze and unfreeze certain Visa debit card transactions 24/7 in the mobile banking app for extra peace of mind.  Handy if you've temporarily misplaced your card!  See our website for more details."
+                      },
+                      {
+                        "Type": "AccountOpeningOrSwitching Incentive",
+                        "Name": "RAF30",
+                        "Amount": "30.00",
+                        "Notes": [
+                          "You can earn £30 by referring a friend to open a Lloyds Personal Current Account. To qualify as the referrer, you must hold any Lloyds Personal Current Account, except for Under19s, Smart Start, or Student Accounts. To receive the reward, you need to share your referral link with a friend, and they must use it to open a qualifying account. That account must remain open for at least 7 days.  As the referred friend, you will earn £30 if you open a qualifying Lloyds Personal Current Account using the referral link provided by the existing customer. Eligible accounts include Classic, Club Lloyds, Basic, Lloyds Premier, Silver, Platinum, Club Lloyds Silver, or Club Lloyds Platinum. You must not have previously received a Refer a Friend reward from Lloyds.  (T&Cs Apply)\n"
+                        ]
+                      }
+                    ],
+                    "Card": [
+                      {
+                        "Type": "DebitCard",
+                        "Scheme": "Visa",
+                        "ContactlessIndicator": true
+                      }
+                    ],
+                    "MobileWallet": [
+                      {
+                        "Type": "GooglePay"
+                      },
+                      {
+                        "Type": "ApplePay"
+                      },
+                      {
+                        "Type": "MobileBankingApp",
+                        "Notes": [
+                          "Our Mobile Banking app for iOS and Android are quick and easy to install, fast, convenient and more secure than ever - the easy way to stay on top of your money. Bank where you want with the latest built-in security technology that keeps your details safe and private. More and more customers are choosing the flexibility, convenience and security of banking on their mobile."
+                        ]
+                      },
+                      {
+                        "Type": "SamsungPay"
+                      }
+                    ]
+                  },
+                  "OtherFeesCharges": {
+                    "FeeChargeDetail": [
+                      {
+                        "FeeCategory": "PaymentScheme",
+                        "FeeType": "CHAPSOut",
+                        "FeeAmount": "25.00",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Applies to CHAPS Payments made internally or externally, processed by our own systems or using the Bank of England Payments processing system\n"
+                        ]
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentIn",
+                        "FeeAmount": "2.00",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "For payments up to and including £100 received electronically from outside the UK or in a foreign currency. No fee charged for receiving euro from within the UK or EEA, or via SEPA Credit Transfer.  "
+                        ],
+                        "FeeApplicableRange": {
+                          "MinimumAmount": "0.00",
+                          "MaximumAmount": "100.00"
+                        }
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentIn",
+                        "FeeAmount": "7.00",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "For payments over £100 received electronically from outside the UK or in a foreign currency.  No fee charged for receiving euro from within the UK or EEA, or via SEPA Credit Transfer."
+                        ],
+                        "FeeApplicableRange": {
+                          "MinimumAmount": "100.01",
+                          "MaximumAmount": "99999999999999.9999"
+                        }
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "FeeAmount": "9.50",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "For payments sent electronically outside the UK or in a foreign currency, other than in euro where no fee is charged"
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "ServiceCAccountFee",
+                        "FeeAmount": "22.50",
+                        "ApplicationFrequency": "Monthly",
+                        "CalculationFrequency": "Monthly",
+                        "Notes": [
+                          "Platinum Account monthly maintaining the account fee of £22.50 per month"
+                        ]
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayForeignCharge",
+                        "FeeAmount": "12.00",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "The Correspondent Bank Fee will be payable for payments outside the UK when you select to pay all agent bank charges.  Zone 1 – USA, Canada, and Europe (non EEA).  "
+                        ]
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayForeignCharge",
+                        "FeeAmount": "20.00",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "The Correspondent Bank Fee will be payable for payments outside the UK when you select to pay all agent bank charges.  Zone 2 – Rest of the world, excluding EEA."
+                        ]
+                      }
+                    ]
+                  },
+                  "CoreProduct": {
+                    "ProductURL": "http://www.lloydsbank.com/current-accounts/all-accounts/platinum-account.asp",
+                    "ProductDescription": "Packed with benefits for only £22.50 per month",
+                    "TcsAndCsURL": "https://www.lloydsbank.com/help-guidance/legal-information/current-account-terms.html",
+                    "SalesAccessChannels": [
+                      "Online"
+                    ],
+                    "ServicingAccessChannels": [
+                      "ATM",
+                      "Branch",
+                      "CallCentre",
+                      "Post",
+                      "MobileBankingApp",
+                      "Online",
+                      "PostOffice",
+                      "Text"
+                    ],
+                    "MonthlyMaximumCharge": "0.00"
+                  }
+                },
+                {
+                  "Identification": "LPA-R002",
+                  "MarketingState": "Promotional",
+                  "FirstMarketedDate": "2017-11-02",
+                  "LastMarketedDate": "2026-05-05",
+                  "StateTenureLength": 3,
+                  "StateTenurePeriod": "Month",
+                  "Notes": [
+                    "Interest free Arranged Overdraft for 3 months"
+                  ],
+                  "Overdraft": {
+                    "OverdraftTierBandSet": [
+                      {
+                        "TierBandMethod": "Whole",
+                        "OverdraftType": "OnDemand",
+                        "Identification": "LPA-AR-001",
+                        "AuthorisedIndicator": true,
+                        "BufferAmount": "0.00",
+                        "OverdraftTierBand": [
+                          {
+                            "Identification": "LPA-AT-201",
+                            "TierValueMin": "0.00",
+                            "EAR": "0.0",
+                            "Notes": [
+                              "To qualify for the interest-free offer you must :\r\n• Use the Current Account Switch Service. This service means your old account will be closed and all your payments transferred to your new Lloyds Bank account\r\n• Have not used the offer within the last 12 months\r\n• Have applied, and been approved for, an Arranged Overdraft on your new Lloyds Bank account"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "Eligibility": {
+                    "OtherEligibility": [
+                      {
+                        "Name": "Previous Bankruptcy",
+                        "Type": "PreviousBankruptcyAllowed",
+                        "Indicator": false
+                      }
+                    ],
+                    "AgeEligibility": {
+                      "MinimumAge": 18,
+                      "Notes": [
+                        "You're aged 18 or older"
+                      ]
+                    },
+                    "ResidencyEligibility": {
+                      "ResidencyIncluded": [
+                        "UK"
+                      ]
+                    },
+                    "CreditCheck": {
+                      "ScoringType": "Hard"
+                    },
+                    "IDVerificationCheck": {
+                      "URL": "http://www.lloydsbank.com/legal/proof-of-identity.asp?srnum=1"
+                    }
+                  },
+                  "FeaturesAndBenefits": {
+                    "FeatureBenefitGroup": [
+                      {
+                        "Name": "Lloyds Platinum Benefits",
+                        "Type": "Other",
+                        "Notes": [
+                          "Lloyds Platinum Account Benefits"
+                        ],
+                        "OtherType": {
+                          "Name": "Platinum Account Benefits",
+                          "Description": "Packaged account benefits"
+                        },
+                        "FeatureBenefitItem": [
+                          {
+                            "Identification": "LPA-BG-001",
+                            "Type": "TravelInsurance",
+                            "Name": "Worldwide travel insurance",
+                            "Textual": "Multi-trip Worldwide travel cover for you and your family (includes, if eligible, your spouse, civil partner or partner and children). Up to the age of 80 for adults and 18 or under (24 or under if still in full time education) for children."
+                          },
+                          {
+                            "Identification": "LPA-BG-002",
+                            "Type": "MotorBreakdown",
+                            "Name": "AA Breakdown family Cover",
+                            "Textual": "Includes Roadside Assistance, At Home and National Recovery. The customer and eligible family member is covered, not the vehicle.\nProvides cover within the UK, Channel Islands and Isle of Man."
+                          },
+                          {
+                            "Identification": "LPA-BG-003",
+                            "Type": "TechnologyInsurance",
+                            "Name": "Mobile phone insurance",
+                            "Textual": "Insures one phone on a sole account and two phones for joint accounts\nRepair or replacement phone up to a maximum of £2,000 (including VAT)\nCovers loss, theft, damage or breakdown (including faults)"
+                          },
+                          {
+                            "Identification": "LPA-BG-004",
+                            "Type": "Travel",
+                            "Name": "No debit card charges abroad",
+                            "Textual": "Wherever you are, we won't charge you for using your debit card.\nIf you’re abroad, and choose to pay for something in Pounds Sterling, the provider of the currency conversion may still charge you. "
+                          }
+                        ]
+                      }
+                    ],
+                    "FeatureBenefitItem": [
+                      {
+                        "Identification": "LCL-BI-004",
+                        "Type": "AccountManagement",
+                        "Name": "Mobile Alerts",
+                        "Textual": "Our mobile alerts are a simple and convenient way to help you stay on top of your money - if we have your mobile number, we’ll send alerts to keep you up to date on your account balance."
+                      },
+                      {
+                        "Identification": "LCL-BI-005",
+                        "Type": "AccountManagement",
+                        "Name": "Money Manager",
+                        "Textual": "Keep track of your spending and see at a glance where your money goes with our free Internet Banking service."
+                      },
+                      {
+                        "Identification": "LCL-BI-006",
+                        "Type": "AccountManagement",
+                        "Name": "Joint Accounts"
+                      },
+                      {
+                        "Identification": "LCL-BI-007",
+                        "Type": "AccountManagement",
+                        "Name": "ATM Withdrawals",
+                        "Textual": "Withdraw money from any cash machine that shows the LINK or VISA sign"
+                      },
+                      {
+                        "Identification": "LCL-BI-008",
+                        "Type": "AccountManagement",
+                        "Name": "Internet Banking",
+                        "Textual": "With Internet Banking, make the most of your account 24/7.  It's the quick, easy way to keep track of your money, make payments and transfers and see your statements."
+                      },
+                      {
+                        "Identification": "LCL-BI-009",
+                        "Type": "AccountManagement",
+                        "Name": "Card Controls",
+                        "Textual": "You can freeze and unfreeze certain Visa debit card transactions 24/7 in the mobile banking app for extra peace of mind.  Handy if you've temporarily misplaced your card!  See our website for more details."
+                      }
+                    ],
+                    "Card": [
+                      {
+                        "Type": "DebitCard",
+                        "Scheme": "Visa",
+                        "ContactlessIndicator": true
+                      }
+                    ],
+                    "MobileWallet": [
+                      {
+                        "Type": "GooglePay"
+                      },
+                      {
+                        "Type": "ApplePay"
+                      },
+                      {
+                        "Type": "MobileBankingApp",
+                        "Notes": [
+                          "Our Mobile Banking app for iOS and Android are quick and easy to install, fast, convenient and more secure than ever - the easy way to stay on top of your money. Bank where you want with the latest built-in security technology that keeps your details safe and private. More and more customers are choosing the flexibility, convenience and security of banking on their mobile."
+                        ]
+                      }
+                    ]
+                  },
+                  "OtherFeesCharges": {
+                    "FeeChargeDetail": [
+                      {
+                        "FeeCategory": "PaymentScheme",
+                        "FeeType": "CHAPSOut",
+                        "FeeAmount": "25.00",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Applies to CHAPS Payments made internally or externally, processed by our own systems or using the Bank of England Payments processing system\n"
+                        ]
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentIn",
+                        "FeeAmount": "2.00",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "For payments up to and including £100 received electronically from outside the UK or in a foreign currency.  No fee charged for receiving euro from within the UK or EEA, or via SEPA Credit Transfer.  "
+                        ],
+                        "FeeApplicableRange": {
+                          "MinimumAmount": "0.00",
+                          "MaximumAmount": "100.00"
+                        }
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentIn",
+                        "FeeAmount": "7.00",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "For payments over £100 received electronically from outside the UK or in a foreign currency.  No fee charged for receiving euro from within the UK or EEA, or via SEPA Credit Transfer."
+                        ],
+                        "FeeApplicableRange": {
+                          "MinimumAmount": "100.01",
+                          "MaximumAmount": "99999999999999.9999"
+                        }
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "FeeAmount": "9.50",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "For payments sent electronically outside the UK or in a foreign currency, other than in euro where no fee is charged"
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "ServiceCAccountFee",
+                        "FeeAmount": "22.50",
+                        "ApplicationFrequency": "Monthly",
+                        "CalculationFrequency": "Monthly",
+                        "Notes": [
+                          "Platinum Account monthly maintaining the account fee of £22.50 per month"
+                        ]
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayForeignCharge",
+                        "FeeAmount": "12.00",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "The Correspondent Bank Fee will be payable for payments outside the UK when you select to pay all agent bank charges.  Zone 1 – USA, Canada, and Europe (non EEA).  "
+                        ]
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayForeignCharge",
+                        "FeeAmount": "20.00",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "The Correspondent Bank Fee will be payable for payments outside the UK when you select to pay all agent bank charges.  Zone 2 – Rest of the world, excluding EEA."
+                        ]
+                      }
+                    ]
+                  },
+                  "CoreProduct": {
+                    "ProductURL": "http://www.lloydsbank.com/current-accounts/all-accounts/platinum-account.asp",
+                    "ProductDescription": "Packed with benefits for only £22.50 per month",
+                    "TcsAndCsURL": "https://www.lloydsbank.com/help-guidance/legal-information/current-account-terms.html",
+                    "SalesAccessChannels": [
+                      "Online"
+                    ],
+                    "ServicingAccessChannels": [
+                      "ATM",
+                      "Branch",
+                      "CallCentre",
+                      "Post",
+                      "MobileBankingApp",
+                      "Online",
+                      "PostOffice",
+                      "Text"
+                    ],
+                    "MonthlyMaximumCharge": "0.00"
+                  }
+                }
+              ]
+            },
+            {
+              "Name": "Under 19s Account",
+              "Identification": "301",
+              "Segment": [
+                "Youth"
+              ],
+              "OnSaleIndicator": true,
+              "PCAMarketingState": [
+                {
+                  "Identification": "LYA-R001",
+                  "MarketingState": "Regular",
+                  "FirstMarketedDate": "2017-11-02",
+                  "LastMarketedDate": "9999-12-31",
+                  "Notes": [
+                    "Arranged Overdrafts are not available on Under 19s accounts. If you do go overdrawn, you will not be charged a daily arranged overdraft fee."
+                  ],
+                  "CreditInterest": {
+                    "TierBandSet": [
+                      {
+                        "TierBandMethod": "Tiered",
+                        "CalculationMethod": "Compound",
+                        "Destination": "SelfCredit",
+                        "TierBand": [
+                          {
+                            "Identification": "LYA-CITB001",
+                            "TierValueMinimum": "0.00",
+                            "TierValueMaximum": "999.99",
+                            "CalculationFrequency": "Monthly",
+                            "ApplicationFrequency": "Quarterly",
+                            "FixedVariableInterestRateType": "Variable",
+                            "AER": "0.50",
+                            "BankInterestRateType": "Gross"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "Eligibility": {
+                    "OtherEligibility": [
+                      {
+                        "Name": "Previous Bankruptcy",
+                        "Type": "PreviousBankruptcyAllowed",
+                        "Indicator": false
+                      }
+                    ],
+                    "AgeEligibility": {
+                      "MinimumAge": 13,
+                      "MaximumAge": 17,
+                      "Notes": [
+                        "Start an application online and provide proof of your identity with a passport or driving licence. If we can't check your identity online, you may need to visit your local branch and bring proof of identity (such as passport or full UK birth certificate) and proof of address (such as letter from your School/College/Educational Institution, or parents utility bill).\nIf you are 13-15 you need to be accompanied by an adult, if you are 16 or 17, you do not"
+                      ]
+                    },
+                    "ResidencyEligibility": {
+                      "ResidencyIncluded": [
+                        "UK"
+                      ]
+                    },
+                    "CreditCheck": {
+                      "ScoringType": "Soft"
+                    },
+                    "IDVerificationCheck": {
+                      "URL": "http://www.lloydsbank.com/legal/proof-of-identity.asp?srnum=1"
+                    }
+                  },
+                  "FeaturesAndBenefits": {
+                    "FeatureBenefitItem": [
+                      {
+                        "Identification": "LYA-BI-001",
+                        "Type": "AccountManagement",
+                        "Name": "Mobile Alerts",
+                        "Textual": "Our mobile alerts are a simple and convenient way to help you stay on top of your money - if we have your mobile number, we’ll send alerts to keep you up to date on your account balance."
+                      },
+                      {
+                        "Identification": "LYA-BI-002",
+                        "Type": "AccountManagement",
+                        "Name": "ATM Withdrawals",
+                        "Textual": "Withdraw money from any cash machine that shows the LINK or VISA sign"
+                      },
+                      {
+                        "Identification": "LYA-BI-003",
+                        "Type": "PreferentialRates",
+                        "Name": "Credit Interest",
+                        "Textual": "You will earn a variable rate of interest of 0.50% AER/0.50% gross variable on balances between £1 and £999.99. Interest is paid quarterly directly into your account and you will not earn credit interest on balances above £999.99."
+                      },
+                      {
+                        "Identification": "LYA-BI-006",
+                        "Type": "AccountManagement",
+                        "Name": "Money Manager",
+                        "Textual": "Keep track of your spending and see at a glance where your money goes with our free Internet Banking service."
+                      },
+                      {
+                        "Identification": "LYA-BI-007",
+                        "Type": "AccountManagement",
+                        "Name": "Internet Banking",
+                        "Textual": "With Internet Banking, make the most of your account 24/7.  It's the quick, easy way to keep track of your money, make payments and transfers and see your statements."
+                      },
+                      {
+                        "Identification": "LYA-BI-008",
+                        "Type": "AccountManagement",
+                        "Name": "Card Controls",
+                        "Textual": "You can freeze and unfreeze certain Visa debit card transactions 24/7 in the mobile banking app for extra peace of mind.  Handy if you've temporarily misplaced your card!  See our website for more details."
+                      }
+                    ],
+                    "Card": [
+                      {
+                        "Type": "DebitCard",
+                        "Scheme": "Visa",
+                        "ContactlessIndicator": true,
+                        "Notes": [
+                          "A Lloyds Bank Visa debit card, which you can use to pay for things in shops, on the internet, or to access your money at cash machines. "
+                        ]
+                      },
+                      {
+                        "Type": "CashCard",
+                        "Scheme": "Visa",
+                        "ContactlessIndicator": false,
+                        "Notes": [
+                          "There's no charge to take money out of our Bank of Scotland, Lloyds Bank or Halifax cash machines, but a charge may apply at other cash machines\n"
+                        ]
+                      }
+                    ],
+                    "MobileWallet": [
+                      {
+                        "Type": "MobileBankingApp",
+                        "Notes": [
+                          "Our Mobile Banking app for iOS and Android are quick and easy to install, fast, convenient and more secure than ever - the easy way to stay on top of your money. Bank where you want with the latest built-in security technology that keeps your details safe and private. More and more customers are choosing the flexibility, convenience and security of banking on their mobile."
+                        ]
+                      },
+                      {
+                        "Type": "GooglePay"
+                      },
+                      {
+                        "Type": "ApplePay"
+                      },
+                      {
+                        "Type": "SamsungPay"
+                      }
+                    ]
+                  },
+                  "OtherFeesCharges": {
+                    "FeeChargeDetail": [
+                      {
+                        "FeeCategory": "PaymentScheme",
+                        "FeeType": "CHAPSOut",
+                        "FeeAmount": "25.00",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Applies to CHAPS Payments made internally or externally, processed by our own systems or using the Bank of England Payments processing system\n"
+                        ]
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentIn",
+                        "FeeAmount": "2.00",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "For payments up to and including £100 received electronically from outside the UK or in a foreign currency.  No fee charged for receiving euro from within the UK or EEA, or via SEPA Credit Transfer.  "
+                        ],
+                        "FeeApplicableRange": {
+                          "MinimumAmount": "0.00",
+                          "MaximumAmount": "100.00"
+                        }
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentIn",
+                        "FeeAmount": "7.00",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "For payments over £100 received electronically from outside the UK or in a foreign currency.  No fee charged for receiving euro from within the UK or EEA or via SEPA Credit Transfer."
+                        ],
+                        "FeeApplicableRange": {
+                          "MinimumAmount": "100.01",
+                          "MaximumAmount": "99999999999999.9999"
+                        }
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayTransRateNonSterling",
+                        "FeeRate": "2.9900",
+                        "FeeRateType": "Gross",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Foreign currency transaction fee: fee charged for the conversion of currency. This is a percentage value of your transaction. \nThe amount is converted to pounds on the day it is processed by Visa using the Visa Payment Scheme Exchange Rate"
+                        ]
+                      },
+                      {
+                        "FeeCategory": "ATM",
+                        "FeeType": "ATMForeignCashDebCard",
+                        "FeeAmount": "1.50",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Foreign currency cash fee:  fee charged to withdraw cash in a currency other than pounds, or to withdraw cash in pounds outside the UK.  The amount is converted to pounds on the day it is processed by Visa using the Visa Payment Scheme exchange rate. ",
+                          "Foreign currency cash fee is not charged for withdrawals of euro within the EEA"
+                        ]
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayPurchaseNonSterling",
+                        "FeeAmount": "0.50",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Foreign currency purchase fee: fee charged per transaction when you make a purchase (not a cash withdrawal or purchase of foreign currency or travellers cheques). Fee is applicable only to debit card transactions. The amount is converted to pounds on the day it is processed by Visa using the Visa Payment Scheme Exchange Rate",
+                          "Foreign currency purchase fee is not charged for purchases in euro within the EEA"
+                        ]
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "FeeAmount": "9.50",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "For payments sent electronically outside the UK or in a foreign currency, other than in euro where no fee is charged"
+                        ]
+                      },
+                      {
+                        "FeeCategory": "ATM",
+                        "FeeType": "ATMAbroadConVisaDebit",
+                        "FeeAmount": "1.50",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Foreign cash fee : fee charged where you elect to allow the cash machine operator/financial service provider to make the conversion to pounds.  The provider of the foreign currency may make a separate charge for conversion.",
+                          "Foreign cash fee is not charged for withdrawals of euro within the EEA"
+                        ]
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayForeignCharge",
+                        "FeeAmount": "12.00",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "The Correspondent Bank Fee will be payable for payments outside the UK when you select to pay all agent bank charges.  Zone 1 – USA, Canada, and Europe (non EEA).  "
+                        ]
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayForeignCharge",
+                        "FeeAmount": "20.00",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "The Correspondent Bank Fee will be payable for payments outside the UK when you select to pay all agent bank charges.  Zone 2 – Rest of the world, excluding EEA."
+                        ]
+                      }
+                    ]
+                  },
+                  "CoreProduct": {
+                    "ProductURL": "https://www.lloydsbank.com/current-accounts/all-accounts/under-19s-account.asp",
+                    "ProductDescription": "Tailored for teens aged 13 to 17 years, this account can help you make the most of your pocket money.",
+                    "TcsAndCsURL": "https://www.lloydsbank.com/help-guidance/legal-information/current-account-terms.html",
+                    "SalesAccessChannels": [
+                      "Online"
+                    ],
+                    "ServicingAccessChannels": [
+                      "ATM",
+                      "Branch",
+                      "CallCentre",
+                      "Post",
+                      "MobileBankingApp",
+                      "Online",
+                      "PostOffice",
+                      "Text"
+                    ],
+                    "MonthlyMaximumCharge": "0.00"
+                  }
+                }
+              ]
+            },
+            {
+              "Name": "Club Lloyds Account",
+              "Identification": "1001",
+              "Segment": [
+                "Reward"
+              ],
+              "OnSaleIndicator": true,
+              "PCAMarketingState": [
+                {
+                  "Identification": "LCL-R002",
+                  "MarketingState": "Promotional",
+                  "FirstMarketedDate": "2017-11-02",
+                  "LastMarketedDate": "2026-05-05",
+                  "StateTenureLength": 3,
+                  "StateTenurePeriod": "Month",
+                  "Notes": [
+                    "Interest free Arranged Overdraft for 3 months"
+                  ],
+                  "CreditInterest": {
+                    "TierBandSet": [
+                      {
+                        "TierBandMethod": "Tiered",
+                        "CalculationMethod": "Compound",
+                        "Destination": "SelfCredit",
+                        "Notes": [
+                          "You will receive credit interest provided you pay two separate Direct Debits from your Club Lloyds current account each calendar month."
+                        ],
+                        "TierBand": [
+                          {
+                            "Identification": "LCL-TB-001",
+                            "TierValueMinimum": "1.00",
+                            "TierValueMaximum": "3999.99",
+                            "CalculationFrequency": "Daily",
+                            "ApplicationFrequency": "Monthly",
+                            "DepositInterestAppliedCoverage": "Tiered",
+                            "FixedVariableInterestRateType": "Variable",
+                            "AER": "0.75",
+                            "BankInterestRateType": "Gross"
+                          },
+                          {
+                            "Identification": "LCL-TB-002",
+                            "TierValueMinimum": "4000.00",
+                            "TierValueMaximum": "5000.00",
+                            "CalculationFrequency": "Daily",
+                            "ApplicationFrequency": "Monthly",
+                            "DepositInterestAppliedCoverage": "Tiered",
+                            "FixedVariableInterestRateType": "Variable",
+                            "AER": "3.00",
+                            "BankInterestRateType": "Gross"
+                          }
+                        ],
+                        "CreditInterestEligibility": [
+                          {
+                            "Name": "Minimum Direct Debits",
+                            "Description": "Must pay two separate Direct Debits from your Club Lloyds current account",
+                            "Type": "DirectDebits",
+                            "Amount": "2",
+                            "Textual": "You must pay two separate Direct Debits from your Club Lloyds current account each calendar month",
+                            "Period": "Month"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "Overdraft": {
+                    "OverdraftTierBandSet": [
+                      {
+                        "TierBandMethod": "Whole",
+                        "OverdraftType": "OnDemand",
+                        "Identification": "LCL-AR-001",
+                        "AuthorisedIndicator": true,
+                        "BufferAmount": "0.00",
+                        "OverdraftTierBand": [
+                          {
+                            "Identification": "LCL-AT-201",
+                            "TierValueMin": "0.00",
+                            "EAR": "0.0",
+                            "Notes": [
+                              "To qualify for the interest-free offer you must :\n• Use the Current Account Switch Service. This service means your old account will be closed and all your payments transferred to your new Lloyds Bank account\n• Have not used the offer within the last 12 months\n• Have applied, and been approved for, an Arranged Overdraft on your new Lloyds Bank account"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "Eligibility": {
+                    "OtherEligibility": [
+                      {
+                        "Name": "Previous Bankruptcy",
+                        "Type": "PreviousBankruptcyAllowed",
+                        "Indicator": false
+                      }
+                    ],
+                    "AgeEligibility": {
+                      "MinimumAge": 18,
+                      "Notes": [
+                        "You're aged 18 or older"
+                      ]
+                    },
+                    "ResidencyEligibility": {
+                      "ResidencyIncluded": [
+                        "UK"
+                      ]
+                    },
+                    "CreditCheck": {
+                      "ScoringType": "Hard"
+                    },
+                    "IDVerificationCheck": {
+                      "URL": "http://www.lloydsbank.com/legal/proof-of-identity.asp?srnum=1"
+                    }
+                  },
+                  "FeaturesAndBenefits": {
+                    "FeatureBenefitGroup": [
+                      {
+                        "Name": "Club Lloyds Lifestyle Benefits",
+                        "Type": "Lifestyle",
+                        "Notes": [
+                          "As a Club Lloyds member, you can choose one Lifestyle Benefit per account per year. You can pick a different one for each account every year, as long as you remain a Club Lloyds customer."
+                        ],
+                        "FeatureBenefitItem": [
+                          {
+                            "Identification": "LCL-BG-001",
+                            "Type": "Lifestyle",
+                            "Name": "6 Cinema Tickets",
+                            "Textual": "6 Vue or ODEON tickets valid at over 80 locations across the UK for use throughout the year."
+                          },
+                          {
+                            "Identification": "LCL-BG-002",
+                            "Type": "Lifestyle",
+                            "Name": "Annual Magazine Subscription",
+                            "Textual": "You can choose one of a wide range of magazine titles available to have delivered to your door or downloaded to your device (compatible with Apple and Android™ devices)."
+                          },
+                          {
+                            "Identification": "LCL-BG-003",
+                            "Type": "Lifestyle",
+                            "Name": "Annual Coffee Club and Gourmet Society Membership",
+                            "Textual": "An annual Coffee Club and Gourmet Society membership gives you 25% off barista-made drinks at Caffe Nero and 25% off your bill at brands including Prezzo and thousands of independent restaurants. Get pizza delivery offers alongside great discounts on theatre tickets and UK attractions."
+                          },
+                          {
+                            "Identification": "LCL-BG-004",
+                            "Type": "Lifestyle",
+                            "Name": "Disney+ subscription",
+                            "Textual": "Choose 12 months of Disney+ and stream endless entertainment from Disney, Pixar, Marvel, Star Wars and National Geographic; as well as a range of general entertainment."
+                          }
+                        ]
+                      }
+                    ],
+                    "FeatureBenefitItem": [
+                      {
+                        "Identification": "LCL-BI-004",
+                        "Type": "AccountManagement",
+                        "Name": "Mobile Alerts",
+                        "Textual": "Our mobile alerts are a simple and convenient way to help you stay on top of your money - if we have your mobile number, we’ll send alerts to keep you up to date on your account balance."
+                      },
+                      {
+                        "Identification": "LCL-BI-005",
+                        "Type": "AccountManagement",
+                        "Name": "Money Manager",
+                        "Textual": "Keep track of your spending and see at a glance where your money goes with our free Internet Banking service."
+                      },
+                      {
+                        "Identification": "LCL-BI-006",
+                        "Type": "AccountManagement",
+                        "Name": "Joint Accounts"
+                      },
+                      {
+                        "Identification": "LCL-BI-007",
+                        "Type": "AccountManagement",
+                        "Name": "ATM Withdrawals",
+                        "Textual": "Withdraw money from any cash machine that shows the LINK or VISA sign"
+                      },
+                      {
+                        "Identification": "LCL-BI-008",
+                        "Type": "PreferentialRates",
+                        "Name": "Club Lloyds Banking Offers",
+                        "Textual": "As a Club Lloyds customer you’ll get exclusive access to offers on a range of Lloyds Bank products.  Check our website to see the latest offers."
+                      },
+                      {
+                        "Identification": "LCL-BI-009",
+                        "Type": "PreferentialRates",
+                        "Name": "Credit Interest",
+                        "Textual": "Earn variable credit interest of 0.75% AER (0.75% gross p.a.) on balances from £1 to £3,999.99 and 3.00% AER (2.96% gross p.a.) on any part of the balance from £4,000 to £5,000 when you pay at least two separate Direct Debits from your Club Lloyds current account each calendar month.",
+                        "FeatureBenefitEligibility": [
+                          {
+                            "Name": "Minimum 2 Direct Debits",
+                            "Description": "Minimum 2 Direct debits from Club Lloyds Account",
+                            "Type": "DirectDebits",
+                            "Amount": "2",
+                            "Indicator": true,
+                            "Textual": "You need to pay at least two separate Direct Debits from your Club Lloyds current account each calendar month.\r\nPlease note, qualifying Direct Debits must come out monthly, quarterly Direct Debits are not eligible. Also Standing Orders do not qualify.",
+                            "Period": "Month"
+                          }
+                        ]
+                      },
+                      {
+                        "Identification": "LCL-BI-010",
+                        "Type": "AccountManagement",
+                        "Name": "Internet Banking",
+                        "Textual": "With Internet Banking, make the most of your account 24/7.  It's the quick, easy way to keep track of your money, make payments and transfers and see your statements."
+                      },
+                      {
+                        "Identification": "LCL-BI-011",
+                        "Type": "AccountManagement",
+                        "Name": "Card Controls",
+                        "Textual": "You can freeze and unfreeze certain Visa debit card transactions 24/7 in the mobile banking app for extra peace of mind.  Handy if you've temporarily misplaced your card!  See our website for more details."
+                      },
+                      {
+                        "Type": "Travel",
+                        "Name": "No debit card charges abroad",
+                        "Textual": "Wherever you are, we won't charge you for using your debit card. If you’re abroad, and choose to pay for something in Pounds Sterling, the provider of the currency conversion may still charge you."
+                      }
+                    ],
+                    "Card": [
+                      {
+                        "Type": "DebitCard",
+                        "Scheme": "Visa",
+                        "ContactlessIndicator": true
+                      }
+                    ],
+                    "MobileWallet": [
+                      {
+                        "Type": "GooglePay"
+                      },
+                      {
+                        "Type": "ApplePay"
+                      },
+                      {
+                        "Type": "MobileBankingApp",
+                        "Notes": [
+                          "Our Mobile Banking app for iOS and Android are quick and easy to install, fast, convenient and more secure than ever - the easy way to stay on top of your money. Bank where you want with the latest built-in security technology that keeps your details safe and private. More and more customers are choosing the flexibility, convenience and security of banking on their mobile."
+                        ]
+                      }
+                    ]
+                  },
+                  "OtherFeesCharges": {
+                    "FeeChargeDetail": [
+                      {
+                        "FeeCategory": "PaymentScheme",
+                        "FeeType": "CHAPSOut",
+                        "FeeAmount": "25.00",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Applies to CHAPS Payments made internally or externally, processed by our own systems or using the Bank of England Payments processing system\n"
+                        ]
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentIn",
+                        "FeeAmount": "2.00",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "For payments up to and including £100 received electronically from outside the UK or in a foreign currency.  No fee charged for receiving euro from within the UK or EEA, or via SEPA Credit Transfer."
+                        ],
+                        "FeeApplicableRange": {
+                          "MinimumAmount": "0.00",
+                          "MaximumAmount": "100.00"
+                        }
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentIn",
+                        "FeeAmount": "7.00",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "For payments over £100 received electronically from outside the UK or in a foreign currency.  No fee charged for receiving euro from within the UK or EEA, or via SEPA Credit Transfer."
+                        ],
+                        "FeeApplicableRange": {
+                          "MinimumAmount": "100.01",
+                          "MaximumAmount": "99999999999999.9999"
+                        }
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "FeeAmount": "9.50",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "For payments sent electronically outside the UK or in a foreign currency, other than in euro where no fee is charged"
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "ServiceCAccountFee",
+                        "FeeAmount": "5.00",
+                        "ApplicationFrequency": "Monthly",
+                        "CalculationFrequency": "Monthly",
+                        "Notes": [
+                          "The Club Lloyds monthly maintaining the account fee is £5 per month. The £5 fee is waived for each month you pay at least £2,000 into your account. If in any month you don't pay in this amount, you will need to pay the £5 monthly account fee."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayForeignCharge",
+                        "FeeAmount": "12.00",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "The Correspondent Bank Fee will be payable for payments outside the UK when you select to pay all agent bank charges.  Zone 1 – USA, Canada, and Europe (non EEA). "
+                        ]
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayForeignCharge",
+                        "FeeAmount": "20.00",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "The Correspondent Bank Fee will be payable for payments outside the UK when you select to pay all agent bank charges.  Zone 2 – Rest of the world, excluding EEA."
+                        ]
+                      }
+                    ]
+                  },
+                  "CoreProduct": {
+                    "ProductURL": "https://www.lloydsbank.com/current-accounts/all-accounts/club-lloyds.asp",
+                    "ProductDescription": "Variable credit interest on balances from £1 to £5,000 and more great benefits. The Club Lloyds monthly account fee is waived if you pay in £2,000 per month, otherwise it costs just £5 per month.\n",
+                    "TcsAndCsURL": "https://www.lloydsbank.com/help-guidance/legal-information/current-account-terms.html",
+                    "SalesAccessChannels": [
+                      "Online"
+                    ],
+                    "ServicingAccessChannels": [
+                      "ATM",
+                      "Branch",
+                      "CallCentre",
+                      "Post",
+                      "MobileBankingApp",
+                      "Online",
+                      "PostOffice",
+                      "Text"
+                    ],
+                    "MonthlyMaximumCharge": "0.00"
+                  }
+                },
+                {
+                  "Identification": "LCL-R001",
+                  "PredecessorID": "LCL-R002",
+                  "MarketingState": "Regular",
+                  "FirstMarketedDate": "2017-11-02",
+                  "LastMarketedDate": "9999-12-31",
+                  "CreditInterest": {
+                    "TierBandSet": [
+                      {
+                        "TierBandMethod": "Tiered",
+                        "CalculationMethod": "Compound",
+                        "Destination": "SelfCredit",
+                        "Notes": [
+                          "To qualify for credit interest, you'll need to pay two separate Direct Debits from your Club Lloyds current account each calendar month."
+                        ],
+                        "TierBand": [
+                          {
+                            "Identification": "LCL-TB-001",
+                            "TierValueMinimum": "1.00",
+                            "TierValueMaximum": "3999.99",
+                            "CalculationFrequency": "Daily",
+                            "ApplicationFrequency": "Monthly",
+                            "DepositInterestAppliedCoverage": "Tiered",
+                            "FixedVariableInterestRateType": "Variable",
+                            "AER": "0.75",
+                            "BankInterestRateType": "Gross"
+                          },
+                          {
+                            "Identification": "LCL-TB-002",
+                            "TierValueMinimum": "4000.00",
+                            "TierValueMaximum": "5000.00",
+                            "CalculationFrequency": "Daily",
+                            "ApplicationFrequency": "Monthly",
+                            "DepositInterestAppliedCoverage": "Tiered",
+                            "FixedVariableInterestRateType": "Variable",
+                            "AER": "3.00",
+                            "BankInterestRateType": "Gross"
+                          }
+                        ],
+                        "CreditInterestEligibility": [
+                          {
+                            "Name": "Minimum Direct Debits",
+                            "Description": "Must pay two separate Direct Debits from your Club Lloyds current account",
+                            "Type": "DirectDebits",
+                            "Amount": "2",
+                            "Textual": "You must pay two separate Direct Debits from your Club Lloyds current account each calendar month",
+                            "Period": "Month"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "Overdraft": {
+                    "OverdraftTierBandSet": [
+                      {
+                        "TierBandMethod": "Tiered",
+                        "OverdraftType": "OnDemand",
+                        "Identification": "LCL-AR-001",
+                        "AuthorisedIndicator": true,
+                        "BufferAmount": "0.00",
+                        "OverdraftTierBand": [
+                          {
+                            "Identification": "LCL-AT-101",
+                            "TierValueMin": "0.00",
+                            "TierValueMax": "100.00",
+                            "EAR": "0.0",
+                            "Notes": [
+                              "The arranged overdraft interest rate does not apply provided you do not exceed your £100 interest-free amount.\n"
+                            ]
+                          },
+                          {
+                            "Identification": "LCL-AT-102",
+                            "TierValueMin": "100.00",
+                            "EAR": "29.90",
+                            "Notes": [
+                              "One Interest Rate You will be charged a single interest rate for everything you borrow using an arranged overdraft over your interest-free amount. The representative interest rate is 29.9% EAR variable.   Daily Charging Instead of paying all daily arranged overdraft interest in one go each month, daily arranged overdraft interest will be charged at the end of each day you use your arranged overdraft – so you’ll pay for what you borrow on the day you borrow it. This will help you keep track of how much your overdraft costs you.   If you go over your limit So all your payments are made, it’s important you manage your account within your arranged overdraft limit. If you don’t have enough money in your account or you reach your limit, you may not be able to make any more payments. If a payment takes you over your limit or we refuse it, you won’t be charged.\n"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "Eligibility": {
+                    "OtherEligibility": [
+                      {
+                        "Name": "Previous Bankruptcy",
+                        "Type": "PreviousBankruptcyAllowed",
+                        "Indicator": false
+                      }
+                    ],
+                    "AgeEligibility": {
+                      "MinimumAge": 18,
+                      "Notes": [
+                        "You're aged 18 or older"
+                      ]
+                    },
+                    "ResidencyEligibility": {
+                      "ResidencyIncluded": [
+                        "UK"
+                      ]
+                    },
+                    "CreditCheck": {
+                      "ScoringType": "Hard"
+                    },
+                    "IDVerificationCheck": {
+                      "URL": "http://www.lloydsbank.com/legal/proof-of-identity.asp?srnum=1"
+                    }
+                  },
+                  "FeaturesAndBenefits": {
+                    "FeatureBenefitGroup": [
+                      {
+                        "Name": "Club Lloyds Lifestyle Benefits",
+                        "Type": "Lifestyle",
+                        "Notes": [
+                          "As a Club Lloyds member, you can choose one Lifestyle Benefit per account per year. You can pick a different one for each account every year, as long as you remain a Club Lloyds customer."
+                        ],
+                        "FeatureBenefitItem": [
+                          {
+                            "Identification": "LCL-BG-001",
+                            "Type": "Lifestyle",
+                            "Name": "6 Cinema Tickets",
+                            "Textual": "6 Vue or ODEON tickets valid at over 80 locations across the UK for use throughout the year."
+                          },
+                          {
+                            "Identification": "LCL-BG-002",
+                            "Type": "Lifestyle",
+                            "Name": "Annual Magazine Subscription",
+                            "Textual": "You can choose one magazine from a wide range of titles available to have delivered to your door or downloaded to your device (compatible with Apple and Android™ devices)."
+                          },
+                          {
+                            "Identification": "LCL-BG-003",
+                            "Type": "Lifestyle",
+                            "Name": "Annual Coffee Club and Gourmet Society Membership",
+                            "Textual": "An annual Coffee Club and Gourmet Society membership gives you 25% off barista-made drinks at Caffe Nero and 25% off your bill at brands including Prezzo and thousands of independent restaurants. Get pizza delivery offers alongside great discounts on theatre tickets and UK attractions."
+                          },
+                          {
+                            "Identification": "LCL-BG-004",
+                            "Type": "Lifestyle",
+                            "Name": "Disney+ Subscription",
+                            "Textual": "Choose 12 months of Disney+ and stream endless entertainment from Disney, Pixar, Marvel, Star Wars and National Geographic; as well as a range of general entertainment."
+                          }
+                        ]
+                      }
+                    ],
+                    "FeatureBenefitItem": [
+                      {
+                        "Identification": "LCL-BI-004",
+                        "Type": "AccountManagement",
+                        "Name": "Mobile Alerts",
+                        "Textual": "Our mobile alerts are a simple and convenient way to help you stay on top of your money - if we have your mobile number, we’ll send alerts to keep you up to date on your account balance."
+                      },
+                      {
+                        "Identification": "LCL-BI-005",
+                        "Type": "AccountManagement",
+                        "Name": "Money Manager",
+                        "Textual": "Keep track of your spending and see at a glance where your money goes with our free Internet Banking service."
+                      },
+                      {
+                        "Identification": "LCL-BI-006",
+                        "Type": "AccountManagement",
+                        "Name": "Joint Accounts"
+                      },
+                      {
+                        "Identification": "LCL-BI-007",
+                        "Type": "AccountManagement",
+                        "Name": "ATM Withdrawals",
+                        "Textual": "Withdraw money from any cash machine that shows the LINK or VISA sign"
+                      },
+                      {
+                        "Identification": "LCL-BI-008",
+                        "Type": "PreferentialRates",
+                        "Name": "Club Lloyds Banking Offers",
+                        "Textual": "As a Club Lloyds customer you’ll get exclusive access to offers on a range of Lloyds Bank products.  Check our website to see the latest offers."
+                      },
+                      {
+                        "Identification": "LCL-BI-009",
+                        "Type": "PreferentialRates",
+                        "Name": "Credit Interest",
+                        "Textual": "Earn variable credit interest of 0.75% AER (0.75% gross p.a.) on balances from £1 to £3,999.99 and 3.00% AER (2.96% gross p.a.) on any part of the balance from £4,000 to £5,000 when you pay at least two separate Direct Debits from your Club Lloyds current account each calendar month.",
+                        "FeatureBenefitEligibility": [
+                          {
+                            "Name": "Minimum 2 Direct Debits",
+                            "Description": "Minimum 2 Direct debits from Club Lloyds Account",
+                            "Type": "DirectDebits",
+                            "Amount": "2",
+                            "Indicator": true,
+                            "Textual": "You need to pay at least two separate Direct Debits from your Club Lloyds current account each calendar month.\nPlease note, qualifying Direct Debits must come out monthly, quarterly Direct Debits are not eligible. Also Standing Orders do not qualify.",
+                            "Period": "Month"
+                          }
+                        ]
+                      },
+                      {
+                        "Identification": "LCL-BI-010",
+                        "Type": "AccountManagement",
+                        "Name": "Internet Banking",
+                        "Textual": "With Internet Banking, make the most of your account 24/7.  It's the quick, easy way to keep track of your money, make payments and transfers and see your statements."
+                      },
+                      {
+                        "Identification": "LCL-BI-011",
+                        "Type": "AccountManagement",
+                        "Name": "Card Controls",
+                        "Textual": "You can freeze and unfreeze certain Visa debit card transactions 24/7 in the mobile banking app for extra peace of mind.  Handy if you've temporarily misplaced your card!  See our website for more details."
+                      },
+                      {
+                        "Type": "Travel",
+                        "Name": "No debit card charges abroad",
+                        "Textual": "Wherever you are, we won't charge you for using your debit card. If you’re abroad, and choose to pay for something in Pounds Sterling, the provider of the currency conversion may still charge you."
+                      },
+                      {
+                        "Type": "AccountOpeningOrSwitching Incentive",
+                        "Name": "RAF30",
+                        "Amount": "30.00",
+                        "Notes": [
+                          "You can earn £30 by referring a friend to open a Lloyds Personal Current Account. To qualify as the referrer, you must hold any Lloyds Personal Current Account, except for Under19s, Smart Start, or Student Accounts. To receive the reward, you need to share your referral link with a friend, and they must use it to open a qualifying account. That account must remain open for at least 7 days.  As the referred friend, you will earn £30 if you open a qualifying Lloyds Personal Current Account using the referral link provided by the existing customer. Eligible accounts include Classic, Club Lloyds, Basic, Lloyds Premier, Silver, Platinum, Club Lloyds Silver, or Club Lloyds Platinum. You must not have previously received a Refer a Friend reward from Lloyds.  (T&Cs Apply)\n"
+                        ]
+                      },
+                      {
+                        "Type": "AccountOpeningOrSwitching Incentive",
+                        "Name": "200",
+                        "Amount": "200.00",
+                        "Notes": [
+                          "To qualify for the £200 switching offer (“the offer”) you must switch to a new Lloyds current account using the ‘Current Account Switch Service’ to switch from a bank account held with another bank. To qualify for the offer all the following conditions apply: Apply for a new Club Lloyds Account (a £5 monthly fee may apply), a new Club Lloyds Platinum Account (£22.50 monthly fee applies, plus £5 monthly Club Lloyds fee may apply), a new Club Lloyds Silver Account (£11.50 monthly fee applies, plus £5 Club Lloyds fee may apply) or a new Lloyds Premier (‘Qualifying Account’); and Use the ‘Current Account Switch Service’ to transfer all the active credits and debits from the bank account that you hold with another bank to the new bank account which will close your old account with the other bank; and Your switch must include the transfer of a minimum of 3 active direct debits from your old account being switched to Lloyds as part of the offer. Direct debits set up after your switch has been started and other types of automated payments, such as standing orders and recurring card payments, won’t count towards the offer; and Open the current account online, in branch or by phone between 17/09/2026 and 09/12/2026; and Start your switch from your old bank account using the ‘Current Account Switch Service’ by 09/12/2026; and If all of the conditions are met, the offer will be paid directly into your account within 14 working days of your switch starting and will appear as a cash credit.\n"
+                        ]
+                      }
+                    ],
+                    "Card": [
+                      {
+                        "Type": "DebitCard",
+                        "Scheme": "Visa",
+                        "ContactlessIndicator": true
+                      }
+                    ],
+                    "MobileWallet": [
+                      {
+                        "Type": "GooglePay"
+                      },
+                      {
+                        "Type": "ApplePay"
+                      },
+                      {
+                        "Type": "MobileBankingApp",
+                        "Notes": [
+                          "Our Mobile Banking app for iOS and Android are quick and easy to install, fast, convenient and more secure than ever - the easy way to stay on top of your money. Bank where you want with the latest built-in security technology that keeps your details safe and private. More and more customers are choosing the flexibility, convenience and security of banking on their mobile."
+                        ]
+                      },
+                      {
+                        "Type": "SamsungPay"
+                      }
+                    ]
+                  },
+                  "OtherFeesCharges": {
+                    "FeeChargeDetail": [
+                      {
+                        "FeeCategory": "PaymentScheme",
+                        "FeeType": "CHAPSOut",
+                        "FeeAmount": "25.00",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "Applies to CHAPS Payments made internally or externally, processed by our own systems or using the Bank of England Payments processing system\n"
+                        ]
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentIn",
+                        "FeeAmount": "2.00",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "For payments up to and including £100 received electronically from outside the UK or in a foreign currency.  No fee charged for receiving euro from within the UK or EEA, or via SEPA Credit Transfer.  "
+                        ],
+                        "FeeApplicableRange": {
+                          "MinimumAmount": "0.00",
+                          "MaximumAmount": "100.00"
+                        }
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentIn",
+                        "FeeAmount": "7.00",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "For payments over £100 received electronically from outside the UK or in a foreign currency.  No fee charged for receiving euro from within the UK or EEA, or via SEPA Credit Transfer."
+                        ],
+                        "FeeApplicableRange": {
+                          "MinimumAmount": "100.01",
+                          "MaximumAmount": "99999999999999.9999"
+                        }
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "FeeAmount": "9.50",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "For payments sent electronically outside the UK or in a foreign currency, other than in euro where no fee is charged"
+                        ]
+                      },
+                      {
+                        "FeeCategory": "Servicing",
+                        "FeeType": "ServiceCAccountFee",
+                        "FeeAmount": "5.00",
+                        "ApplicationFrequency": "Monthly",
+                        "CalculationFrequency": "Monthly",
+                        "Notes": [
+                          "The Club Lloyds monthly account fee is £5 per month. The £5 fee is waived for each month you pay at least £2,000 into your account. If in any month you don't pay in this amount, you will need to pay the £5 monthly account fee."
+                        ]
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayForeignCharge",
+                        "FeeAmount": "12.00",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "The Correspondent Bank Fee will be payable for payments outside the UK when you select to pay all agent bank charges.  Zone 1 – USA, Canada, and Europe (non EEA).  "
+                        ]
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayForeignCharge",
+                        "FeeAmount": "20.00",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerTransaction",
+                        "Notes": [
+                          "The Correspondent Bank Fee will be payable for payments outside the UK when you select to pay all agent bank charges. Zone 2 – Rest of the world, excluding EEA."
+                        ]
+                      }
+                    ]
+                  },
+                  "CoreProduct": {
+                    "ProductURL": "https://www.lloydsbank.com/current-accounts/all-accounts/club-lloyds.asp",
+                    "ProductDescription": "Variable credit interest on balances from £1 to £5,000 and more great benefits. \n\nThe Club Lloyds monthly account fee is waived if you pay in £2,000 per month, otherwise it costs just £5 per month.",
+                    "TcsAndCsURL": "https://www.lloydsbank.com/help-guidance/legal-information/current-account-terms.html",
+                    "SalesAccessChannels": [
+                      "Online"
+                    ],
+                    "ServicingAccessChannels": [
+                      "ATM",
+                      "Branch",
+                      "CallCentre",
+                      "Post",
+                      "MobileBankingApp",
+                      "Online",
+                      "PostOffice",
+                      "Text"
+                    ],
+                    "MonthlyMaximumCharge": "0.00"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,200 @@
+{
+  "meta": {
+    "LastUpdated": "2026-11-04T18:09:05.503Z",
+    "TotalResults": 424,
+    "Agreement": "Use of the APIs and any related data will be subject to the terms of the Open Licence and subject to terms and conditions",
+    "License": "https://www.openbanking.org.uk/open-licence",
+    "TermsOfUse": "https://www.openbanking.org.uk/terms"
+  },
+  "data": [
+    {
+      "Brand": [
+        {
+          "BrandName": "NWB",
+          "ATM": [
+            {
+              "Identification": "r27Oaj",
+              "SupportedLanguages": [],
+              "ATMServices": [],
+              "Accessibility": [],
+              "SupportedCurrencies": [
+                "GBP"
+              ],
+              "Note": [],
+              "OtherAccessibility": [],
+              "OtherATMServices": [],
+              "Location": {
+                "LocationCategory": [],
+                "OtherLocationCategory": [],
+                "PostalAddress": {
+                  "AddressLine": [
+                    "Horseferry Road",
+                    "London",
+                    "London",
+                    "SW1P 2AY"
+                  ],
+                  "TownName": "London",
+                  "CountrySubDivision": [
+                    "London"
+                  ],
+                  "Country": "UK",
+                  "PostCode": "SW1P 2AY",
+                  "GeoLocation": {
+                    "GeographicCoordinates": {
+                      "Latitude": "051.49486280",
+                      "Longitude": "-000.12953160"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "Identification": "5A5V4x",
+              "SupportedLanguages": [],
+              "ATMServices": [],
+              "Accessibility": [],
+              "SupportedCurrencies": [
+                "GBP"
+              ],
+              "Note": [],
+              "OtherAccessibility": [],
+              "OtherATMServices": [],
+              "Location": {
+                "LocationCategory": [],
+                "OtherLocationCategory": [],
+                "PostalAddress": {
+                  "AddressLine": [
+                    "95 High Street",
+                    "London",
+                    "London",
+                    "W3 6QX"
+                  ],
+                  "TownName": "London",
+                  "CountrySubDivision": [
+                    "London"
+                  ],
+                  "Country": "UK",
+                  "PostCode": "W3 6QX",
+                  "GeoLocation": {
+                    "GeographicCoordinates": {
+                      "Latitude": "051.50659581",
+                      "Longitude": "-000.26836773"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "Identification": "PPvxaV",
+              "SupportedLanguages": [],
+              "ATMServices": [],
+              "Accessibility": [],
+              "SupportedCurrencies": [
+                "GBP"
+              ],
+              "Note": [],
+              "OtherAccessibility": [],
+              "OtherATMServices": [],
+              "Location": {
+                "LocationCategory": [],
+                "OtherLocationCategory": [],
+                "PostalAddress": {
+                  "AddressLine": [
+                    "159 High Street",
+                    "Burton-On-Trent",
+                    "Staffordshire",
+                    "DE14 1JG"
+                  ],
+                  "TownName": "Burton-On-Trent",
+                  "CountrySubDivision": [
+                    "Staffordshire"
+                  ],
+                  "Country": "UK",
+                  "PostCode": "DE14 1JG",
+                  "GeoLocation": {
+                    "GeographicCoordinates": {
+                      "Latitude": "052.80264900",
+                      "Longitude": "-001.62968700"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "Identification": "jm6Rak",
+              "SupportedLanguages": [],
+              "ATMServices": [],
+              "Accessibility": [],
+              "SupportedCurrencies": [
+                "GBP"
+              ],
+              "Note": [],
+              "OtherAccessibility": [],
+              "OtherATMServices": [],
+              "Location": {
+                "LocationCategory": [],
+                "OtherLocationCategory": [],
+                "PostalAddress": {
+                  "AddressLine": [
+                    "The Square",
+                    "Chagford",
+                    "Devon",
+                    "TQ13 8AH"
+                  ],
+                  "TownName": "Chagford",
+                  "CountrySubDivision": [
+                    "Devon"
+                  ],
+                  "Country": "UK",
+                  "PostCode": "TQ13 8AH",
+                  "GeoLocation": {
+                    "GeographicCoordinates": {
+                      "Latitude": "050.67285572",
+                      "Longitude": "-003.84055959"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "Identification": "ZVgzJW",
+              "SupportedLanguages": [],
+              "ATMServices": [],
+              "Accessibility": [],
+              "SupportedCurrencies": [
+                "GBP"
+              ],
+              "Note": [],
+              "OtherAccessibility": [],
+              "OtherATMServices": [],
+              "Location": {
+                "LocationCategory": [],
+                "OtherLocationCategory": [],
+                "PostalAddress": {
+                  "AddressLine": [
+                    "1 High Street",
+                    "Long Buckby",
+                    "Northamptonshire",
+                    "NN6 7RR"
+                  ],
+                  "TownName": "Long Buckby",
+                  "CountrySubDivision": [
+                    "Northamptonshire"
+                  ],
+                  "Country": "UK",
+                  "PostCode": "NN6 7RR",
+                  "GeoLocation": {
+                    "GeographicCoordinates": {
+                      "Latitude": "052.30318593",
+                      "Longitude": "-001.08029869"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

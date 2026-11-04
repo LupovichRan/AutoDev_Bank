@@ -1,0 +1,1524 @@
+{
+  "meta": {
+    "LastUpdated": "2026-11-04T17:28:58.183Z",
+    "TotalResults": 18,
+    "Agreement": "Use of the APIs and any related data will be subject to the terms of the Open Licence and subject to terms and conditions",
+    "License": "https://www.openbanking.org.uk/open-licence",
+    "TermsOfUse": "https://www.openbanking.org.uk/terms"
+  },
+  "data": [
+    {
+      "Brand": [
+        {
+          "BrandName": "NatWest",
+          "PCA": [
+            {
+              "Name": "Foundation",
+              "Identification": "QF",
+              "OnSaleIndicator": true,
+              "PCAMarketingState": [
+                {
+                  "Identification": "1",
+                  "CoreProduct": {
+                    "ProductDescription": "An everyday fee free account with no overdraft facility.\n\nBank anywhere with our mobile app, 24-hour telephony banking and online banking, Text alerts",
+                    "ProductURL": "http://personal.natwest.com/personal/current-accounts/manage/foundation.html",
+                    "TcsAndCsURL": "http://personal.natwest.com/personal/current-accounts/terms-and-conditions.html",
+                    "MonthlyMaximumCharge": "0",
+                    "SalesAccessChannels": [
+                      "Branch",
+                      "Online",
+                      "CallCentre"
+                    ],
+                    "ServicingAccessChannels": [
+                      "ATM",
+                      "Branch",
+                      "CallCentre",
+                      "MobileBankingApp",
+                      "Online",
+                      "PostOffice",
+                      "Text"
+                    ]
+                  },
+                  "FeaturesAndBenefits": {
+                    "FeatureBenefitItem": [
+                      {
+                        "Identification": "116429",
+                        "Name": "CardScheme",
+                        "Type": "Other",
+                        "Textual": "MasterCard"
+                      },
+                      {
+                        "Identification": "116433",
+                        "Name": "Cashback",
+                        "Type": "Cashback",
+                        "Indicator": false
+                      },
+                      {
+                        "Identification": "116434",
+                        "Name": "OverdraftAvailable",
+                        "Type": "AccountManagement",
+                        "Indicator": false
+                      },
+                      {
+                        "Identification": "116435",
+                        "Name": "PackagedAccountBenefits",
+                        "Type": "AccountManagement",
+                        "Indicator": false
+                      },
+                      {
+                        "Identification": "116422",
+                        "Name": "RegularFee",
+                        "Type": "AccountManagement",
+                        "Textual": "None"
+                      },
+                      {
+                        "Identification": "116436",
+                        "Name": "SetOffArrangement",
+                        "Type": "AccountManagement",
+                        "Indicator": false
+                      },
+                      {
+                        "Identification": "116437",
+                        "Name": "Rewards",
+                        "Type": "Rewards",
+                        "Indicator": false
+                      },
+                      {
+                        "Identification": "116438",
+                        "Name": "ChequeBookAvailable",
+                        "Type": "AccountManagement",
+                        "Indicator": false
+                      },
+                      {
+                        "Identification": "116439",
+                        "Name": "CreditInterestRatePayable",
+                        "Type": "AccountManagement",
+                        "Indicator": false
+                      },
+                      {
+                        "Identification": "116423",
+                        "Name": "Currency",
+                        "Type": "Other",
+                        "Textual": "GBP"
+                      },
+                      {
+                        "Identification": "116440",
+                        "Name": "CurrentAccountSwitchService",
+                        "Type": "AccountOpeningOrSwitching Incentive",
+                        "Indicator": true
+                      },
+                      {
+                        "Identification": "116441",
+                        "Name": "DebitCard",
+                        "Type": "AccountManagement",
+                        "Indicator": true
+                      },
+                      {
+                        "Identification": "116442",
+                        "Name": "DirectDebits",
+                        "Type": "AccountManagement",
+                        "Indicator": true
+                      },
+                      {
+                        "Identification": "116424",
+                        "Name": "ElectronicPayments",
+                        "Type": "AccountManagement",
+                        "Textual": "BACS; Faster Payments; Domestic Payments; International Payments; CHAPS"
+                      },
+                      {
+                        "Identification": "116443",
+                        "Name": "InstantAccess",
+                        "Type": "AccountManagement",
+                        "Indicator": true
+                      },
+                      {
+                        "Identification": "116425",
+                        "Name": "JointAccountAvailability",
+                        "Type": "AccountManagement",
+                        "Textual": "Sole and Joint"
+                      },
+                      {
+                        "Identification": "116426",
+                        "Name": "NegotiableTariffOptions",
+                        "Type": "Other",
+                        "Textual": "N/A"
+                      },
+                      {
+                        "Identification": "116427",
+                        "Name": "PaymentClearingSystemSupported",
+                        "Type": "AccountManagement",
+                        "Textual": "BACS; CHAPS; International systems"
+                      },
+                      {
+                        "Identification": "116444",
+                        "Name": "QuickDepositsServiceAvailability",
+                        "Type": "AccountManagement",
+                        "Indicator": true
+                      },
+                      {
+                        "Identification": "116445",
+                        "Name": "StandingOrderAvailability",
+                        "Type": "AccountManagement",
+                        "Indicator": true
+                      },
+                      {
+                        "Identification": "116446",
+                        "Name": "TextAlerts",
+                        "Type": "AccountManagement",
+                        "Indicator": true
+                      },
+                      {
+                        "Identification": "116447",
+                        "Name": "TransfersAllowed",
+                        "Type": "AccountManagement",
+                        "Indicator": true
+                      },
+                      {
+                        "Identification": "116448",
+                        "Name": "DigitalServices",
+                        "Type": "AccountManagement",
+                        "Textual": "Online Banking, Moblie App, Apple Pay"
+                      },
+                      {
+                        "Identification": "116449",
+                        "Name": "AutoTransfers",
+                        "Type": "AccountManagement",
+                        "Indicator": false
+                      }
+                    ],
+                    "MobileWallet": [
+                      {
+                        "Type": "ApplePay",
+                        "Notes": [
+                          "Android Pay"
+                        ]
+                      },
+                      {
+                        "Type": "MobileBankingApp",
+                        "Notes": [
+                          "Android Pay"
+                        ]
+                      },
+                      {
+                        "Type": "Other",
+                        "Notes": [
+                          "Android Pay"
+                        ]
+                      },
+                      {
+                        "Type": "PayM",
+                        "Notes": [
+                          "Android Pay"
+                        ]
+                      }
+                    ],
+                    "Card": [
+                      {
+                        "Scheme": "MasterCard",
+                        "Type": "DebitCard",
+                        "ContactlessIndicator": true
+                      }
+                    ]
+                  },
+                  "MarketingState": "Regular",
+                  "FirstMarketedDate": "2015-11-27",
+                  "LastMarketedDate": "2099-12-31",
+                  "OtherFeesCharges": {
+                    "FeeChargeDetail": [
+                      {
+                        "FeeCategory": "Transaction",
+                        "FeeType": "IntlPayTransNonSterling",
+                        "Notes": [
+                          "Fee - Non-sterling transaction",
+                          "2.75% Non-Sterling Transaction Fee on foreign currency withdrawal (UK cash machines), and \ncash withdrawals or buying currency/travellers cheques outside the UK. Also applies to payments made in a foreign currency inside or outside the UK. Customers with Black, Reward Black, Reward Platinum and Reward Silver debit cards will not be charged this fee on point of sale transactions."
+                        ],
+                        "FeeRate": "2.75",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "Report",
+                        "FeeType": "ReportStatementCopy1",
+                        "Notes": [
+                          "Charge - Duplicate statement",
+                          "Copy statements £3"
+                        ],
+                        "FeeAmount": "3",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerItem"
+                      },
+                      {
+                        "FeeCategory": "BankersDrafts",
+                        "FeeType": "DraftsBankers",
+                        "Notes": [
+                          "Fee - Bankers draft issuance",
+                          "UK Bankers Draft £20"
+                        ],
+                        "FeeAmount": "20",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerItem"
+                      },
+                      {
+                        "FeeCategory": "PaymentScheme",
+                        "FeeType": "CHAPSOutInterBranch",
+                        "Notes": [
+                          "Fee - CHAPS (between RBS branches)",
+                          "CHAPS payment (within NatWest) £20"
+                        ],
+                        "FeeAmount": "21",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "PaymentScheme",
+                        "FeeType": "CHAPSOutInterBank",
+                        "Notes": [
+                          "Fee - CHAPS (between Banks)",
+                          "CHAPS payment (to another bank) £23"
+                        ],
+                        "FeeAmount": "23",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "Report",
+                        "FeeType": "ReportReference",
+                        "Notes": [
+                          "Fee",
+                          "Banker’s Reference £10 each request"
+                        ],
+                        "FeeAmount": "10",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerItem"
+                      },
+                      {
+                        "FeeCategory": "Cheque",
+                        "FeeType": "ServiceCOther",
+                        "Notes": [
+                          "Fee",
+                          "Sterling Travellers cheques 1% of value (min £3, max £50)"
+                        ],
+                        "FeeRate": "1",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "Notes": [
+                          "Charge - Payment delivery",
+                          "Standard International Payment: Outwards Non-Euro Payment made via Branch, Post/Fax, Telephone £22"
+                        ],
+                        "FeeAmount": "22",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "Notes": [
+                          "Charge - Payment delivery",
+                          "Urgent International Payment: Outward non-Euro Payment made via Branch, Post/Fax, Telephone £30"
+                        ],
+                        "FeeAmount": "30",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "Notes": [
+                          "Charge - Payment delivery",
+                          "International Payment Outward Payment Agents’ Charges £8.50"
+                        ],
+                        "FeeAmount": "8.50",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "Notes": [
+                          "Charge - Payment delivery",
+                          "International Payment: Outward Payment Agents Charge £12.50"
+                        ],
+                        "FeeAmount": "12.50",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "Notes": [
+                          "Charge - Payment delivery",
+                          "Standard International Payment: Outward Euro Payment made via Branch, Post/Fax, Telephony £0"
+                        ],
+                        "FeeAmount": "0",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "ForeignChqDraft",
+                        "Notes": [
+                          "Charge",
+                          "Foreign Drafts - Up to and including £100: £8"
+                        ],
+                        "FeeAmount": "8",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "ForeignChqDraft",
+                        "Notes": [
+                          "Charge",
+                          "Foreign Drafts - Over £100: £20"
+                        ],
+                        "FeeAmount": "20",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentIn",
+                        "Notes": [
+                          "Charge - Payment delivery",
+                          "International Payments - Inwards Non-Euro Payments Up to and including £100: £1"
+                        ],
+                        "FeeAmount": "1",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentIn",
+                        "Notes": [
+                          "Charge - Payment delivery",
+                          "International Payments - Inwards Non-Euro Payments Over £100: £7"
+                        ],
+                        "FeeAmount": "7",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "Cheque",
+                        "FeeType": "ChqForeign",
+                        "Notes": [
+                          "Charge - Cheques Paid In - Branches",
+                          "Foreign Cheques paid in: Up to and including £100 - £5\n(Payments by Negotiation or Collection)"
+                        ],
+                        "FeeAmount": "5",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "Cheque",
+                        "FeeType": "ChqForeign",
+                        "Notes": [
+                          "Charge - Cheques Paid In - Branches",
+                          "Foreign Cheques paid in: £100.01 to £5,000 - £10\n(Payments by Negotiation or Collection)"
+                        ],
+                        "FeeAmount": "10",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "Cheque",
+                        "FeeType": "ChqForeign",
+                        "Notes": [
+                          "Charge - Cheques Paid In - Branches",
+                          "Foreign Cheques paid in: £5,000.01 to £20,000 - £30(Payments by Negotiation or Collection)"
+                        ],
+                        "FeeAmount": "30",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "Cheque",
+                        "FeeType": "ChqForeign",
+                        "Notes": [
+                          "Charge - Cheques Paid In - Branches",
+                          "Foreign Cheques paid in: Above £20,000 - £60\n(Payments by Negotiation or Collection)"
+                        ],
+                        "FeeAmount": "60",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "Notes": [
+                          "Charge - Payment delivery",
+                          "Urgent International Payment: Outwards Euro Payment made via Branch, Post/Fax, Telephone £23"
+                        ],
+                        "FeeAmount": "23",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "Notes": [
+                          "Charge - Payment delivery",
+                          "Standard International Payment: Outward Payment in any currency made via Mobile Banking/Online Banking £0"
+                        ],
+                        "FeeAmount": "0",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "Notes": [
+                          "Charge - Payment delivery",
+                          "Urgent International Payment: Outward Payment in any currency made via Online Banking/Mobile Banking £15"
+                        ],
+                        "FeeAmount": "15",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentIn",
+                        "Notes": [
+                          "Charge - Payment delivery",
+                          "International Payment - Inwards Euro Payment of any Value: £0"
+                        ],
+                        "FeeAmount": "0",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      }
+                    ],
+                    "FeeChargeCap": [
+                      {
+                        "MinMaxType": "Minimum",
+                        "FeeCapAmount": "3",
+                        "FeeType": [
+                          "ServiceCOther"
+                        ]
+                      },
+                      {
+                        "MinMaxType": "Maximum",
+                        "FeeCapAmount": "50",
+                        "FeeType": [
+                          "ServiceCOther"
+                        ]
+                      }
+                    ]
+                  },
+                  "Eligibility": {}
+                }
+              ],
+              "Segment": [
+                "Basic"
+              ]
+            },
+            {
+              "Name": "Select Account",
+              "Identification": "ZJ",
+              "OnSaleIndicator": true,
+              "PCAMarketingState": [
+                {
+                  "Identification": "1",
+                  "CoreProduct": {
+                    "ProductDescription": "Select is our everyday bank account. \n\nWith it you can get a range of time-saving features, like a contactless debit card and an easy-to-use mobile app.",
+                    "ProductURL": "http://www.natwest.com/select",
+                    "TcsAndCsURL": "http://personal.natwest.com/personal/current-accounts/terms-and-conditions.html",
+                    "MonthlyMaximumCharge": "0",
+                    "SalesAccessChannels": [
+                      "Branch",
+                      "Online",
+                      "CallCentre"
+                    ],
+                    "ServicingAccessChannels": [
+                      "ATM",
+                      "Branch",
+                      "CallCentre",
+                      "MobileBankingApp",
+                      "Online",
+                      "PostOffice",
+                      "Text"
+                    ]
+                  },
+                  "FeaturesAndBenefits": {
+                    "FeatureBenefitItem": [
+                      {
+                        "Identification": "116732",
+                        "Name": "CardScheme",
+                        "Type": "Other",
+                        "Textual": "Visa"
+                      },
+                      {
+                        "Identification": "116737",
+                        "Name": "Cashback",
+                        "Type": "Cashback",
+                        "Indicator": false
+                      },
+                      {
+                        "Identification": "116738",
+                        "Name": "OverdraftAvailable",
+                        "Type": "AccountManagement",
+                        "Indicator": true
+                      },
+                      {
+                        "Identification": "116739",
+                        "Name": "PackagedAccountBenefits",
+                        "Type": "AccountManagement",
+                        "Indicator": false
+                      },
+                      {
+                        "Identification": "116725",
+                        "Name": "RegularFee",
+                        "Type": "AccountManagement",
+                        "Textual": "None"
+                      },
+                      {
+                        "Identification": "116740",
+                        "Name": "SetOffArrangement",
+                        "Type": "AccountManagement",
+                        "Indicator": false
+                      },
+                      {
+                        "Identification": "116741",
+                        "Name": "Rewards",
+                        "Type": "Rewards",
+                        "Indicator": false
+                      },
+                      {
+                        "Identification": "116742",
+                        "Name": "ChequeBookAvailable",
+                        "Type": "AccountManagement",
+                        "Indicator": true
+                      },
+                      {
+                        "Identification": "116743",
+                        "Name": "CreditInterestRatePayable",
+                        "Type": "AccountManagement",
+                        "Indicator": false
+                      },
+                      {
+                        "Identification": "116726",
+                        "Name": "Currency",
+                        "Type": "Other",
+                        "Textual": "GBP"
+                      },
+                      {
+                        "Identification": "116744",
+                        "Name": "CurrentAccountSwitchService",
+                        "Type": "AccountOpeningOrSwitching Incentive",
+                        "Indicator": true
+                      },
+                      {
+                        "Identification": "116745",
+                        "Name": "DebitCard",
+                        "Type": "AccountManagement",
+                        "Indicator": true
+                      },
+                      {
+                        "Identification": "116746",
+                        "Name": "DirectDebits",
+                        "Type": "AccountManagement",
+                        "Indicator": true
+                      },
+                      {
+                        "Identification": "116727",
+                        "Name": "ElectronicPayments",
+                        "Type": "AccountManagement",
+                        "Textual": "BACS; Faster Payments; Domestic Payments; International Payments; CHAPS"
+                      },
+                      {
+                        "Identification": "116747",
+                        "Name": "InstantAccess",
+                        "Type": "AccountManagement",
+                        "Indicator": true
+                      },
+                      {
+                        "Identification": "116728",
+                        "Name": "JointAccountAvailability",
+                        "Type": "AccountManagement",
+                        "Textual": "Sole and Joint"
+                      },
+                      {
+                        "Identification": "116729",
+                        "Name": "NegotiableTariffOptions",
+                        "Type": "Other",
+                        "Textual": "N/A"
+                      },
+                      {
+                        "Identification": "116730",
+                        "Name": "PaymentClearingSystemSupported",
+                        "Type": "AccountManagement",
+                        "Textual": "BACS; CHAPS; International systems"
+                      },
+                      {
+                        "Identification": "116748",
+                        "Name": "QuickDepositsServiceAvailability",
+                        "Type": "AccountManagement",
+                        "Indicator": true
+                      },
+                      {
+                        "Identification": "116749",
+                        "Name": "StandingOrderAvailability",
+                        "Type": "AccountManagement",
+                        "Indicator": true
+                      },
+                      {
+                        "Identification": "116750",
+                        "Name": "TextAlerts",
+                        "Type": "AccountManagement",
+                        "Indicator": true
+                      },
+                      {
+                        "Identification": "116751",
+                        "Name": "TransfersAllowed",
+                        "Type": "AccountManagement",
+                        "Indicator": true
+                      },
+                      {
+                        "Identification": "116752",
+                        "Name": "DigitalServices",
+                        "Type": "AccountManagement",
+                        "Textual": "Online Banking, Moblie App, Apple Pay, Android Pay, PayM"
+                      },
+                      {
+                        "Identification": "116753",
+                        "Name": "AutoTransfers",
+                        "Type": "AccountManagement",
+                        "Indicator": false
+                      }
+                    ],
+                    "MobileWallet": [
+                      {
+                        "Type": "ApplePay",
+                        "Notes": [
+                          "Android Pay"
+                        ]
+                      },
+                      {
+                        "Type": "MobileBankingApp",
+                        "Notes": [
+                          "Android Pay"
+                        ]
+                      },
+                      {
+                        "Type": "Other",
+                        "Notes": [
+                          "Android Pay"
+                        ]
+                      },
+                      {
+                        "Type": "PayM",
+                        "Notes": [
+                          "Android Pay"
+                        ]
+                      }
+                    ],
+                    "Card": [
+                      {
+                        "Scheme": "Visa",
+                        "Type": "DebitCard",
+                        "ContactlessIndicator": true
+                      }
+                    ]
+                  },
+                  "Eligibility": {
+                    "IDVerificationCheck": {},
+                    "CreditCheck": {
+                      "ScoringType": "Hard"
+                    }
+                  },
+                  "MarketingState": "Regular",
+                  "FirstMarketedDate": "2011-07-04",
+                  "LastMarketedDate": "2099-12-31",
+                  "OtherFeesCharges": {
+                    "FeeChargeDetail": [
+                      {
+                        "FeeCategory": "Transaction",
+                        "FeeType": "IntlPayTransNonSterling",
+                        "Notes": [
+                          "Fee - Non-sterling transaction",
+                          "2.75% Non-Sterling Transaction Fee on foreign currency withdrawal (UK cash machines), and \ncash withdrawals or buying currency/travellers cheques outside the UK. Also applies to payments made in a foreign currency inside or outside the UK. Customers with Black, Reward Black, Reward Platinum and Reward Silver debit cards will not be charged this fee on point of sale transactions."
+                        ],
+                        "FeeRate": "2.75",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "Report",
+                        "FeeType": "ReportStatementCopy1",
+                        "Notes": [
+                          "Charge - Duplicate statement",
+                          "Copy statements £3"
+                        ],
+                        "FeeAmount": "3",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerItem"
+                      },
+                      {
+                        "FeeCategory": "BankersDrafts",
+                        "FeeType": "DraftsBankers",
+                        "Notes": [
+                          "Fee - Bankers draft issuance",
+                          "UK Bankers Draft £20"
+                        ],
+                        "FeeAmount": "20",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerItem"
+                      },
+                      {
+                        "FeeCategory": "PaymentScheme",
+                        "FeeType": "CHAPSOutInterBranch",
+                        "Notes": [
+                          "Fee - CHAPS (between RBS branches)",
+                          "CHAPS payment (within NatWest) £20"
+                        ],
+                        "FeeAmount": "21",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "PaymentScheme",
+                        "FeeType": "CHAPSOutInterBank",
+                        "Notes": [
+                          "Fee - CHAPS (between Banks)",
+                          "CHAPS payment (to another bank) £23"
+                        ],
+                        "FeeAmount": "23",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "Report",
+                        "FeeType": "ReportReference",
+                        "Notes": [
+                          "Fee",
+                          "Banker’s Reference £10 each request"
+                        ],
+                        "FeeAmount": "10",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerItem"
+                      },
+                      {
+                        "FeeCategory": "Cheque",
+                        "FeeType": "ServiceCOther",
+                        "Notes": [
+                          "Fee",
+                          "Sterling Travellers cheques 1% of value (min £3, max £50)"
+                        ],
+                        "FeeRate": "1",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "Notes": [
+                          "Charge - Payment delivery",
+                          "Standard International Payment: Outwards Non-Euro Payment made via Branch, Post/Fax, Telephone £22"
+                        ],
+                        "FeeAmount": "22",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "Notes": [
+                          "Charge - Payment delivery",
+                          "Urgent International Payment: Outward non-Euro Payment made via Branch, Post/Fax, Telephone £30"
+                        ],
+                        "FeeAmount": "30",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "Notes": [
+                          "Charge - Payment delivery",
+                          "International Payment Outward Payment Agents’ Charges £8.50"
+                        ],
+                        "FeeAmount": "8.50",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "Notes": [
+                          "Charge - Payment delivery",
+                          "International Payment: Outward Payment Agents Charge £12.50"
+                        ],
+                        "FeeAmount": "12.50",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "Notes": [
+                          "Charge - Payment delivery",
+                          "Standard International Payment: Outward Euro Payment made via Branch, Post/Fax, Telephony £0"
+                        ],
+                        "FeeAmount": "0",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "ForeignChqDraft",
+                        "Notes": [
+                          "Charge",
+                          "Foreign Drafts - Up to and including £100: £8"
+                        ],
+                        "FeeAmount": "8",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "ForeignChqDraft",
+                        "Notes": [
+                          "Charge",
+                          "Foreign Drafts - Over £100: £20"
+                        ],
+                        "FeeAmount": "20",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentIn",
+                        "Notes": [
+                          "Charge - Payment delivery",
+                          "International Payments - Inwards Non-Euro Payments Up to and including £100: £1"
+                        ],
+                        "FeeAmount": "1",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentIn",
+                        "Notes": [
+                          "Charge - Payment delivery",
+                          "International Payments - Inwards Non-Euro Payments Over £100: £7"
+                        ],
+                        "FeeAmount": "7",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "Cheque",
+                        "FeeType": "ChqForeign",
+                        "Notes": [
+                          "Charge - Cheques Paid In - Branches",
+                          "Foreign Cheques paid in: Up to and including £100 - £5\n(Payments by Negotiation or Collection)"
+                        ],
+                        "FeeAmount": "5",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "Cheque",
+                        "FeeType": "ChqForeign",
+                        "Notes": [
+                          "Charge - Cheques Paid In - Branches",
+                          "Foreign Cheques paid in: £100.01 to £5,000 - £10\n(Payments by Negotiation or Collection)"
+                        ],
+                        "FeeAmount": "10",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "Cheque",
+                        "FeeType": "ChqForeign",
+                        "Notes": [
+                          "Charge - Cheques Paid In - Branches",
+                          "Foreign Cheques paid in: £5,000.01 to £20,000 - £30(Payments by Negotiation or Collection)"
+                        ],
+                        "FeeAmount": "30",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "Cheque",
+                        "FeeType": "ChqForeign",
+                        "Notes": [
+                          "Charge - Cheques Paid In - Branches",
+                          "Foreign Cheques paid in: Above £20,000 - £60\n(Payments by Negotiation or Collection)"
+                        ],
+                        "FeeAmount": "60",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "Notes": [
+                          "Charge - Payment delivery",
+                          "Urgent International Payment: Outwards Euro Payment made via Branch, Post/Fax, Telephone £23"
+                        ],
+                        "FeeAmount": "23",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "Notes": [
+                          "Charge - Payment delivery",
+                          "Standard International Payment: Outward Payment in any currency made via Mobile Banking/Online Banking £0"
+                        ],
+                        "FeeAmount": "0",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "Notes": [
+                          "Charge - Payment delivery",
+                          "Urgent International Payment: Outward Payment in any currency made via Online Banking/Mobile Banking £15"
+                        ],
+                        "FeeAmount": "15",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentIn",
+                        "Notes": [
+                          "Charge - Payment delivery",
+                          "International Payment - Inwards Euro Payment of any Value: £0"
+                        ],
+                        "FeeAmount": "0",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      }
+                    ],
+                    "FeeChargeCap": [
+                      {
+                        "MinMaxType": "Minimum",
+                        "FeeCapAmount": "3",
+                        "FeeType": [
+                          "ServiceCOther"
+                        ]
+                      },
+                      {
+                        "MinMaxType": "Maximum",
+                        "FeeCapAmount": "50",
+                        "FeeType": [
+                          "ServiceCOther"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ],
+              "Segment": [
+                "General"
+              ]
+            },
+            {
+              "Name": "Select Account with Overdraft Control",
+              "Identification": "MJ",
+              "OnSaleIndicator": false,
+              "PCAMarketingState": [
+                {
+                  "Identification": "1",
+                  "CoreProduct": {
+                    "ProductDescription": "Our standard bank account with additional control to stop you incurring unexpected unarranged fees and charges."
+                  },
+                  "FeaturesAndBenefits": {
+                    "FeatureBenefitItem": [
+                      {
+                        "Identification": "15801",
+                        "Type": "Other",
+                        "Name": "Overdraft Control"
+                      },
+                      {
+                        "Identification": "116808",
+                        "Name": "CardScheme",
+                        "Type": "Other",
+                        "Textual": "MasterCard"
+                      },
+                      {
+                        "Identification": "116812",
+                        "Name": "Cashback",
+                        "Type": "Cashback",
+                        "Indicator": false
+                      },
+                      {
+                        "Identification": "116813",
+                        "Name": "OverdraftAvailable",
+                        "Type": "AccountManagement",
+                        "Indicator": true
+                      },
+                      {
+                        "Identification": "116814",
+                        "Name": "PackagedAccountBenefits",
+                        "Type": "AccountManagement",
+                        "Indicator": false
+                      },
+                      {
+                        "Identification": "116801",
+                        "Name": "RegularFee",
+                        "Type": "AccountManagement",
+                        "Textual": "None"
+                      },
+                      {
+                        "Identification": "116815",
+                        "Name": "SetOffArrangement",
+                        "Type": "AccountManagement",
+                        "Indicator": false
+                      },
+                      {
+                        "Identification": "116816",
+                        "Name": "Rewards",
+                        "Type": "Rewards",
+                        "Indicator": false
+                      },
+                      {
+                        "Identification": "116817",
+                        "Name": "ChequeBookAvailable",
+                        "Type": "AccountManagement",
+                        "Indicator": true
+                      },
+                      {
+                        "Identification": "116818",
+                        "Name": "CreditInterestRatePayable",
+                        "Type": "AccountManagement",
+                        "Indicator": false
+                      },
+                      {
+                        "Identification": "116802",
+                        "Name": "Currency",
+                        "Type": "Other",
+                        "Textual": "GBP"
+                      },
+                      {
+                        "Identification": "116819",
+                        "Name": "CurrentAccountSwitchService",
+                        "Type": "AccountOpeningOrSwitching Incentive",
+                        "Indicator": true
+                      },
+                      {
+                        "Identification": "116820",
+                        "Name": "DebitCard",
+                        "Type": "AccountManagement",
+                        "Indicator": true
+                      },
+                      {
+                        "Identification": "116821",
+                        "Name": "DirectDebits",
+                        "Type": "AccountManagement",
+                        "Indicator": true
+                      },
+                      {
+                        "Identification": "116803",
+                        "Name": "ElectronicPayments",
+                        "Type": "AccountManagement",
+                        "Textual": "BACS; Faster Payments; Domestic Payments; International Payments; CHAPS"
+                      },
+                      {
+                        "Identification": "116822",
+                        "Name": "InstantAccess",
+                        "Type": "AccountManagement",
+                        "Indicator": true
+                      },
+                      {
+                        "Identification": "116804",
+                        "Name": "JointAccountAvailability",
+                        "Type": "AccountManagement",
+                        "Textual": "Sole and Joint"
+                      },
+                      {
+                        "Identification": "116805",
+                        "Name": "NegotiableTariffOptions",
+                        "Type": "Other",
+                        "Textual": "N/A"
+                      },
+                      {
+                        "Identification": "116806",
+                        "Name": "PaymentClearingSystemSupported",
+                        "Type": "AccountManagement",
+                        "Textual": "BACS; CHAPS; International systems"
+                      },
+                      {
+                        "Identification": "116823",
+                        "Name": "QuickDepositsServiceAvailability",
+                        "Type": "AccountManagement",
+                        "Indicator": true
+                      },
+                      {
+                        "Identification": "116824",
+                        "Name": "StandingOrderAvailability",
+                        "Type": "AccountManagement",
+                        "Indicator": true
+                      },
+                      {
+                        "Identification": "116825",
+                        "Name": "TextAlerts",
+                        "Type": "AccountManagement",
+                        "Indicator": true
+                      },
+                      {
+                        "Identification": "116826",
+                        "Name": "TransfersAllowed",
+                        "Type": "AccountManagement",
+                        "Indicator": true
+                      },
+                      {
+                        "Identification": "116827",
+                        "Name": "DigitalServices",
+                        "Type": "AccountManagement",
+                        "Textual": "Online Banking, Moblie App, Apple Pay, Andriod Pay, PayM"
+                      },
+                      {
+                        "Identification": "116828",
+                        "Name": "AutoTransfers",
+                        "Type": "AccountManagement",
+                        "Indicator": false
+                      }
+                    ],
+                    "MobileWallet": [
+                      {
+                        "Type": "ApplePay",
+                        "Notes": [
+                          "Android Pay"
+                        ]
+                      },
+                      {
+                        "Type": "MobileBankingApp",
+                        "Notes": [
+                          "Android Pay"
+                        ]
+                      },
+                      {
+                        "Type": "Other",
+                        "Notes": [
+                          "Android Pay"
+                        ]
+                      },
+                      {
+                        "Type": "PayM",
+                        "Notes": [
+                          "Android Pay"
+                        ]
+                      }
+                    ],
+                    "Card": [
+                      {
+                        "Scheme": "MasterCard",
+                        "Type": "DebitCard",
+                        "ContactlessIndicator": true
+                      }
+                    ]
+                  },
+                  "Eligibility": {
+                    "IDVerificationCheck": {},
+                    "CreditCheck": {
+                      "ScoringType": "Hard"
+                    }
+                  },
+                  "MarketingState": "Regular",
+                  "FirstMarketedDate": "2011-07-04",
+                  "LastMarketedDate": "2099-12-31",
+                  "OtherFeesCharges": {
+                    "FeeChargeDetail": [
+                      {
+                        "FeeCategory": "Transaction",
+                        "FeeType": "IntlPayTransNonSterling",
+                        "Notes": [
+                          "Fee - Non-sterling transaction",
+                          "2.75% Non-Sterling Transaction Fee on foreign currency withdrawal (UK cash machines), and \ncash withdrawals or buying currency/travellers cheques outside the UK. Also applies to payments made in a foreign currency inside or outside the UK. Customers with Black, Reward Black, Reward Platinum and Reward Silver debit cards will not be charged this fee on point of sale transactions."
+                        ],
+                        "FeeRate": "2.75",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "Report",
+                        "FeeType": "ReportStatementCopy1",
+                        "Notes": [
+                          "Charge - Duplicate statement",
+                          "Copy statements £3"
+                        ],
+                        "FeeAmount": "3",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerItem"
+                      },
+                      {
+                        "FeeCategory": "BankersDrafts",
+                        "FeeType": "DraftsBankers",
+                        "Notes": [
+                          "Fee - Bankers draft issuance",
+                          "UK Bankers Draft £20"
+                        ],
+                        "FeeAmount": "20",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerItem"
+                      },
+                      {
+                        "FeeCategory": "PaymentScheme",
+                        "FeeType": "CHAPSOutInterBranch",
+                        "Notes": [
+                          "Fee - CHAPS (between RBS branches)",
+                          "CHAPS payment (within NatWest) £20"
+                        ],
+                        "FeeAmount": "21",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "PaymentScheme",
+                        "FeeType": "CHAPSOutInterBank",
+                        "Notes": [
+                          "Fee - CHAPS (between Banks)",
+                          "CHAPS payment (to another bank) £23"
+                        ],
+                        "FeeAmount": "23",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "Report",
+                        "FeeType": "ReportReference",
+                        "Notes": [
+                          "Fee",
+                          "Banker’s Reference £10 each request"
+                        ],
+                        "FeeAmount": "10",
+                        "ApplicationFrequency": "PerItem",
+                        "CalculationFrequency": "PerItem"
+                      },
+                      {
+                        "FeeCategory": "Cheque",
+                        "FeeType": "ServiceCOther",
+                        "Notes": [
+                          "Fee",
+                          "Sterling Travellers cheques 1% of value (min £3, max £50)"
+                        ],
+                        "FeeRate": "1",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "Notes": [
+                          "Charge - Payment delivery",
+                          "Standard International Payment: Outwards Non-Euro Payment made via Branch, Post/Fax, Telephone £22"
+                        ],
+                        "FeeAmount": "22",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "Notes": [
+                          "Charge - Payment delivery",
+                          "Urgent International Payment: Outward non-Euro Payment made via Branch, Post/Fax, Telephone £30"
+                        ],
+                        "FeeAmount": "30",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "Notes": [
+                          "Charge - Payment delivery",
+                          "International Payment Outward Payment Agents’ Charges £8.50"
+                        ],
+                        "FeeAmount": "8.50",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "Notes": [
+                          "Charge - Payment delivery",
+                          "International Payment: Outward Payment Agents Charge £12.50"
+                        ],
+                        "FeeAmount": "12.50",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "Notes": [
+                          "Charge - Payment delivery",
+                          "Standard International Payment: Outward Euro Payment made via Branch, Post/Fax, Telephony £0"
+                        ],
+                        "FeeAmount": "0",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "ForeignChqDraft",
+                        "Notes": [
+                          "Charge",
+                          "Foreign Drafts - Up to and including £100: £8"
+                        ],
+                        "FeeAmount": "8",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "ForeignChqDraft",
+                        "Notes": [
+                          "Charge",
+                          "Foreign Drafts - Over £100: £20"
+                        ],
+                        "FeeAmount": "20",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentIn",
+                        "Notes": [
+                          "Charge - Payment delivery",
+                          "International Payments - Inwards Non-Euro Payments Up to and including £100: £1"
+                        ],
+                        "FeeAmount": "1",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentIn",
+                        "Notes": [
+                          "Charge - Payment delivery",
+                          "International Payments - Inwards Non-Euro Payments Over £100: £7"
+                        ],
+                        "FeeAmount": "7",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "Cheque",
+                        "FeeType": "ChqForeign",
+                        "Notes": [
+                          "Charge - Cheques Paid In - Branches",
+                          "Foreign Cheques paid in: Up to and including £100 - £5\n(Payments by Negotiation or Collection)"
+                        ],
+                        "FeeAmount": "5",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "Cheque",
+                        "FeeType": "ChqForeign",
+                        "Notes": [
+                          "Charge - Cheques Paid In - Branches",
+                          "Foreign Cheques paid in: £100.01 to £5,000 - £10\n(Payments by Negotiation or Collection)"
+                        ],
+                        "FeeAmount": "10",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "Cheque",
+                        "FeeType": "ChqForeign",
+                        "Notes": [
+                          "Charge - Cheques Paid In - Branches",
+                          "Foreign Cheques paid in: £5,000.01 to £20,000 - £30(Payments by Negotiation or Collection)"
+                        ],
+                        "FeeAmount": "30",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "Cheque",
+                        "FeeType": "ChqForeign",
+                        "Notes": [
+                          "Charge - Cheques Paid In - Branches",
+                          "Foreign Cheques paid in: Above £20,000 - £60\n(Payments by Negotiation or Collection)"
+                        ],
+                        "FeeAmount": "60",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "Notes": [
+                          "Charge - Payment delivery",
+                          "Urgent International Payment: Outwards Euro Payment made via Branch, Post/Fax, Telephone £23"
+                        ],
+                        "FeeAmount": "23",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "Notes": [
+                          "Charge - Payment delivery",
+                          "Standard International Payment: Outward Payment in any currency made via Mobile Banking/Online Banking £0"
+                        ],
+                        "FeeAmount": "0",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentOut",
+                        "Notes": [
+                          "Charge - Payment delivery",
+                          "Urgent International Payment: Outward Payment in any currency made via Online Banking/Mobile Banking £15"
+                        ],
+                        "FeeAmount": "15",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      },
+                      {
+                        "FeeCategory": "International",
+                        "FeeType": "IntlPayFXPaymentIn",
+                        "Notes": [
+                          "Charge - Payment delivery",
+                          "International Payment - Inwards Euro Payment of any Value: £0"
+                        ],
+                        "FeeAmount": "0",
+                        "ApplicationFrequency": "PerTransaction",
+                        "CalculationFrequency": "PerTransaction"
+                      }
+                    ],
+                    "FeeChargeCap": [
+                      {
+                        "MinMaxType": "Minimum",
+                        "FeeCapAmount": "3",
+                        "FeeType": [
+                          "ServiceCOther"
+                        ]
+                      },
+                      {
+                        "MinMaxType": "Maximum",
+                        "FeeCapAmount": "50",
+                        "FeeType": [
+                          "ServiceCOther"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ],
+              "Segment": [
+                "General"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
