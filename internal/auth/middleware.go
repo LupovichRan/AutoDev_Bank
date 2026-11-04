@@ -85,15 +85,20 @@ func (s *Service) HasRole(ctx context.Context, sess Session, role string) (bool,
 	return ok, err
 }
 
+// defaultMaxBuckets caps the rate limiter's memory under an address sweep.
+const defaultMaxBuckets = 10_000
+
 // rateLimiter is an in-memory token bucket per client IP: `rate` tokens
-// refill evenly over `per`, with a burst of `rate`.
+// refill evenly over `per`, with a burst of `rate`. At most maxBuckets keys
+// are tracked; past that the least recently seen key is evicted.
 type rateLimiter struct {
-	mu      sync.Mutex
-	rate    float64
-	per     time.Duration
-	buckets map[string]*bucket
-	now     func() time.Time
-	lastGC  time.Time
+	mu         sync.Mutex
+	rate       float64
+	per        time.Duration
+	buckets    map[string]*bucket
+	maxBuckets int
+	now        func() time.Time
+	lastGC     time.Time
 }
 
 type bucket struct {
@@ -102,7 +107,7 @@ type bucket struct {
 }
 
 func newRateLimiter(rate int, per time.Duration) *rateLimiter {
-	return &rateLimiter{rate: float64(rate), per: per, buckets: map[string]*bucket{}, now: time.Now}
+	return &rateLimiter{rate: float64(rate), per: per, buckets: map[string]*bucket{}, maxBuckets: defaultMaxBuckets, now: time.Now}
 }
 
 func (l *rateLimiter) allow(key string) bool {
@@ -120,6 +125,9 @@ func (l *rateLimiter) allow(key string) bool {
 	}
 	b, ok := l.buckets[key]
 	if !ok {
+		if len(l.buckets) >= l.maxBuckets {
+			l.evictOldest()
+		}
 		b = &bucket{tokens: l.rate, last: now}
 		l.buckets[key] = b
 	}
@@ -133,6 +141,24 @@ func (l *rateLimiter) allow(key string) bool {
 	}
 	b.tokens--
 	return true
+}
+
+// evictOldest drops the least recently seen bucket. O(n), but only runs
+// when the map is full, i.e. under an address sweep.
+func (l *rateLimiter) evictOldest() {
+	var (
+		oldestKey string
+		oldest    time.Time
+		found     bool
+	)
+	for k, b := range l.buckets {
+		if !found || b.last.Before(oldest) {
+			oldestKey, oldest, found = k, b.last, true
+		}
+	}
+	if found {
+		delete(l.buckets, oldestKey)
+	}
 }
 
 // rateLimit applies the per-IP ceremony budget (429 when exhausted).

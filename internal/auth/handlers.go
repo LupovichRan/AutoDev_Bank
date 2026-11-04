@@ -16,31 +16,31 @@ import (
 	"github.com/LupovichRan/AutoDev_Bank/internal/db"
 )
 
-// errHandleTaken: registration for an existing handle by someone who is not
-// signed in as that principal (would otherwise allow account takeover).
-var errHandleTaken = errors.New("auth: handle already registered")
-
 var handleRE = regexp.MustCompile(`^[a-z0-9][a-z0-9._-]{0,62}$`)
 
 const maxBody = 128 << 10
 
 // Mount registers the auth endpoints (spec §3.7) on mux. Every route is
 // wrapped in Authenticate, so it works with or without a global session
-// middleware; the ceremony endpoints are rate limited per client IP.
+// middleware; the ceremony endpoints are rate limited per client IP, and
+// the limiter runs first so throttled requests never reach the database.
 //
 // POST /api/auth/dev-login is mounted only when Config.AllowTestLogin is
 // set. It signs anyone in by handle and must never be enabled in production.
 func (s *Service) Mount(mux *http.ServeMux) {
-	limited := func(h http.HandlerFunc) http.Handler { return s.Authenticate(s.rateLimit(h)) }
+	limited := func(h http.HandlerFunc) http.Handler { return s.rateLimit(s.Authenticate(h)) }
 	authed := func(h http.HandlerFunc) http.Handler {
 		return s.Authenticate(s.RequireSession(h))
+	}
+	limitedAuthed := func(h http.HandlerFunc) http.Handler {
+		return s.rateLimit(s.Authenticate(s.RequireSession(h)))
 	}
 	mux.Handle("POST /api/auth/register/begin", limited(s.handleRegisterBegin))
 	mux.Handle("POST /api/auth/register/finish", limited(s.handleRegisterFinish))
 	mux.Handle("POST /api/auth/login/begin", limited(s.handleLoginBegin))
 	mux.Handle("POST /api/auth/login/finish", limited(s.handleLoginFinish))
-	mux.Handle("POST /api/auth/stepup/begin", s.Authenticate(s.RequireSession(s.rateLimit(http.HandlerFunc(s.handleStepUpBegin)))))
-	mux.Handle("POST /api/auth/stepup/finish", s.Authenticate(s.RequireSession(s.rateLimit(http.HandlerFunc(s.handleStepUpFinish)))))
+	mux.Handle("POST /api/auth/stepup/begin", limitedAuthed(s.handleStepUpBegin))
+	mux.Handle("POST /api/auth/stepup/finish", limitedAuthed(s.handleStepUpFinish))
 	mux.Handle("POST /api/auth/logout", s.Authenticate(http.HandlerFunc(s.handleLogout)))
 	mux.Handle("GET /api/me", authed(s.handleMe))
 	if s.cfg.AllowTestLogin {
@@ -79,34 +79,27 @@ func (s *Service) handleRegisterBegin(w http.ResponseWriter, r *http.Request) {
 		problem(w, http.StatusBadRequest, "display_name is too long")
 		return
 	}
+	// A new handle starts a registration; the principal is only created
+	// when it finishes. An existing handle is a 409 unless the caller is
+	// signed in as that principal, in which case it adds a passkey, which
+	// requires a fresh step-up for AddCredentialPayloadHash(handle).
 	var (
-		pid     uuid.UUID
-		created bool
+		pid  uuid.UUID
+		opts json.RawMessage
+		cid  string
 	)
-	err := db.WithTx(r.Context(), s.pool, func(ctx context.Context, tx pgx.Tx) error {
-		var err error
-		pid, created, err = ensurePrincipal(ctx, tx, handle, display)
-		if err != nil {
-			return err
+	err := s.pool.QueryRow(r.Context(), `select id from control.principals where handle=$1`, handle).Scan(&pid)
+	switch {
+	case errors.Is(err, pgx.ErrNoRows):
+		opts, cid, err = s.BeginRegistration(r.Context(), handle, display)
+	case err != nil:
+	default:
+		if sess, ok := FromContext(r.Context()); ok && sess.PrincipalID == pid {
+			opts, cid, err = s.BeginAddCredential(r.Context(), sess)
+		} else {
+			err = ErrHandleTaken
 		}
-		if !created {
-			// Adding another passkey to an existing principal requires being
-			// signed in as that principal.
-			if sess, ok := FromContext(ctx); !ok || sess.PrincipalID != pid {
-				return errHandleTaken
-			}
-		}
-		return nil
-	})
-	if err != nil {
-		s.writeErr(w, r, err)
-		return
 	}
-	name, dn := handle, display
-	if !created {
-		name, dn = "", "" // keep the stored names
-	}
-	opts, cid, err := s.BeginRegistration(r.Context(), pid, dn, name)
 	if err != nil {
 		s.writeErr(w, r, err)
 		return
@@ -119,7 +112,8 @@ func (s *Service) handleRegisterFinish(w http.ResponseWriter, r *http.Request) {
 	if !decodeJSON(w, r, &req) {
 		return
 	}
-	sess, err := s.finishRegistration(r.Context(), req.ChallengeID, req.Credential, r.UserAgent())
+	// The browser's previous session, if any, is ended in the same transaction.
+	sess, err := s.finishRegistration(r.Context(), req.ChallengeID, req.Credential, r.UserAgent(), currentSession(r.Context(), r))
 	if err != nil {
 		s.writeErr(w, r, err)
 		return
@@ -142,14 +136,11 @@ func (s *Service) handleLoginFinish(w http.ResponseWriter, r *http.Request) {
 	if !decodeJSON(w, r, &req) {
 		return
 	}
-	sess, err := s.finishLogin(r.Context(), req.ChallengeID, req.Credential, r.UserAgent())
+	// The browser's previous session, if any, is ended in the same transaction.
+	sess, err := s.finishLogin(r.Context(), req.ChallengeID, req.Credential, r.UserAgent(), currentSession(r.Context(), r))
 	if err != nil {
 		s.writeErr(w, r, err)
 		return
-	}
-	// Replace any previous session of this browser.
-	if old, ok := FromContext(r.Context()); ok {
-		_ = s.Logout(r.Context(), old)
 	}
 	s.setSessionCookie(w, sess)
 	writeJSON(w, http.StatusOK, map[string]string{"principal_id": sess.PrincipalID.String()})
@@ -261,9 +252,8 @@ func (s *Service) handleDevLogin(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]string{"principal_id": pid.String()})
 }
 
-func (s *Service) secureCookie() bool {
-	return strings.HasPrefix(strings.ToLower(s.cfg.Origins[0]), "https://")
-}
+// secureCookie is true when ANY configured origin is https (see Config.AllowMixedOrigins).
+func (s *Service) secureCookie() bool { return s.secure }
 
 func (s *Service) setSessionCookie(w http.ResponseWriter, sess Session) {
 	http.SetCookie(w, &http.Cookie{
@@ -302,8 +292,12 @@ func (s *Service) writeErr(w http.ResponseWriter, r *http.Request, err error) {
 		problem(w, http.StatusBadRequest, "payload_hash must be a hex sha256 digest")
 	case errors.Is(err, ErrCredentialExists):
 		problem(w, http.StatusConflict, "this passkey is already registered")
-	case errors.Is(err, errHandleTaken):
+	case errors.Is(err, ErrHandleTaken):
 		problem(w, http.StatusConflict, "handle already registered; sign in to add a passkey")
+	case errors.Is(err, ErrInvalidHandle):
+		problem(w, http.StatusBadRequest, "invalid handle")
+	case errors.Is(err, ErrStepUpRequired):
+		problem(w, http.StatusForbidden, "step-up required: confirm with your passkey first")
 	case errors.Is(err, ErrNoSession):
 		problem(w, http.StatusUnauthorized, "sign in required")
 	case errors.Is(err, ErrPrincipalNotFound):

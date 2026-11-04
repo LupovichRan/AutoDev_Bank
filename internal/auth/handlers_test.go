@@ -5,9 +5,14 @@ import (
 	"context"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
+	"strings"
+	"sync"
 	"testing"
+	"time"
 
 	"github.com/LupovichRan/AutoDev_Bank/internal/testutil"
 )
@@ -50,6 +55,11 @@ func (c *testClient) do(method, path string, body any) *httptest.ResponseRecorde
 		}
 	}
 	return w
+}
+
+type beginResp struct {
+	ChallengeID string          `json:"challenge_id"`
+	Options     json.RawMessage `json:"options"`
 }
 
 func decode[T any](t *testing.T, w *httptest.ResponseRecorder) T {
@@ -107,7 +117,7 @@ func TestHandlers_CookieFlags(t *testing.T) {
 }
 
 func TestHandlers_CookieSecureForHTTPSOrigin(t *testing.T) {
-	s, _ := newTestService(t, func(c *Config) { c.Origins = []string{"https://bank.example"}; c.RPID = "bank.example" })
+	s, _ := newTestService(t, func(c *Config) { c.Origins = []string{"https://localhost:8443"} })
 	c := newTestClient(t, s)
 	w := c.do("POST", "/api/auth/dev-login", map[string]string{"handle": "lee"})
 	testutil.Equal(t, http.StatusOK, w.Code)
@@ -125,10 +135,6 @@ func TestHandlers_RegisterLoginStepUpFlow(t *testing.T) {
 	c := newTestClient(t, s)
 	authr := newSoftAuthenticator(t)
 
-	type beginResp struct {
-		ChallengeID string          `json:"challenge_id"`
-		Options     json.RawMessage `json:"options"`
-	}
 	w := c.do("POST", "/api/auth/register/begin", map[string]string{"handle": "mona", "display_name": "Mona"})
 	testutil.Equal(t, http.StatusOK, w.Code, w.Body.String())
 	b := decode[beginResp](t, w)
@@ -213,4 +219,151 @@ func TestMiddleware_RequireRole(t *testing.T) {
 	_, err = s.pool.Exec(ctx, `insert into control.roles (principal_id, role) values ($1, 'payments.approver')`, pid)
 	testutil.NoError(t, err)
 	testutil.Equal(t, http.StatusTeapot, call(true))
+}
+
+func TestHandlers_RegisterCancelledThenRetried(t *testing.T) {
+	s, _ := newTestService(t)
+	c := newTestClient(t, s)
+	w := c.do("POST", "/api/auth/register/begin", map[string]string{"handle": "nora"})
+	testutil.Equal(t, http.StatusOK, w.Code, w.Body.String())
+	testutil.Equal(t, 0, principalCount(t, s, "nora"))
+
+	// The user cancelled; retrying (even from another client) is allowed.
+	retry := newTestClient(t, s)
+	retry.ip = "192.0.2.50:1"
+	w = retry.do("POST", "/api/auth/register/begin", map[string]string{"handle": "nora"})
+	testutil.Equal(t, http.StatusOK, w.Code, w.Body.String())
+	b := decode[beginResp](t, w)
+	w = retry.do("POST", "/api/auth/register/finish", map[string]any{"challenge_id": b.ChallengeID, "credential": newSoftAuthenticator(t).create(t, b.Options)})
+	testutil.Equal(t, http.StatusOK, w.Code, w.Body.String())
+	testutil.Equal(t, 1, principalCount(t, s, "nora"))
+
+	// Now the handle is taken: begin is a 409 for anyone not signed in as nora.
+	testutil.Equal(t, http.StatusConflict, c.do("POST", "/api/auth/register/begin", map[string]string{"handle": "nora"}).Code)
+}
+
+func TestHandlers_RegisterFinishHandleTakenIs409(t *testing.T) {
+	s, _ := newTestService(t)
+	a, b := newTestClient(t, s), newTestClient(t, s)
+	b.ip = "192.0.2.51:1"
+	ba := decode[beginResp](t, a.do("POST", "/api/auth/register/begin", map[string]string{"handle": "omar"}))
+	bb := decode[beginResp](t, b.do("POST", "/api/auth/register/begin", map[string]string{"handle": "omar"}))
+	w := a.do("POST", "/api/auth/register/finish", map[string]any{"challenge_id": ba.ChallengeID, "credential": newSoftAuthenticator(t).create(t, ba.Options)})
+	testutil.Equal(t, http.StatusOK, w.Code, w.Body.String())
+	w = b.do("POST", "/api/auth/register/finish", map[string]any{"challenge_id": bb.ChallengeID, "credential": newSoftAuthenticator(t).create(t, bb.Options)})
+	testutil.Equal(t, http.StatusConflict, w.Code, w.Body.String())
+	testutil.True(t, b.cookie == nil, "the loser is not signed in")
+}
+
+func TestHandlers_AddCredentialNeedsStepUp(t *testing.T) {
+	s, aud := newTestService(t)
+	c := newTestClient(t, s)
+	authr := newSoftAuthenticator(t)
+	b := decode[beginResp](t, c.do("POST", "/api/auth/register/begin", map[string]string{"handle": "pete"}))
+	w := c.do("POST", "/api/auth/register/finish", map[string]any{"challenge_id": b.ChallengeID, "credential": authr.create(t, b.Options)})
+	testutil.Equal(t, http.StatusOK, w.Code, w.Body.String())
+	actingSession := c.cookie.Value
+
+	// Signed in, same handle, but no step-up: refused.
+	w = c.do("POST", "/api/auth/register/begin", map[string]string{"handle": "pete"})
+	testutil.Equal(t, http.StatusForbidden, w.Code, w.Body.String())
+	testutil.Equal(t, "application/problem+json", w.Header().Get("Content-Type"))
+
+	// Step up for "add-credential:pete", then begin succeeds.
+	hash := AddCredentialPayloadHash("pete")
+	b = decode[beginResp](t, c.do("POST", "/api/auth/stepup/begin", map[string]string{"payload_hash": hex.EncodeToString(hash)}))
+	w = c.do("POST", "/api/auth/stepup/finish", map[string]any{"challenge_id": b.ChallengeID, "credential": authr.get(t, b.Options)})
+	testutil.Equal(t, http.StatusOK, w.Code, w.Body.String())
+	w = c.do("POST", "/api/auth/register/begin", map[string]string{"handle": "pete"})
+	testutil.Equal(t, http.StatusOK, w.Code, w.Body.String())
+	b = decode[beginResp](t, w)
+	second := newSoftAuthenticator(t)
+	w = c.do("POST", "/api/auth/register/finish", map[string]any{"challenge_id": b.ChallengeID, "credential": second.create(t, b.Options)})
+	testutil.Equal(t, http.StatusOK, w.Code, w.Body.String())
+	testutil.True(t, aud.has("auth.credential_added"), "credential_added audited")
+	testutil.Equal[any](t, actingSession, aud.last("auth.credential_added")["session_id"])
+	testutil.True(t, c.cookie.Value != actingSession, "session replaced")
+	_, err := s.LoadSession(context.Background(), actingSession)
+	testutil.ErrorIs(t, err, ErrNoSession)
+	var n int
+	testutil.NoError(t, s.pool.QueryRow(context.Background(), `select count(*) from control.credentials`).Scan(&n))
+	testutil.Equal(t, 2, n)
+}
+
+func TestHandlers_RegisterFinishReplacesSession(t *testing.T) {
+	s, _ := newTestService(t)
+	c := newTestClient(t, s)
+	testutil.Equal(t, http.StatusOK, c.do("POST", "/api/auth/dev-login", map[string]string{"handle": "quin"}).Code)
+	old := c.cookie.Value
+	b := decode[beginResp](t, c.do("POST", "/api/auth/register/begin", map[string]string{"handle": "rhea"}))
+	w := c.do("POST", "/api/auth/register/finish", map[string]any{"challenge_id": b.ChallengeID, "credential": newSoftAuthenticator(t).create(t, b.Options)})
+	testutil.Equal(t, http.StatusOK, w.Code, w.Body.String())
+	testutil.True(t, c.cookie.Value != old, "new cookie")
+	_, err := s.LoadSession(context.Background(), old)
+	testutil.ErrorIs(t, err, ErrNoSession, "previous session deleted")
+	me := decode[map[string]any](t, c.do("GET", "/api/me", nil))
+	testutil.Equal(t, "rhea", me["handle"])
+}
+
+func TestRateLimiter_CapsBuckets(t *testing.T) {
+	l := newRateLimiter(10, time.Minute)
+	l.maxBuckets = 100
+	now := time.Unix(1_000_000, 0)
+	l.now = func() time.Time { return now }
+	for i := 0; i < 1000; i++ {
+		now = now.Add(time.Millisecond)
+		testutil.True(t, l.allow(fmt.Sprintf("10.0.%d.%d", i/256, i%256)))
+		testutil.True(t, len(l.buckets) <= 100, "bucket map is capped")
+	}
+	_, newest := l.buckets["10.0.3.231"]
+	testutil.True(t, newest, "the most recent key is kept")
+	_, oldest := l.buckets["10.0.0.0"]
+	testutil.False(t, oldest, "the oldest key was evicted")
+}
+
+// syncBuffer is a goroutine-safe log sink.
+type syncBuffer struct {
+	mu sync.Mutex
+	b  bytes.Buffer
+}
+
+func (s *syncBuffer) Write(p []byte) (int, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.b.Write(p)
+}
+
+func (s *syncBuffer) String() string {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.b.String()
+}
+
+func TestHandlers_RateLimitRunsBeforeSessionLookup(t *testing.T) {
+	logs := &syncBuffer{}
+	s, _ := newTestService(t, func(c *Config) { c.Logger = slog.New(slog.NewTextHandler(logs, nil)) })
+	mux := http.NewServeMux()
+	s.Mount(mux)
+
+	// A request whose context is already cancelled makes any session lookup
+	// fail loudly ("auth: load session"), which tells us whether it ran.
+	probe := func(ip string) int {
+		ctx, cancel := context.WithCancel(context.Background())
+		cancel()
+		r := httptest.NewRequest("POST", "/api/auth/login/begin", bytes.NewReader([]byte(`{}`))).WithContext(ctx)
+		r.RemoteAddr = ip
+		r.AddCookie(&http.Cookie{Name: CookieName, Value: "some-session"})
+		w := httptest.NewRecorder()
+		mux.ServeHTTP(w, r)
+		return w.Code
+	}
+	c := newTestClient(t, s)
+	for i := 0; i < 10; i++ {
+		testutil.Equal(t, http.StatusOK, c.do("POST", "/api/auth/login/begin", map[string]string{}).Code)
+	}
+	testutil.Equal(t, http.StatusTooManyRequests, probe(c.ip))
+	testutil.False(t, strings.Contains(logs.String(), "auth: load session"), "throttled request never looked up its session")
+
+	probe("198.51.100.200:1") // an unthrottled client does reach the lookup
+	testutil.True(t, strings.Contains(logs.String(), "auth: load session"), "probe is sensitive")
 }

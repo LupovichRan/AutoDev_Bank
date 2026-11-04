@@ -69,18 +69,25 @@ func (s *Service) LoadSession(ctx context.Context, id string) (Session, error) {
 // Logout deletes the session (and opportunistically purges expired ones).
 func (s *Service) Logout(ctx context.Context, sess Session) error {
 	return db.WithTx(ctx, s.pool, func(ctx context.Context, tx pgx.Tx) error {
-		tag, err := tx.Exec(ctx, `delete from control.sessions where id=$1`, sess.ID)
-		if err != nil {
+		ended, err := s.endSessionTx(ctx, tx, sess, "logout")
+		if err != nil || !ended {
 			return err
 		}
-		if tag.RowsAffected() == 0 {
-			return nil
-		}
-		if _, err := tx.Exec(ctx, `delete from control.sessions where expires_at < now() - interval '1 day'`); err != nil {
-			return err
-		}
-		return s.audit(ctx, tx, "auth.logout", "principal:"+sess.PrincipalID.String(), &sess.PrincipalID, nil)
+		_, err = tx.Exec(ctx, `delete from control.sessions where expires_at < now() - interval '1 day'`)
+		return err
 	})
+}
+
+// endSessionTx deletes sess inside tx and audits auth.logout with reason
+// ("logout", or "replaced" when a new login/registration supersedes it).
+// It reports whether the session row existed.
+func (s *Service) endSessionTx(ctx context.Context, tx pgx.Tx, sess Session, reason string) (bool, error) {
+	tag, err := tx.Exec(ctx, `delete from control.sessions where id=$1 and principal_id=$2`, sess.ID, sess.PrincipalID)
+	if err != nil || tag.RowsAffected() == 0 {
+		return false, err
+	}
+	return true, s.audit(ctx, tx, "auth.logout", "principal:"+sess.PrincipalID.String(), &sess.PrincipalID,
+		map[string]any{"reason": reason})
 }
 
 // TestLogin signs principalID in without an authenticator. It works only

@@ -32,29 +32,50 @@ const (
 
 // recordingAuditor captures audit calls so tests can assert on them.
 type recordingAuditor struct {
-	mu      sync.Mutex
-	actions []string
+	mu     sync.Mutex
+	events []auditEvent
 }
 
-func (a *recordingAuditor) Append(_ context.Context, tx pgx.Tx, action, _ string, _ *uuid.UUID, _ map[string]any) error {
+type auditEvent struct {
+	action  string
+	payload map[string]any
+}
+
+func (a *recordingAuditor) Append(_ context.Context, tx pgx.Tx, action, _ string, _ *uuid.UUID, payload map[string]any) error {
 	if tx == nil {
 		panic("auditor called without a transaction")
 	}
 	a.mu.Lock()
 	defer a.mu.Unlock()
-	a.actions = append(a.actions, action)
+	a.events = append(a.events, auditEvent{action, payload})
 	return nil
 }
 
 func (a *recordingAuditor) has(action string) bool {
+	return a.count(action) > 0
+}
+
+func (a *recordingAuditor) count(action string) int {
 	a.mu.Lock()
 	defer a.mu.Unlock()
-	for _, x := range a.actions {
-		if x == action {
-			return true
+	n := 0
+	for _, x := range a.events {
+		if x.action == action {
+			n++
 		}
 	}
-	return false
+	return n
+}
+
+func (a *recordingAuditor) last(action string) map[string]any {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	for i := len(a.events) - 1; i >= 0; i-- {
+		if a.events[i].action == action {
+			return a.events[i].payload
+		}
+	}
+	return nil
 }
 
 func newTestService(t *testing.T, mod ...func(*Config)) (*Service, *recordingAuditor) {
@@ -96,6 +117,7 @@ type softAuthenticator struct {
 	credID     []byte
 	userHandle []byte
 	counter    uint32
+	zeroCount  bool // synced passkeys report a constant 0 sign count
 	rpID       string
 	origin     string
 }
@@ -179,7 +201,9 @@ func (a *softAuthenticator) get(t *testing.T, options json.RawMessage) json.RawM
 	t.Helper()
 	var opt optionsEnvelope
 	testutil.NoError(t, json.Unmarshal(options, &opt))
-	a.counter++
+	if !a.zeroCount {
+		a.counter++
+	}
 	cd := a.clientData(t, "webauthn.get", opt.PublicKey.Challenge)
 	rpHash := sha256.Sum256([]byte(a.rpID))
 	var ad bytes.Buffer
@@ -213,12 +237,55 @@ func credentialRequest(body json.RawMessage) *http.Request {
 	return r
 }
 
+// register runs a full new-principal registration and returns the session
+// it signs in plus the authenticator holding the passkey.
+func register(t *testing.T, s *Service, handle string) (Session, *softAuthenticator) {
+	t.Helper()
+	authr := newSoftAuthenticator(t)
+	return registerWith(t, s, handle, authr), authr
+}
+
+func registerWith(t *testing.T, s *Service, handle string, authr *softAuthenticator) Session {
+	t.Helper()
+	ctx := context.Background()
+	options, cid, err := s.BeginRegistration(ctx, handle, strings.ToUpper(handle))
+	testutil.NoError(t, err)
+	sess, err := s.FinishRegistration(ctx, cid, credentialRequest(authr.create(t, options)))
+	testutil.NoError(t, err)
+	return sess
+}
+
+// login runs a discoverable login with authr.
+func login(t *testing.T, s *Service, authr *softAuthenticator) (Session, error) {
+	t.Helper()
+	ctx := context.Background()
+	options, cid, err := s.BeginLogin(ctx)
+	testutil.NoError(t, err)
+	return s.FinishLogin(ctx, cid, credentialRequest(authr.get(t, options)))
+}
+
+// stepUp runs a step-up ceremony for hash on sess with authr.
+func stepUp(t *testing.T, s *Service, sess Session, authr *softAuthenticator, hash []byte) error {
+	t.Helper()
+	ctx := context.Background()
+	options, cid, err := s.BeginStepUp(ctx, sess, hash)
+	testutil.NoError(t, err)
+	return s.FinishStepUp(ctx, sess, cid, credentialRequest(authr.get(t, options)))
+}
+
+func principalCount(t *testing.T, s *Service, handle string) int {
+	t.Helper()
+	var n int
+	testutil.NoError(t, s.pool.QueryRow(context.Background(),
+		`select count(*) from control.principals where handle=$1`, handle).Scan(&n))
+	return n
+}
+
 func TestBeginRegistration_RequiresResidentKeyAndUV(t *testing.T) {
 	s, _ := newTestService(t)
 	ctx := context.Background()
-	pid := mustPrincipal(t, s, "alice")
 
-	options, challengeID, err := s.BeginRegistration(ctx, pid, "Alice", "alice")
+	options, challengeID, err := s.BeginRegistration(ctx, "alice", "Alice")
 	testutil.NoError(t, err)
 	testutil.True(t, challengeID != "", "challenge id")
 
@@ -230,8 +297,9 @@ func TestBeginRegistration_RequiresResidentKeyAndUV(t *testing.T) {
 				UserVerification string `json:"userVerification"`
 			} `json:"authenticatorSelection"`
 			User struct {
-				ID   string `json:"id"`
-				Name string `json:"name"`
+				ID          string `json:"id"`
+				Name        string `json:"name"`
+				DisplayName string `json:"displayName"`
 			} `json:"user"`
 			RP struct {
 				ID string `json:"id"`
@@ -242,37 +310,141 @@ func TestBeginRegistration_RequiresResidentKeyAndUV(t *testing.T) {
 	testutil.Equal(t, "required", opt.PublicKey.AuthenticatorSelection.ResidentKey)
 	testutil.Equal(t, "required", opt.PublicKey.AuthenticatorSelection.UserVerification)
 	testutil.Equal(t, "alice", opt.PublicKey.User.Name)
+	testutil.Equal(t, "Alice", opt.PublicKey.User.DisplayName)
 	testutil.Equal(t, testRPID, opt.PublicKey.RP.ID)
 	uh, err := b64.DecodeString(opt.PublicKey.User.ID)
 	testutil.NoError(t, err)
-	testutil.Equal(t, pid[:], uh, "user handle is the principal uuid bytes")
+	_, err = uuid.FromBytes(uh)
+	testutil.NoError(t, err, "user handle is a principal uuid")
 
-	var kind string
-	var principal uuid.UUID
+	var kind, handle, display string
+	var principal *uuid.UUID
 	var ttl time.Duration
 	var challenge string
-	err = s.pool.QueryRow(ctx, `select kind, principal_id, expires_at - now(), session_data->>'challenge'
-		from control.webauthn_challenges where id=$1`, challengeID).Scan(&kind, &principal, &ttl, &challenge)
+	err = s.pool.QueryRow(ctx, `select kind, principal_id, handle, display_name, expires_at - now(), session_data->>'challenge'
+		from control.webauthn_challenges where id=$1`, challengeID).Scan(&kind, &principal, &handle, &display, &ttl, &challenge)
 	testutil.NoError(t, err)
 	testutil.Equal(t, "register", kind)
-	testutil.Equal(t, pid, principal)
+	testutil.True(t, principal == nil, "no principal yet")
+	testutil.Equal(t, "alice", handle)
+	testutil.Equal(t, "Alice", display)
 	testutil.True(t, ttl > 4*time.Minute && ttl <= 5*time.Minute, "challenge expires in 5 minutes")
 	testutil.Equal(t, opt.PublicKey.Challenge, challenge, "stored session data carries the challenge")
+}
+
+func TestRegistration_BeginOnlyNeverCreatesPrincipal(t *testing.T) {
+	s, _ := newTestService(t)
+	ctx := context.Background()
+	_, _, err := s.BeginRegistration(ctx, "olga", "Olga")
+	testutil.NoError(t, err)
+	testutil.Equal(t, 0, principalCount(t, s, "olga"), "begin must not create the principal")
+	var n int
+	testutil.NoError(t, s.pool.QueryRow(ctx, `select count(*) from control.principals`).Scan(&n))
+	testutil.Equal(t, 0, n)
+}
+
+func TestRegistration_CancelledThenRetried(t *testing.T) {
+	s, aud := newTestService(t)
+	ctx := context.Background()
+
+	// First attempt is abandoned (the user cancels the browser prompt).
+	abandoned, abandonedID, err := s.BeginRegistration(ctx, "pia", "Pia")
+	testutil.NoError(t, err)
+
+	// A retry (or anyone) can begin again for the same handle.
+	options, cid, err := s.BeginRegistration(ctx, "pia", "Pia")
+	testutil.NoError(t, err)
+	authr := newSoftAuthenticator(t)
+	sess, err := s.FinishRegistration(ctx, cid, credentialRequest(authr.create(t, options)))
+	testutil.NoError(t, err)
+	testutil.Equal(t, 1, principalCount(t, s, "pia"))
+	testutil.Equal(t, uuid.UUID(authr.userHandle), sess.PrincipalID, "principal id is the user handle from begin")
+	testutil.True(t, aud.has("auth.register"), "register audited")
+
+	// The abandoned ceremony can no longer claim the handle.
+	late := newSoftAuthenticator(t)
+	_, err = s.FinishRegistration(ctx, abandonedID, credentialRequest(late.create(t, abandoned)))
+	testutil.ErrorIs(t, err, ErrHandleTaken)
+	testutil.Equal(t, 1, principalCount(t, s, "pia"))
+	var n int
+	testutil.NoError(t, s.pool.QueryRow(ctx, `select count(*) from control.credentials`).Scan(&n))
+	testutil.Equal(t, 1, n, "the losing credential is not stored")
+
+	// Once taken, begin refuses the handle.
+	_, _, err = s.BeginRegistration(ctx, "pia", "Pia")
+	testutil.ErrorIs(t, err, ErrHandleTaken)
+}
+
+func TestAddCredential_RequiresFreshStepUp(t *testing.T) {
+	s, aud := newTestService(t)
+	ctx := context.Background()
+	sess, authr := register(t, s, "pat")
+
+	// A plain session is not enough.
+	_, _, err := s.BeginAddCredential(ctx, sess)
+	testutil.ErrorIs(t, err, ErrStepUpRequired)
+
+	// A step-up for some other payload is not enough either.
+	other := sha256.Sum256([]byte("transfer"))
+	testutil.NoError(t, stepUp(t, s, sess, authr, other[:]))
+	_, _, err = s.BeginAddCredential(ctx, sess)
+	testutil.ErrorIs(t, err, ErrStepUpRequired)
+
+	// Step-up bound to "add-credential:pat" unlocks it, once.
+	hash := AddCredentialPayloadHash("pat")
+	want := sha256.Sum256([]byte("add-credential:pat"))
+	testutil.Equal(t, want[:], hash)
+	testutil.NoError(t, stepUp(t, s, sess, authr, hash))
+	options, cid, err := s.BeginAddCredential(ctx, sess)
+	testutil.NoError(t, err)
+	_, _, err = s.BeginAddCredential(ctx, sess)
+	testutil.ErrorIs(t, err, ErrStepUpRequired, "step-up consumed")
+
+	second := newSoftAuthenticator(t)
+	r := credentialRequest(second.create(t, options))
+	r = r.WithContext(WithSession(r.Context(), sess))
+	newSess, err := s.FinishRegistration(ctx, cid, r)
+	testutil.NoError(t, err)
+	testutil.Equal(t, sess.PrincipalID, newSess.PrincipalID)
+	testutil.Equal(t, uuid.UUID(second.userHandle), sess.PrincipalID)
+	testutil.Equal(t, 1, aud.count("auth.register"), "adding is not a registration")
+	testutil.True(t, aud.has("auth.credential_added"), "credential_added audited")
+	testutil.Equal[any](t, sess.ID, aud.last("auth.credential_added")["session_id"])
+
+	_, err = s.LoadSession(ctx, sess.ID)
+	testutil.ErrorIs(t, err, ErrNoSession, "the acting session is replaced")
+
+	// The second passkey signs in as pat.
+	loggedIn, err := login(t, s, second)
+	testutil.NoError(t, err)
+	testutil.Equal(t, sess.PrincipalID, loggedIn.PrincipalID)
+}
+
+func TestAddCredential_FinishRequiresActingSession(t *testing.T) {
+	s, _ := newTestService(t)
+	ctx := context.Background()
+	sess, authr := register(t, s, "quinn")
+	testutil.NoError(t, stepUp(t, s, sess, authr, AddCredentialPayloadHash("quinn")))
+	options, cid, err := s.BeginAddCredential(ctx, sess)
+	testutil.NoError(t, err)
+	// Finishing without the session that started it fails.
+	_, err = s.FinishRegistration(ctx, cid, credentialRequest(newSoftAuthenticator(t).create(t, options)))
+	testutil.ErrorIs(t, err, ErrChallengeNotFound)
 }
 
 func TestCeremony_RegisterLoginStepUp(t *testing.T) {
 	s, aud := newTestService(t)
 	ctx := context.Background()
-	pid := mustPrincipal(t, s, "bob")
 	authr := newSoftAuthenticator(t)
 
 	// Registration.
-	options, cid, err := s.BeginRegistration(ctx, pid, "Bob", "bob")
+	options, cid, err := s.BeginRegistration(ctx, "bob", "Bob")
 	testutil.NoError(t, err)
 	regSess, err := s.FinishRegistration(ctx, cid, credentialRequest(authr.create(t, options)))
 	testutil.NoError(t, err)
-	testutil.Equal(t, pid, regSess.PrincipalID)
+	pid := regSess.PrincipalID
 	testutil.True(t, aud.has("auth.register"), "register audited")
+	testutil.Equal(t, 1, principalCount(t, s, "bob"))
 
 	var n int
 	testutil.NoError(t, s.pool.QueryRow(ctx, `select count(*) from control.credentials where principal_id=$1`, pid).Scan(&n))
@@ -315,6 +487,7 @@ func TestCeremony_RegisterLoginStepUp(t *testing.T) {
 
 	testutil.NoError(t, s.FinishStepUp(ctx, sess, cid, credentialRequest(authr.get(t, options))))
 	testutil.True(t, aud.has("auth.stepup"), "step-up audited")
+	testutil.False(t, aud.has("auth.clone_warning"), "no clone warning for increasing counters")
 	testutil.NoError(t, s.RequireStepUp(ctx, sess, hash[:]))
 	testutil.ErrorIs(t, s.RequireStepUp(ctx, sess, hash[:]), ErrStepUpRequired, "step-up consumed")
 }
@@ -322,34 +495,114 @@ func TestCeremony_RegisterLoginStepUp(t *testing.T) {
 func TestStepUp_ChallengeBoundToPrincipal(t *testing.T) {
 	s, _ := newTestService(t)
 	ctx := context.Background()
-	alice := mustPrincipal(t, s, "alice")
-	mallory := mustPrincipal(t, s, "mallory")
-	authr := newSoftAuthenticator(t)
-	options, cid, err := s.BeginRegistration(ctx, alice, "Alice", "alice")
-	testutil.NoError(t, err)
-	aliceSess, err := s.FinishRegistration(ctx, cid, credentialRequest(authr.create(t, options)))
-	testutil.NoError(t, err)
-	malSess, err := s.TestLogin(ctx, mallory)
+	aliceSess, authr := register(t, s, "alice")
+	malSess, err := s.TestLogin(ctx, mustPrincipal(t, s, "mallory"))
 	testutil.NoError(t, err)
 
 	hash := sha256.Sum256([]byte("payload"))
-	options, cid, err = s.BeginStepUp(ctx, aliceSess, hash[:])
+	options, cid, err := s.BeginStepUp(ctx, aliceSess, hash[:])
 	testutil.NoError(t, err)
 	err = s.FinishStepUp(ctx, malSess, cid, credentialRequest(authr.get(t, options)))
 	testutil.ErrorIs(t, err, ErrChallengeNotFound, "another principal cannot finish alice's step-up")
 }
 
+func TestStepUp_ChallengeBoundToSession(t *testing.T) {
+	s, _ := newTestService(t)
+	ctx := context.Background()
+	first, authr := register(t, s, "sam")
+	second, err := login(t, s, authr)
+	testutil.NoError(t, err)
+
+	hash := sha256.Sum256([]byte("payload"))
+	options, cid, err := s.BeginStepUp(ctx, first, hash[:])
+	testutil.NoError(t, err)
+	err = s.FinishStepUp(ctx, second, cid, credentialRequest(authr.get(t, options)))
+	testutil.ErrorIs(t, err, ErrChallengeNotFound, "another session of the same principal cannot finish it")
+	testutil.ErrorIs(t, s.RequireStepUp(ctx, second, hash[:]), ErrStepUpRequired)
+	testutil.ErrorIs(t, s.RequireStepUp(ctx, first, hash[:]), ErrStepUpRequired)
+}
+
+func TestStepUp_DynamicLinkingNegative(t *testing.T) {
+	s, _ := newTestService(t)
+	ctx := context.Background()
+	sess, authr := register(t, s, "tara")
+	hashA := sha256.Sum256([]byte("pay 10 to A"))
+	hashB := sha256.Sum256([]byte("pay 9999 to B"))
+	optsA, _, err := s.BeginStepUp(ctx, sess, hashA[:])
+	testutil.NoError(t, err)
+	_, cidB, err := s.BeginStepUp(ctx, sess, hashB[:])
+	testutil.NoError(t, err)
+
+	// The user approved A; an attacker submits that assertion against B.
+	err = s.FinishStepUp(ctx, sess, cidB, credentialRequest(authr.get(t, optsA)))
+	testutil.ErrorIs(t, err, ErrVerification)
+	testutil.ErrorIs(t, s.RequireStepUp(ctx, sess, hashB[:]), ErrStepUpRequired)
+	testutil.ErrorIs(t, s.RequireStepUp(ctx, sess, hashA[:]), ErrStepUpRequired)
+}
+
+func TestFinishLogin_WrongOriginRejected(t *testing.T) {
+	s, _ := newTestService(t)
+	_, authr := register(t, s, "uma")
+	authr.origin = "http://evil.example:8080"
+	_, err := login(t, s, authr)
+	testutil.ErrorIs(t, err, ErrVerification)
+}
+
+func TestRegistration_WrongOriginRejected(t *testing.T) {
+	s, _ := newTestService(t)
+	ctx := context.Background()
+	authr := newSoftAuthenticator(t)
+	authr.origin = "https://phish.example"
+	options, cid, err := s.BeginRegistration(ctx, "vera", "Vera")
+	testutil.NoError(t, err)
+	_, err = s.FinishRegistration(ctx, cid, credentialRequest(authr.create(t, options)))
+	testutil.ErrorIs(t, err, ErrVerification)
+	testutil.Equal(t, 0, principalCount(t, s, "vera"))
+}
+
+func TestCounterRegression_StepUpRejectedLoginAudited(t *testing.T) {
+	s, aud := newTestService(t)
+	ctx := context.Background()
+	sess, authr := register(t, s, "walt")
+	_, err := login(t, s, authr) // stored sign count is now 1
+	testutil.NoError(t, err)
+
+	// A clone replays a counter that is not greater than the stored one.
+	authr.counter = 0 // next assertion carries 1 again
+	hash := sha256.Sum256([]byte("transfer"))
+	err = stepUp(t, s, sess, authr, hash[:])
+	testutil.ErrorIs(t, err, ErrVerification, "step-up refuses a counter regression")
+	testutil.Equal(t, 1, aud.count("auth.clone_warning"), "clone warning audited despite the failure")
+	testutil.False(t, aud.has("auth.stepup"), "no step-up recorded")
+	testutil.ErrorIs(t, s.RequireStepUp(ctx, sess, hash[:]), ErrStepUpRequired)
+
+	// Plain login still succeeds, but is audited.
+	authr.counter = 0
+	_, err = login(t, s, authr)
+	testutil.NoError(t, err)
+	testutil.Equal(t, 2, aud.count("auth.clone_warning"))
+	testutil.Equal[any](t, true, aud.last("auth.login")["clone_warning"])
+}
+
+func TestCounterZero_SyncedPasskeyAllowed(t *testing.T) {
+	s, aud := newTestService(t)
+	authr := newSoftAuthenticator(t)
+	authr.zeroCount = true
+	sess := registerWith(t, s, "xena", authr)
+	_, err := login(t, s, authr)
+	testutil.NoError(t, err)
+	hash := sha256.Sum256([]byte("transfer"))
+	testutil.NoError(t, stepUp(t, s, sess, authr, hash[:]))
+	testutil.NoError(t, stepUp(t, s, sess, authr, hash[:]))
+	testutil.False(t, aud.has("auth.clone_warning"), "counter 0 is not a regression")
+}
+
 func TestFinishLogin_ExpiredChallenge(t *testing.T) {
 	s, _ := newTestService(t)
 	ctx := context.Background()
-	pid := mustPrincipal(t, s, "carol")
-	authr := newSoftAuthenticator(t)
-	options, cid, err := s.BeginRegistration(ctx, pid, "Carol", "carol")
-	testutil.NoError(t, err)
-	_, err = s.FinishRegistration(ctx, cid, credentialRequest(authr.create(t, options)))
-	testutil.NoError(t, err)
+	_, authr := register(t, s, "carol")
 
-	options, cid, err = s.BeginLogin(ctx)
+	options, cid, err := s.BeginLogin(ctx)
 	testutil.NoError(t, err)
 	_, err = s.pool.Exec(ctx, `update control.webauthn_challenges set expires_at = now() - interval '1 second' where id=$1`, cid)
 	testutil.NoError(t, err)
@@ -359,19 +612,43 @@ func TestFinishLogin_ExpiredChallenge(t *testing.T) {
 
 func TestFinishLogin_BadSignatureRejected(t *testing.T) {
 	s, _ := newTestService(t)
-	ctx := context.Background()
-	pid := mustPrincipal(t, s, "dave")
-	authr := newSoftAuthenticator(t)
-	options, cid, err := s.BeginRegistration(ctx, pid, "Dave", "dave")
-	testutil.NoError(t, err)
-	_, err = s.FinishRegistration(ctx, cid, credentialRequest(authr.create(t, options)))
-	testutil.NoError(t, err)
+	_, authr := register(t, s, "dave")
 
 	// A different key claiming the same credential id must not log in.
 	imposter := newSoftAuthenticator(t)
 	imposter.credID, imposter.userHandle = authr.credID, authr.userHandle
-	options, cid, err = s.BeginLogin(ctx)
-	testutil.NoError(t, err)
-	_, err = s.FinishLogin(ctx, cid, credentialRequest(imposter.get(t, options)))
+	_, err := login(t, s, imposter)
 	testutil.ErrorIs(t, err, ErrVerification)
+}
+
+func TestNew_OriginPolicy(t *testing.T) {
+	pool := db.TestPool(t)
+	base := func() Config {
+		return Config{RPID: "localhost", RPDisplayName: "Bank", Origins: []string{"https://localhost:8443"}}
+	}
+	cfg := base()
+	cfg.Origins = []string{"https://localhost:8443", "http://localhost:8080"}
+	_, err := New(pool, cfg)
+	testutil.Error(t, err, "mixed http/https origins are refused")
+
+	cfg.AllowMixedOrigins = true
+	s, err := New(pool, cfg)
+	testutil.NoError(t, err)
+	testutil.True(t, s.secureCookie(), "Secure when any origin is https")
+
+	cfg = base()
+	cfg.Origins = []string{"http://localhost:8080", "https://localhost:8443"}
+	cfg.AllowMixedOrigins = true
+	s, err = New(pool, cfg)
+	testutil.NoError(t, err)
+	testutil.True(t, s.secureCookie(), "Secure regardless of origin order")
+
+	cfg = Config{RPID: "bank.example", Origins: []string{"https://bank.example"}, AllowTestLogin: true}
+	_, err = New(pool, cfg)
+	testutil.Error(t, err, "test login refused for a public https origin")
+
+	cfg = base()
+	cfg.AllowTestLogin = true
+	_, err = New(pool, cfg)
+	testutil.NoError(t, err, "test login allowed on https://localhost")
 }

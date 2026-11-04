@@ -47,14 +47,29 @@ create index sessions_principal_idx on control.sessions (principal_id);
 create index sessions_expires_idx on control.sessions (expires_at);
 
 -- WebAuthn ceremony state between /begin and /finish; single use, 5 minutes.
+--   login:    no principal, no session.
+--   register: either a NEW principal (principal_id null; handle and
+--             display_name are carried here and the principal is created
+--             only when the ceremony finishes; its id is session_data.user_id),
+--             or a passkey added to an existing principal (principal_id and
+--             the acting session_id set).
+--   stepup:   principal_id, the session it was started in, and payload_hash.
 create table control.webauthn_challenges (
   id           text primary key,
   kind         text not null check (kind in ('register','login','stepup')),
   principal_id uuid null references control.principals(id),
+  session_id   text null references control.sessions(id) on delete cascade,
+  handle       text null,
+  display_name text null,
   session_data jsonb not null,                       -- webauthn.SessionData
   payload_hash bytea null,                           -- step-up only: sha256 of the payment payload
   expires_at   timestamptz not null,
   check ((kind = 'stepup') = (payload_hash is not null)),
-  check (kind = 'login' or principal_id is not null)
+  check ((handle is null) = (display_name is null)),
+  check (kind <> 'login' or (principal_id is null and session_id is null and handle is null)),
+  check (kind <> 'stepup' or (principal_id is not null and session_id is not null and handle is null)),
+  check (kind <> 'register' or
+         (principal_id is null and session_id is null and handle is not null) or
+         (principal_id is not null and session_id is not null and handle is null))
 );
 create index webauthn_challenges_expires_idx on control.webauthn_challenges (expires_at);
