@@ -22,7 +22,7 @@ ensure_dir() {
   # traverse to PGDATA. Otherwise the server runs as the caller and no
   # permissions are touched.
   if [ "$(id -u)" = "0" ]; then
-    local d="$PGDATA"; while [ "$d" != "/" ]; do chmod o+x "$d" 2>/dev/null || true; d="$(dirname "$d")"; done
+    local d="$(dirname "$PGDATA")"; while [ "$d" != "/" ]; do chmod o+x "$d" 2>/dev/null || true; d="$(dirname "$d")"; done
   fi
 }
 url() { echo "postgres://postgres@localhost:$PGPORT/$DB?sslmode=disable"; }
