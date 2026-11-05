@@ -5,6 +5,7 @@ import (
 	_ "embed"
 	"encoding/base64"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"net/http"
 	"strconv"
@@ -15,16 +16,77 @@ import (
 	"github.com/LupovichRan/AutoDev_Bank/internal/audit"
 )
 
-// feesJSON is the published fee logic, served verbatim.
+// feesJSON is the published fee logic. Rule names and descriptions are
+// bilingual ({"he": ..., "en": ...}); the endpoint serves one language.
 //
 //go:embed fees.json
 var feesJSON []byte
 
-// GET /api/transparency/fees
+// feeLangs are the languages of fees.json; the first is the default.
+var feeLangs = []string{"he", "en"}
+
+type bilingual map[string]string
+
+type feeFile struct {
+	Currency           string `json:"currency"`
+	FXMarkupBP         int    `json:"currency_fx_markup_bp"`
+	MonthlyFee         int64  `json:"monthly_fee"`
+	IncomeSharePercent int    `json:"income_share_percent"`
+	Rules              []struct {
+		Name        bilingual `json:"name"`
+		Description bilingual `json:"description"`
+	} `json:"rules"`
+}
+
+type feeRule struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+}
+
+type feeSchedule struct {
+	Lang               string    `json:"lang"`
+	Currency           string    `json:"currency"`
+	FXMarkupBP         int       `json:"currency_fx_markup_bp"`
+	MonthlyFee         int64     `json:"monthly_fee"`
+	IncomeSharePercent int       `json:"income_share_percent"`
+	Rules              []feeRule `json:"rules"`
+}
+
+// feesByLang is fees.json flattened per language, built once at start-up.
+// A rule missing a translation is a build defect, so it panics.
+var feesByLang = func() map[string]feeSchedule {
+	var f feeFile
+	if err := json.Unmarshal(feesJSON, &f); err != nil {
+		panic("httpapi: fees.json: " + err.Error())
+	}
+	out := make(map[string]feeSchedule, len(feeLangs))
+	for _, lang := range feeLangs {
+		s := feeSchedule{Lang: lang, Currency: f.Currency, FXMarkupBP: f.FXMarkupBP,
+			MonthlyFee: f.MonthlyFee, IncomeSharePercent: f.IncomeSharePercent, Rules: make([]feeRule, len(f.Rules))}
+		for i, rule := range f.Rules {
+			if rule.Name[lang] == "" || rule.Description[lang] == "" {
+				panic("httpapi: fees.json: rule " + strconv.Itoa(i) + " has no " + lang + " text")
+			}
+			s.Rules[i] = feeRule{Name: rule.Name[lang], Description: rule.Description[lang]}
+		}
+		out[lang] = s
+	}
+	return out
+}()
+
+// GET /api/transparency/fees?lang=he|en (default he)
 func (a *api) fees(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	_, _ = w.Write(feesJSON)
+	lang := r.URL.Query().Get("lang")
+	if lang == "" {
+		lang = feeLangs[0]
+	}
+	s, ok := feesByLang[lang]
+	if !ok {
+		Write(w, r, http.StatusBadRequest, "", "invalid_lang", nil)
+		return
+	}
+	w.Header().Set("Content-Language", lang)
+	JSON(w, http.StatusOK, s)
 }
 
 // verifyCacheTTL is how long a chain verification report is reused.

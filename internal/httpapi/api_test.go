@@ -13,6 +13,7 @@ import (
 	"net/http/cookiejar"
 	"net/http/httptest"
 	"net/url"
+	"strconv"
 	"strings"
 	"testing"
 	"testing/fstest"
@@ -193,6 +194,7 @@ func decodeProblem(t *testing.T, resp *http.Response, body []byte) problemBody {
 type tAccount struct {
 	ID        string `json:"id"`
 	Code      string `json:"code"`
+	Name      string `json:"name"`
 	Currency  string `json:"currency"`
 	Kind      string `json:"kind"`
 	Balance   int64  `json:"balance"`
@@ -296,7 +298,8 @@ func TestTransfers_SmallPosts201(t *testing.T) {
 	testutil.Equal(t, int64(2500000-5000), bal[seed.AliceILS].Available)
 	testutil.Equal(t, "ILS", bal[seed.AliceILS].Currency)
 	testutil.Len(t, bal[seed.AliceILS].Holders, 1)
-	testutil.Equal(t, "alice", strings.ToLower(bal[seed.AliceILS].Holders[0].DisplayName))
+	testutil.Equal(t, "אליס", bal[seed.AliceILS].Holders[0].DisplayName)
+	testutil.Equal(t, "עו״ש אליס", bal[seed.AliceILS].Name)
 	testutil.Len(t, bal[seed.Joint].Holders, 2)
 	_, hasBobs := bal[seed.BobILS]
 	testutil.False(t, hasBobs, "alice does not see bob's account")
@@ -396,7 +399,7 @@ func TestTransfers_LargeReturns202AndApproverCanDecide(t *testing.T) {
 	bob.getJSON("/api/approvals", &bl)
 	testutil.Len(t, bl.Inbox, 1)
 	testutil.Equal(t, out.Approval.ID, bl.Inbox[0].ID)
-	testutil.Equal(t, "Alice", bl.Inbox[0].Initiator.DisplayName)
+	testutil.Equal(t, "אליס", bl.Inbox[0].Initiator.DisplayName)
 
 	bob.approveStepUp(out.Approval.ID)
 	resp, raw = bob.do("POST", "/api/approvals/"+out.Approval.ID+"/decide", map[string]any{"approve": true, "reason": "ok"}, nil)
@@ -524,7 +527,8 @@ func TestTransparency_AuditVerifyOK(t *testing.T) {
 func TestTransparency_FeesAndRoot(t *testing.T) {
 	e := newEnv(t)
 	anon := e.anon()
-	var fees struct {
+	type feeResp struct {
+		Lang               string `json:"lang"`
 		Currency           string `json:"currency"`
 		FXMarkupBP         int    `json:"currency_fx_markup_bp"`
 		MonthlyFee         int64  `json:"monthly_fee"`
@@ -534,12 +538,32 @@ func TestTransparency_FeesAndRoot(t *testing.T) {
 			Description string `json:"description"`
 		} `json:"rules"`
 	}
+	var fees, he, en feeResp
 	anon.getJSON("/api/transparency/fees", &fees)
+	testutil.Equal(t, "he", fees.Lang, "Hebrew by default")
 	testutil.Equal(t, "ILS", fees.Currency)
 	testutil.Equal(t, 0, fees.FXMarkupBP)
 	testutil.Equal(t, int64(0), fees.MonthlyFee)
 	testutil.Equal(t, 50, fees.IncomeSharePercent)
 	testutil.True(t, len(fees.Rules) >= 4 && len(fees.Rules) <= 6, "4-6 rules")
+	testutil.Equal(t, "ללא עמלות", fees.Rules[0].Name)
+
+	anon.getJSON("/api/transparency/fees?lang=he", &he)
+	anon.getJSON("/api/transparency/fees?lang=en", &en)
+	testutil.Equal(t, "he", he.Lang)
+	testutil.Equal(t, "en", en.Lang)
+	testutil.Equal(t, "No fees", en.Rules[0].Name)
+	testutil.Equal(t, "Everything is auditable", en.Rules[len(en.Rules)-1].Name)
+	testutil.Equal(t, "הכול ניתן לביקורת", he.Rules[len(he.Rules)-1].Name)
+	testutil.Equal(t, len(he.Rules), len(en.Rules))
+	for i := range he.Rules {
+		testutil.True(t, he.Rules[i].Name != en.Rules[i].Name && he.Rules[i].Description != en.Rules[i].Description,
+			"rule "+strconv.Itoa(i)+" translated")
+		testutil.True(t, he.Rules[i].Description != "" && en.Rules[i].Description != "", "rule "+strconv.Itoa(i)+" described")
+	}
+	resp, raw := anon.do("GET", "/api/transparency/fees?lang=fr", nil, nil)
+	testutil.Equal(t, http.StatusBadRequest, resp.StatusCode, string(raw))
+	testutil.Equal(t, "invalid_lang", decodeProblem(t, resp, raw).Detail)
 
 	// Finished days are signed; today is provisional and unsigned
 	// (TestTransparency_TodayRootUnsigned).

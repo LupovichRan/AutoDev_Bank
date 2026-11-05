@@ -3,6 +3,13 @@
 // idempotent: principals are looked up by handle, accounts by code, roles
 // and holders are added only if missing, and opening balances are posted
 // with fixed `seed:*` idempotency keys, so running it again changes nothing.
+//
+// Demo names are Hebrew (the app is Hebrew-first); handles and account codes
+// stay ASCII. A database seeded before the names were translated is renamed
+// in place: a principal or account whose name is still the old English seed
+// name gets the Hebrew one, and any other name (edited by hand) is left
+// alone. Opening-balance transactions are immutable in the ledger, so their
+// description stays "Opening balance" on such databases.
 package seed
 
 import (
@@ -33,24 +40,28 @@ const (
 // RoleStaffOps guards staff-only operations such as POST /api/opendata/refresh.
 const RoleStaffOps = "staff.ops"
 
+// OpeningDescription is the description of the opening-balance transactions.
+const OpeningDescription = "יתרת פתיחה"
+
 type principalSpec struct {
 	handle, kind, displayName string
 	roles                     []string
+	legacyName                string // English display name used by earlier seeds
 }
 
 var principals = []principalSpec{
-	{"alice", "customer", "Alice", nil},
-	{"bob", "customer", "Bob", nil},
-	{"carol", "staff", "Carol", []string{approvals.RoleApprover, RoleStaffOps}},
-	{"dave", "staff", "Dave", []string{approvals.RoleInitiator}},
+	{"alice", "customer", "אליס", nil, "Alice"},
+	{"bob", "customer", "בוב", nil, "Bob"},
+	{"carol", "staff", "קרול", []string{approvals.RoleApprover, RoleStaffOps}, "Carol"},
+	{"dave", "staff", "דייב", []string{approvals.RoleInitiator}, "Dave"},
 }
 
 type accountSpec struct {
-	code, name, currency, kind string
-	owner                      string   // handle of owner_id, "" for none
-	holders                    []string // handles
-	allowNegative              bool
-	opening                    int64 // minor units, funded from the currency's equity account
+	code, name, legacyName, currency, kind string
+	owner                                  string   // handle of owner_id, "" for none
+	holders                                []string // handles
+	allowNegative                          bool
+	opening                                int64 // minor units, funded from the currency's equity account
 }
 
 // Customer accounts use kind 'asset' in this slice, i.e. they are modelled
@@ -59,12 +70,12 @@ type accountSpec struct {
 // flipped to 'liability' when real general-ledger reporting lands. Equity
 // accounts may go negative: they are the source of the opening balances.
 var accounts = []accountSpec{
-	{EquityILS, "Bank equity (ILS)", "ILS", "equity", "", nil, true, 0},
-	{EquityEUR, "Bank equity (EUR)", "EUR", "equity", "", nil, true, 0},
-	{AliceILS, "Alice current account", "ILS", "asset", "alice", []string{"alice"}, false, 2_500_000},
-	{AliceEUR, "Alice savings", "EUR", "asset", "alice", []string{"alice"}, false, 120_000},
-	{Joint, "Alice & Bob joint account", "ILS", "asset", "", []string{"alice", "bob"}, false, 800_000},
-	{BobILS, "Bob current account", "ILS", "asset", "bob", []string{"bob"}, false, 350_000},
+	{EquityILS, "הון הבנק (ILS)", "Bank equity (ILS)", "ILS", "equity", "", nil, true, 0},
+	{EquityEUR, "הון הבנק (EUR)", "Bank equity (EUR)", "EUR", "equity", "", nil, true, 0},
+	{AliceILS, "עו״ש אליס", "Alice current account", "ILS", "asset", "alice", []string{"alice"}, false, 2_500_000},
+	{AliceEUR, "חיסכון אליס (אירו)", "Alice savings", "EUR", "asset", "alice", []string{"alice"}, false, 120_000},
+	{Joint, "חשבון משותף אליס ובוב", "Alice & Bob joint account", "ILS", "asset", "", []string{"alice", "bob"}, false, 800_000},
+	{BobILS, "עו״ש בוב", "Bob current account", "ILS", "asset", "bob", []string{"bob"}, false, 350_000},
 }
 
 var equityFor = map[string]string{"ILS": EquityILS, "EUR": EquityEUR}
@@ -83,6 +94,10 @@ func Run(ctx context.Context, pool *pgxpool.Pool, led *ledger.Service, ap *appro
 		pr, err := ap.GetPrincipalByHandle(ctx, p.handle)
 		if errors.Is(err, approvals.ErrNotFound) {
 			pr, err = ap.CreatePrincipal(ctx, p.kind, p.displayName, p.handle)
+		} else if err == nil && pr.DisplayName == p.legacyName {
+			_, err = pool.Exec(ctx,
+				`update control.principals set display_name = $2 where id = $1 and display_name = $3`,
+				pr.ID, p.displayName, p.legacyName)
 		}
 		if err != nil {
 			return Result{}, fmt.Errorf("seed: principal %s: %w", p.handle, err)
@@ -115,7 +130,7 @@ func Run(ctx context.Context, pool *pgxpool.Pool, led *ledger.Service, ap *appro
 		}
 		_, err := led.Post(ctx, ledger.PostRequest{
 			IdempotencyKey: "seed:opening:" + a.code,
-			Description:    "Opening balance",
+			Description:    OpeningDescription,
 			Currency:       a.currency,
 			Lines: []ledger.Line{
 				{AccountID: res.Accounts[equityFor[a.currency]].ID, Amount: -a.opening},
@@ -142,6 +157,11 @@ func ensureAccount(ctx context.Context, pool *pgxpool.Pool, led *ledger.Service,
 	var id uuid.UUID
 	err := pool.QueryRow(ctx, `select id from ledger.accounts where code = $1`, a.code).Scan(&id)
 	if err == nil {
+		// Rename a pre-Hebrew seed account; a hand-edited name is kept.
+		if _, err := pool.Exec(ctx, `update ledger.accounts set name = $2 where id = $1 and name = $3`,
+			id, a.name, a.legacyName); err != nil {
+			return ledger.Account{}, fmt.Errorf("seed: rename %s: %w", a.code, err)
+		}
 		return led.Account(ctx, id)
 	}
 	if !errors.Is(err, pgx.ErrNoRows) {

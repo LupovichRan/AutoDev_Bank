@@ -5,28 +5,64 @@
   "income_share_percent": 50,
   "rules": [
     {
-      "name": "No fees",
-      "description": "There is no monthly fee, no transfer fee and no fee for cards, statements or closing your account."
+      "name": {
+        "he": "ללא עמלות",
+        "en": "No fees"
+      },
+      "description": {
+        "he": "אין דמי ניהול חודשיים, אין עמלת העברה ואין עמלה על כרטיסים, על דפי חשבון או על סגירת החשבון.",
+        "en": "There is no monthly fee, no transfer fee and no fee for cards, statements or closing your account."
+      }
     },
     {
-      "name": "Currency exchange at the mid-rate",
-      "description": "Foreign currency is converted at the published central-bank mid-rate with a 0 basis-point markup. The rate we use is shown before you confirm."
+      "name": {
+        "he": "המרת מט״ח בשער היציג ללא מרווח",
+        "en": "Currency exchange at the mid-rate"
+      },
+      "description": {
+        "he": "מטבע חוץ מומר לפי השער היציג שמפרסם הבנק המרכזי, בתוספת מרווח של 0 נקודות בסיס. השער שבו נשתמש מוצג לך לפני האישור.",
+        "en": "Foreign currency is converted at the published central-bank mid-rate with a 0 basis-point markup. The rate we use is shown before you confirm."
+      }
     },
     {
-      "name": "Half of the income on your money comes back to you",
-      "description": "50% of the interest the bank earns on customer balances is shared back with customers in proportion to their balances."
+      "name": {
+        "he": "מחצית מההכנסה על הכסף שלך חוזרת אליך",
+        "en": "Half of the income on your money comes back to you"
+      },
+      "description": {
+        "he": "50% מהריבית שהבנק מרוויח על יתרות הלקוחות מוחזרים ללקוחות, באופן יחסי ליתרה של כל אחד.",
+        "en": "50% of the interest the bank earns on customer balances is shared back with customers in proportion to their balances."
+      }
     },
     {
-      "name": "No hidden charges",
-      "description": "This page is the complete fee schedule. Anything not listed here costs nothing."
+      "name": {
+        "he": "ללא חיובים נסתרים",
+        "en": "No hidden charges"
+      },
+      "description": {
+        "he": "דף זה הוא תעריפון העמלות המלא. כל מה שאינו מופיע כאן אינו כרוך בתשלום.",
+        "en": "This page is the complete fee schedule. Anything not listed here costs nothing."
+      }
     },
     {
-      "name": "Large transfers need a second approval",
-      "description": "Transfers of 1,000.00 or more, and any transfer from a joint account, wait for an independent approver before money moves. This is a safeguard, not a charge."
+      "name": {
+        "he": "העברות גדולות דורשות אישור נוסף",
+        "en": "Large transfers need a second approval"
+      },
+      "description": {
+        "he": "העברות של 1,000.00 ומעלה, וכל העברה מחשבון משותף, ממתינות לאישור של גורם מאשר בלתי תלוי לפני שהכסף זז. זהו אמצעי הגנה, לא חיוב.",
+        "en": "Transfers of 1,000.00 or more, and any transfer from a joint account, wait for an independent approver before money moves. This is a safeguard, not a charge."
+      }
     },
     {
-      "name": "Everything is auditable",
-      "description": "Every payment, approval and sign-in is written to a hash-chained audit log whose daily root is signed and published here, so anyone can check nothing was changed afterwards."
+      "name": {
+        "he": "הכול ניתן לביקורת",
+        "en": "Everything is auditable"
+      },
+      "description": {
+        "he": "כל תשלום, אישור והתחברות נרשמים ביומן ביקורת משורשר בגיבובים. השורש היומי שלו נחתם ומתפרסם כאן, כך שכל אחד יכול לוודא ששום דבר לא שונה בדיעבד.",
+        "en": "Every payment, approval and sign-in is written to a hash-chained audit log whose daily root is signed and published here, so anyone can check nothing was changed afterwards."
+      }
     }
   ]
 }
