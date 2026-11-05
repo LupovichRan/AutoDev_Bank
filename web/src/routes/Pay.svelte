@@ -4,7 +4,7 @@
   import Problem from '../components/Problem.svelte';
   import { apiGet, NetworkError, ProblemError } from '../lib/api';
   import { SubmitFlow } from './pay/submit.svelte';
-  import { t, tValue } from '../lib/i18n.svelte';
+  import { lbl, t } from '../lib/i18n.svelte';
   import { formatMinor, parseToMinor, minorExponent } from '../lib/money';
   import { connectivity } from '../lib/online.svelte';
   import type { TransferBody } from '../lib/payload';
@@ -157,7 +157,7 @@
   <Card title={outcome.kind === 'sent' ? t('pay.sent') : t('pay.awaiting')} id="outcome">
     {#if outcome.kind === 'sent'}
       <p class="ok big">{t('pay.sentMessage', { summary: sentSummary })}</p>
-      <p class="muted">{t('pay.transaction')} <bdi class="mono">{outcome.transactionId}</bdi> · {tValue('status', outcome.status)}</p>
+      <p class="muted">{t('pay.transaction')} <bdi class="mono">{outcome.transactionId}</bdi> · {lbl('txStatus', outcome.status)}</p>
     {:else}
       <p class="warn big">{awaitingText(outcome.requiredApprovals)}</p>
       <p>{t('pay.willBeSent', { summary: sentSummary })} <a href={href('/approvals')}>{t('title.approvals')}</a>.</p>

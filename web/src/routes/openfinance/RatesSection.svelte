@@ -3,7 +3,7 @@
   import Problem from '../../components/Problem.svelte';
   import { apiGet } from '../../lib/api';
   import { formatDate, formatPercent } from '../../lib/format';
-  import { t } from '../../lib/i18n.svelte';
+  import { lbl, t } from '../../lib/i18n.svelte';
   import type { OpenDataList, OpenDataRecord, PolicyRateData } from '../../lib/types';
   import Badges from './Badges.svelte';
 
@@ -36,7 +36,7 @@
         <thead><tr><th scope="col">{t('rates.colBank')}</th><th scope="col">{t('rates.colName')}</th><th scope="col" class="num">{t('rates.colValue')}</th><th scope="col">{t('rates.colEffective')}</th></tr></thead>
         <tbody>
           {#each records as r (r.key)}
-            <tr><th scope="row">{r.data.bank}</th><td>{r.data.name}</td><td class="num">{formatPercent(r.data.rate)}</td><td>{formatDate(r.data.effective)}</td></tr>
+            <tr><th scope="row">{lbl('centralBank', r.data.bank)}</th><td>{lbl('policyRate', r.data.name)}</td><td class="num">{formatPercent(r.data.rate)}</td><td>{formatDate(r.data.effective)}</td></tr>
           {/each}
         </tbody>
       </table>

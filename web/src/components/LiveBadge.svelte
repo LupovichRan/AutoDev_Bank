@@ -1,7 +1,8 @@
 <script lang="ts">
   import { safeUrl } from '../lib/safeUrl';
   import { formatDateTime, relativeTime } from '../lib/format';
-  import { i18n, t } from '../lib/i18n.svelte';
+  import { i18n, lbl, t } from '../lib/i18n.svelte';
+  import { hasLabel } from '../lib/labels';
 
   interface Props {
     provider: string;
@@ -14,6 +15,11 @@
 
   const source = $derived(safeUrl(sourceUrl));
   const terms = $derived(safeUrl(licenseUrl));
+  // `provider` is the provider id; show its name in the UI language.
+  const name = $derived(lbl('provider', provider));
+  // A translated licence label per provider; the publisher's own wording
+  // stays available on hover and its terms link is unchanged.
+  const licenceText = $derived(license && hasLabel('licence', provider, i18n.lang) ? lbl('licence', provider) : (license ?? ''));
 
   // Re-render the relative time every minute.
   let now = $state(Date.now());
@@ -25,20 +31,20 @@
 
 <p class="badge">
   <span class="pill ok">{t('live.data')}</span>
-  <bdi>{provider}</bdi>
+  <bdi>{name}</bdi>
   <span aria-hidden="true">·</span>
   <time datetime={fetchedAt} title={formatDateTime(fetchedAt, i18n.locale)}>{t('live.fetched', { time: relativeTime(fetchedAt, now, i18n.locale) })}</time>
   {#if source}
     <span aria-hidden="true">·</span>
-    <a href={source} rel="noopener noreferrer" target="_blank">{t('live.source')}<span class="visually-hidden">{t('live.sourceFor', { provider })}</span></a>
+    <a href={source} rel="noopener noreferrer" target="_blank">{t('live.source')}<span class="visually-hidden">{t('live.sourceFor', { provider: name })}</span></a>
   {/if}
   {#if license}
     <span aria-hidden="true">·</span>
-    <span>{t('live.licence', { license })}</span>
+    <span title={licenceText !== license ? license : undefined}>{t('live.licence', { license: licenceText })}</span>
   {/if}
   {#if terms}
     <span aria-hidden="true">·</span>
-    <a href={terms} rel="noopener noreferrer" target="_blank">{t('live.terms')}<span class="visually-hidden">{t('live.termsOf', { provider })}</span></a>
+    <a href={terms} rel="noopener noreferrer" target="_blank">{t('live.terms')}<span class="visually-hidden">{t('live.termsOf', { provider: name })}</span></a>
   {/if}
 </p>
 

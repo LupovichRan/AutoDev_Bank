@@ -1,6 +1,6 @@
 <script lang="ts">
   import { NetworkError, ProblemError } from '../lib/api';
-  import { t } from '../lib/i18n.svelte';
+  import { t, tDetail } from '../lib/i18n.svelte';
   import { isKey } from '../lib/messages';
 
   interface Props {
@@ -10,8 +10,8 @@
   }
   let { error, onretry }: Props = $props();
 
-  // Server titles and details are English; known statuses and detail codes
-  // are shown in the UI language, anything else as the server sent it.
+  // Server titles and details are English; known statuses, detail codes and
+  // auth sentences are shown in the UI language, anything else as sent.
   const title = $derived.by(() => {
     if (error instanceof ProblemError) {
       const k = `problem.status.${error.status}`;
@@ -23,8 +23,7 @@
   });
   const detail = $derived.by(() => {
     if (error instanceof ProblemError) {
-      const k = `problem.detail.${error.detail}`;
-      return isKey(k) ? t(k) : error.detail;
+      return tDetail(error.detail);
     }
     if (error instanceof NetworkError) return t('problem.offlineDetail');
     return error instanceof Error ? error.message : String(error);

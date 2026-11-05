@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import {
+  ACCOUNT_NAMES,
   accountByCode,
   addPasskey,
   ALICE_ILS,
@@ -9,9 +10,10 @@ import {
   devLogin,
   enableVirtualAuthenticator,
   JOINT,
+  NAMES,
   sha256Hex,
 } from './helpers';
-import { escapeRe, L } from './i18n';
+import { escapeRe, HL, L } from './i18n';
 
 const APPROVE = new RegExp(`^${escapeRe(L('approvals.approve'))}`);
 
@@ -56,7 +58,7 @@ test('payments: step-up, maker-checker on the joint account, no self-approval', 
     expect(await balance(page.request, ALICE_ILS)).toBe(before - 5000);
 
     await page.getByRole('link', { name: L('pay.backHome') }).click();
-    await page.getByRole('button', { name: /Alice current account/ }).click();
+    await page.getByRole('button', { name: new RegExp(escapeRe(ACCOUNT_NAMES[ALICE_ILS])) }).click();
     await expect(page.getByRole('region', { name: L('home.recent') }).getByText(lunch)).toBeVisible();
   });
 
@@ -70,7 +72,7 @@ test('payments: step-up, maker-checker on the joint account, no self-approval', 
 
     await page.goto('/#/approvals');
     const item = page.getByRole('region', { name: L('approvals.mine') }).getByRole('listitem').filter({ hasText: big });
-    await expect(item.getByText(L('status.pending'), { exact: true })).toBeVisible();
+    await expect(item.getByText(HL('approvalStatus', 'pending'), { exact: true })).toBeVisible();
     await expect(item.getByRole('button', { name: APPROVE })).toHaveCount(0);
   });
 
@@ -87,7 +89,7 @@ test('payments: step-up, maker-checker on the joint account, no self-approval', 
     await page.goto('/#/approvals');
     const item = page.getByRole('region', { name: L('approvals.inbox') }).getByRole('listitem').filter({ hasText: big });
     await expect(item).toBeVisible();
-    await expect(item.getByText('Alice', { exact: true })).toBeVisible();
+    await expect(item.getByText(NAMES.alice, { exact: true })).toBeVisible();
     await item.getByRole('button', { name: new RegExp(`^${escapeRe(L('approvals.approve'))} ${big}$`) }).click();
     await expect(item.getByRole('button', { name: APPROVE })).toHaveCount(0);
   });
@@ -96,7 +98,7 @@ test('payments: step-up, maker-checker on the joint account, no self-approval', 
     await devLogin(page, 'alice');
     await page.goto('/#/approvals');
     const item = page.getByRole('region', { name: L('approvals.mine') }).getByRole('listitem').filter({ hasText: big });
-    await expect(item.getByText(L('status.executed'), { exact: true })).toBeVisible();
+    await expect(item.getByText(HL('approvalStatus', 'executed'), { exact: true })).toBeVisible();
     expect(await balance(page.request, JOINT)).toBe(jointBeforeBig - 200000);
     const mine = (await approvals(page.request)).mine.find((a) => a.subject.description === big);
     expect(mine?.status).toBe('executed');
@@ -113,7 +115,7 @@ test('payments: step-up, maker-checker on the joint account, no self-approval', 
     await page.goto('/#/approvals');
     await expect(page.getByRole('heading', { level: 1, name: L('title.approvals') })).toBeVisible();
     const mineItem = page.getByRole('region', { name: L('approvals.mine') }).getByRole('listitem').filter({ hasText: own });
-    await expect(mineItem.getByText(L('status.pending'), { exact: true })).toBeVisible();
+    await expect(mineItem.getByText(HL('approvalStatus', 'pending'), { exact: true })).toBeVisible();
     await expect(page.getByRole('listitem').filter({ hasText: own }).getByRole('button', { name: APPROVE })).toHaveCount(0);
     const inbox = (await approvals(page.request)).inbox;
     expect(inbox.some((a) => a.subject.description === own)).toBe(false);
@@ -155,9 +157,9 @@ test('payments: step-up, maker-checker on the joint account, no self-approval', 
     await expect(page.getByRole('heading', { name: L('pay.awaiting'), exact: true })).toBeVisible();
     await page.goto('/#/approvals');
     const item = page.getByRole('region', { name: L('approvals.mine') }).getByRole('listitem').filter({ hasText: oops });
-    await expect(item.getByText(L('status.pending'), { exact: true })).toBeVisible();
+    await expect(item.getByText(HL('approvalStatus', 'pending'), { exact: true })).toBeVisible();
     await item.getByRole('button', { name: new RegExp(`^${escapeRe(L('approvals.cancel'))} ${oops}$`) }).click();
-    await expect(item.getByText(L('status.rejected'), { exact: true })).toBeVisible();
+    await expect(item.getByText(HL('approvalStatus', 'rejected'), { exact: true })).toBeVisible();
     await expect(item.getByRole('button', { name: new RegExp(escapeRe(L('approvals.cancel'))) })).toHaveCount(0);
     expect(await balance(page.request, JOINT)).toBe(jointBefore);
     // Bob's inbox no longer offers it.

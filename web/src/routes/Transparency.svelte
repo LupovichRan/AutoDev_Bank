@@ -3,7 +3,7 @@
   import Problem from '../components/Problem.svelte';
   import { apiGet } from '../lib/api';
   import { formatDateTime, formatNumber, formatPercent, truncateMiddle } from '../lib/format';
-  import { t } from '../lib/i18n.svelte';
+  import { i18n, lbl, t } from '../lib/i18n.svelte';
   import { formatMinor } from '../lib/money';
   import { status } from '../lib/status.svelte';
   import type { AuditEvent, AuditVerify, FeeSchedule } from '../lib/types';
@@ -35,17 +35,22 @@
       eventsError = e;
     }
   }
-  async function loadFees() {
+  async function loadFees(lang = i18n.lang) {
     feesError = null;
     try {
-      fees = await apiGet<FeeSchedule>('/api/transparency/fees');
+      const f = await apiGet<FeeSchedule>(`/api/transparency/fees?lang=${lang}`);
+      if (lang === i18n.lang) fees = f; // a later switch wins
     } catch (e) {
       feesError = e;
     }
   }
   loadVerify();
   loadEvents();
-  loadFees();
+  // The fee rules are published in both languages: fetch the one shown,
+  // and again whenever the language changes.
+  $effect(() => {
+    loadFees(i18n.lang);
+  });
 
   async function copyHash() {
     if (!verify) return;
@@ -110,7 +115,7 @@
               <tr>
                 <td class="num">{ev.seq}</td>
                 <td><time datetime={ev.at}>{formatDateTime(ev.at)}</time></td>
-                <td>{ev.action}</td>
+                <td>{lbl('auditAction', ev.action)}</td>
                 <td class="mono"><bdi>{ev.hash_prefix}…</bdi></td>
               </tr>
             {/each}
@@ -122,7 +127,7 @@
 
   <Card title={t('tr.fees')} id="fees">
     {#if feesError}
-      <Problem error={feesError} onretry={loadFees} />
+      <Problem error={feesError} onretry={() => loadFees()} />
     {:else if fees === null}
       <p aria-busy="true">{t('tr.loadingFees')}</p>
     {:else}
@@ -138,7 +143,7 @@
             <thead><tr><th scope="col">{t('tr.rule')}</th><th scope="col">{t('tr.whatItDoes')}</th></tr></thead>
             <tbody>
               {#each fees.rules as r (r.name)}
-                <tr><th scope="row" class="mono"><bdi>{r.name}</bdi></th><td lang="en">{r.description}</td></tr>
+                <tr><th scope="row"><bdi>{r.name}</bdi></th><td lang={fees.lang}>{r.description}</td></tr>
               {/each}
             </tbody>
           </table>

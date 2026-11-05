@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { accountByCode, ALICE_ILS, apiAs, BOB_ILS } from './helpers';
+import { accountByCode, ALICE_ILS, apiAs, BOB_ILS, NAMES } from './helpers';
 import { escapeRe, L } from './i18n';
 
 // A WebView without WebAuthn (as in a test APK on http://192.168.x.x): the
@@ -16,7 +16,7 @@ test('dev-mode fallback when the browser has no PublicKeyCredential', async ({ p
   await expect(page.getByRole('button', { name: L('signin.create') })).toHaveCount(0);
   const demo = page.getByRole('region', { name: L('signin.demoTitle') });
   await demo.getByRole('button', { name: L('signin.demoAs', { who: L('signin.demo.alice') }) }).click();
-  await expect(page.getByRole('heading', { level: 1, name: L('home.hello', { name: 'Alice' }) })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: L('home.hello', { name: NAMES.alice }) })).toBeVisible();
 
   const alice = await accountByCode(page.request, ALICE_ILS);
   const before = alice.balance;

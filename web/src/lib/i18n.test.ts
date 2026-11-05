@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { currentLocale, DEFAULT_LANG, i18n, t, tValue } from './i18n.svelte';
+import { currentLocale, DEFAULT_LANG, i18n, lbl, t, tDetail } from './i18n.svelte';
 import { en, he, interpolate } from './messages';
 import { formatMinor, parseToMinor } from './money';
 
@@ -47,8 +47,21 @@ describe('t()', () => {
   });
 
   it('translates known server values and passes unknown ones through', () => {
-    expect(tValue('status', 'pending')).toBe('ממתין לאישור');
-    expect(tValue('status', 'brand_new')).toBe('brand_new');
+    expect(lbl('approvalStatus', 'pending')).toBe('ממתין');
+    expect(lbl('approvalStatus', 'brand_new')).toBe('brand_new');
+    i18n.set('en');
+    expect(lbl('approvalStatus', 'pending')).toBe('pending');
+    expect(lbl('provider', 'boi')).toBe('Bank of Israel');
+  });
+
+  it('translates problem details, codes and server sentences alike', () => {
+    expect(tDetail('insufficient_funds')).toBe('אין די יתרה זמינה לביצוע תשלום זה.');
+    expect(tDetail('handle already registered; sign in to add a passkey')).toBe(
+      'שם משתמש זה כבר רשום. יש להתחבר כדי להוסיף מפתח גישה.',
+    );
+    expect(tDetail('something new')).toBe('something new');
+    i18n.set('en');
+    expect(tDetail('self_approval')).toBe('You cannot approve a payment you started.');
   });
 });
 

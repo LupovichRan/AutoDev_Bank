@@ -3,7 +3,7 @@
   import Problem from '../../components/Problem.svelte';
   import { apiGet } from '../../lib/api';
   import { formatDate } from '../../lib/format';
-  import { i18n, t } from '../../lib/i18n.svelte';
+  import { i18n, lbl, t } from '../../lib/i18n.svelte';
   import { convertViaEur } from '../../lib/opendata';
   import type { FxData, OpenDataList, OpenDataRecord } from '../../lib/types';
   import Badges from './Badges.svelte';
@@ -90,7 +90,7 @@
         <thead><tr><th scope="col">{t('fx.colCurrency')}</th><th scope="col" class="num">{t('fx.colRate')}</th><th scope="col">{t('fx.colDate')}</th><th scope="col">{t('fx.colSource')}</th></tr></thead>
         <tbody>
           {#each eur as r (r.key)}
-            <tr><th scope="row">{r.data.quote}</th><td class="num">{fmtRate(r.data.rate)}</td><td>{formatDate(r.data.date)}</td><td>{r.data.source || r.provider}</td></tr>
+            <tr><th scope="row">{r.data.quote}</th><td class="num">{fmtRate(r.data.rate)}</td><td>{formatDate(r.data.date)}</td><td>{r.data.source ? lbl('fxSource', r.data.source) : lbl('provider', r.provider)}</td></tr>
           {/each}
         </tbody>
       </table>
@@ -103,7 +103,7 @@
           <thead><tr><th scope="col">{t('fx.colPair')}</th><th scope="col" class="num">{t('fx.colRate')}</th><th scope="col">{t('fx.colDate')}</th><th scope="col">{t('fx.colSource')}</th></tr></thead>
           <tbody>
             {#each others as r (r.key)}
-              <tr><th scope="row"><bdi>1 {r.data.base} = {r.data.quote}</bdi></th><td class="num">{fmtRate(r.data.rate)}</td><td>{formatDate(r.data.date)}</td><td>{r.data.source || r.provider}</td></tr>
+              <tr><th scope="row"><bdi>1 {r.data.base} = {r.data.quote}</bdi></th><td class="num">{fmtRate(r.data.rate)}</td><td>{formatDate(r.data.date)}</td><td>{r.data.source ? lbl('fxSource', r.data.source) : lbl('provider', r.provider)}</td></tr>
             {/each}
           </tbody>
         </table>

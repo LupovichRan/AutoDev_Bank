@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { NAMES } from './helpers';
 import { L } from './i18n';
 
 // The e2e server runs with BANK_DEV_TEST_LOGIN=1, as `./dev demo` does, so
@@ -14,6 +15,6 @@ test('demo sign-in buttons appear only with dev test login, and sign in', async 
     await expect(demo.getByRole('button', { name: L('signin.demoAs', { who: L(who) }) })).toBeVisible();
   }
   await demo.getByRole('button', { name: L('signin.demoAs', { who: L('signin.demo.carol') }) }).click();
-  await expect(page.getByRole('heading', { level: 1, name: L('home.hello', { name: 'Carol' }) })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: L('home.hello', { name: NAMES.carol }) })).toBeVisible();
   expect(await (await page.request.get('/api/me')).json()).toMatchObject({ handle: 'carol', kind: 'staff' });
 });

@@ -152,4 +152,5 @@ export interface FeeSchedule {
   currency?: string; // defaults to ILS
   income_share_percent: number;
   rules: { name: string; description: string }[];
+  lang?: 'he' | 'en'; // language of the rules (GET /api/transparency/fees?lang=)
 }

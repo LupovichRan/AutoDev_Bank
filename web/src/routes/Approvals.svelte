@@ -4,7 +4,7 @@
   import Problem from '../components/Problem.svelte';
   import { apiGet, apiPost, ProblemError } from '../lib/api';
   import { formatDateTime } from '../lib/format';
-  import { t, tValue } from '../lib/i18n.svelte';
+  import { lbl, t } from '../lib/i18n.svelte';
   import { approvePayloadHash } from '../lib/payload';
   import { status } from '../lib/status.svelte';
   import type { Approval, Me } from '../lib/types';
@@ -136,7 +136,7 @@
   <li class="item">
     <div class="top">
       <strong><Amount amount={a.amount} currency={a.currency} /></strong>
-      <span class="pill" class:warn={a.status === 'pending'} class:ok={a.status === 'executed' || a.status === 'approved'} class:bad={a.status === 'rejected'}>{tValue('status', a.status)}</span>
+      <span class="pill" class:warn={a.status === 'pending'} class:ok={a.status === 'executed' || a.status === 'approved'} class:bad={a.status === 'rejected'}>{lbl('approvalStatus', a.status)}</span>
     </div>
     <p class="desc">{a.subject.description || t('approvals.noDescription')}</p>
     <dl class="meta">

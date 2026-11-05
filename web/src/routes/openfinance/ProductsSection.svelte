@@ -3,7 +3,7 @@
   import Problem from '../../components/Problem.svelte';
   import { apiGet } from '../../lib/api';
   import { formatPercent } from '../../lib/format';
-  import { t } from '../../lib/i18n.svelte';
+  import { lbl, t } from '../../lib/i18n.svelte';
   import { safeUrl } from '../../lib/safeUrl';
   import type { OpenDataList, OpenDataRecord, ProductData } from '../../lib/types';
   import Badges from './Badges.svelte';
@@ -64,7 +64,7 @@
               <th scope="row">
                 {#if safeUrl(r.data.url)}<a href={safeUrl(r.data.url)} rel="noopener noreferrer" target="_blank">{r.data.name}</a>{:else}{r.data.name}{/if}
               </th>
-              <td>{r.data.type}</td>
+              <td>{lbl('productType', r.data.type)}</td>
               <td class="num">{formatPercent(r.data.overdraft_ear)}</td>
               <td class="num">{fee(r.data.monthly_fee)}</td>
             </tr>

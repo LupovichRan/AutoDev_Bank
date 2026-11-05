@@ -4,7 +4,7 @@
   import Problem from '../components/Problem.svelte';
   import { apiGet } from '../lib/api';
   import { formatDate } from '../lib/format';
-  import { t, tValue } from '../lib/i18n.svelte';
+  import { lbl, t } from '../lib/i18n.svelte';
   import { href } from '../lib/router';
   import type { Account, Entry, Me } from '../lib/types';
 
@@ -70,7 +70,7 @@
             onclick={() => (selectedId = a.id)}
           >
             <span class="acc-name">{a.name}</span>
-            <span class="acc-meta"><bdi class="code">{a.code}</bdi> · {tValue('kind', a.kind)}{a.holders.length > 1 ? ` · ${t('home.joint')}` : ''}</span>
+            <span class="acc-meta"><bdi class="code">{a.code}</bdi> · {lbl('accountKind', a.kind)}{a.holders.length > 1 ? ` · ${t('home.joint')}` : ''}</span>
             <Amount amount={a.balance} currency={a.currency} large />
             <span class="acc-meta">{t('home.available')} <Amount amount={a.available} currency={a.currency} /></span>
           </button>
@@ -115,7 +115,7 @@
                 </div>
                 <div class="entry-meta muted">
                   <time datetime={e.effective_date}>{formatDate(e.effective_date)}</time>
-                  {#if e.status !== 'posted'}<span class="pill warn">{tValue('status', e.status)}</span>{/if}
+                  {#if e.status !== 'posted'}<span class="pill warn">{lbl('txStatus', e.status)}</span>{/if}
                   <span>{t('home.balance')} <Amount amount={e.balance_after} currency={e.currency} /></span>
                 </div>
               </li>

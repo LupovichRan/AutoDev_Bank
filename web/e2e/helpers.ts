@@ -111,3 +111,14 @@ export async function approvals(api: APIRequestContext): Promise<{ inbox: Approv
 export const ALICE_ILS = 'cust.alice.ILS.current';
 export const JOINT = 'cust.alice-bob.ILS.joint';
 export const BOB_ILS = 'cust.bob.ILS.current';
+
+// Seeded display names and account names (internal/seed/seed.go): Hebrew,
+// while handles and account codes stay ASCII.
+export const NAMES = { alice: 'אליס', bob: 'בוב', carol: 'קרול', dave: 'דייב' } as const;
+export const ACCOUNT_NAMES = {
+  [ALICE_ILS]: 'עו״ש אליס',
+  'cust.alice.EUR.savings': 'חיסכון אליס (אירו)',
+  [JOINT]: 'חשבון משותף אליס ובוב',
+  [BOB_ILS]: 'עו״ש בוב',
+} as const;
+export const OPENING_BALANCE = 'יתרת פתיחה';

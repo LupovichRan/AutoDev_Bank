@@ -1,5 +1,6 @@
 // In-house i18n: Hebrew first (right to left), English second. No library.
 // `t()` reads the reactive `i18n.lang`, so templates re-render on a switch.
+import { detailCode, labelFor, type LabelKind } from './labels';
 import { DICTS, en, he, isKey, localeFor, translate, type Key, type Lang, type Params } from './messages';
 
 export { en, he, type Key, type Lang, type Params };
@@ -49,10 +50,15 @@ export function t(key: Key, params?: Params): string {
   return translate(DICTS[i18n.lang], key, params);
 }
 
-/** Translate a server value (status, kind) under `prefix.`; unknown values show as sent. */
-export function tValue(prefix: string, value: string): string {
-  const k = `${prefix}.${value}`;
-  return isKey(k) ? t(k) : value;
+/** Display name of a server value (status, kind, provider…) in the UI language; unknown values show as sent. */
+export function lbl(kind: LabelKind, value: string | null | undefined): string {
+  return labelFor(kind, value, i18n.lang);
+}
+
+/** A problem detail (code or server sentence) in the UI language; unknown details show as sent. */
+export function tDetail(detail: string): string {
+  const k = `problem.detail.${detailCode(detail)}`;
+  return isKey(k) ? t(k) : detail;
 }
 
 /** Locale for Intl formatting of the current language ("he-IL" or "en"). */

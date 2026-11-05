@@ -2,7 +2,7 @@
   import Card from '../../components/Card.svelte';
   import { apiGet } from '../../lib/api';
   import { relativeTime } from '../../lib/format';
-  import { t } from '../../lib/i18n.svelte';
+  import { lbl, t } from '../../lib/i18n.svelte';
   import type { ProviderStatus } from '../../lib/types';
 
   let providers = $state<ProviderStatus[] | null>(null);
@@ -23,7 +23,7 @@
       {#each providers as p (p.provider + p.kind)}
         <li class="row">
           <span class="pill" class:ok={p.ok} class:bad={!p.ok}>{p.ok ? t('health.ok') : t('health.failing')}</span>
-          <span><strong><bdi>{p.provider}</bdi></strong> <span class="muted">(<bdi>{p.kind}</bdi>)</span></span>
+          <span><strong><bdi>{lbl('provider', p.provider)}</bdi></strong> <span class="muted">(<bdi>{lbl('dataKind', p.kind)}</bdi>)</span></span>
           <span class="muted">{t('health.last', { time: relativeTime(p.fetched_at) })}{p.duration_ms ? `, ${p.duration_ms} ms` : ''}</span>
           {#if !p.ok && p.error}<span class="bad" lang="en" dir="ltr">{p.error}</span>{/if}
         </li>
